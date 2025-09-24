@@ -307,7 +307,7 @@
                     carouselDiv.className = 'service-carousel';
                     let slidesHTML = '';
                     servicesByCategory[category].forEach(service => {
-                        const imageUrl = service.imageUrl ? service.imageUrl : `https://via.placeholder.com/320x200/eee/999?text=${encodeURIComponent(service.name)}`;
+                        const imageUrl = service.imageurl ? service.imageurl : `https://via.placeholder.com/320x200/eee/999?text=${encodeURIComponent(service.name)}`;
                         const descriptionText = service.description || `Provided by ${service.performer}`;
                         slidesHTML += `<div class="slide" data-service-name="${service.name}" data-service-category="${service.category}"><img src="${imageUrl}" alt="${service.name}"><h3>${service.name}</h3><p>${descriptionText}</p></div>`;
                     });
