@@ -6,16 +6,11 @@
     <title>Aesthetics & Wellness Lounge</title>
     <meta name="description" content="Aesthetics — curated skincare, advanced treatments and restorative wellness in a boutique lounge." />
     <meta name="theme-color" content="#FBFAF8">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     <script src="https://js.stripe.com/v3/"></script>
-  
     <style>
-        :root {
-            --bg: #FBFAF8; --text: #111114; --muted: #7B7B80; --surface: #FFFFFF; --gold: #d4af37; --gold-2: #B78E46; --blue: #0f6b86; --radius: 14px; --container: 1200px; --ease: cubic-bezier(.2, .9, .3, 1);
-        }
+        :root { --bg: #FBFAF8; --text: #111114; --muted: #7B7B80; --surface: #FFFFFF; --gold: #d4af37; --gold-2: #B78E46; --blue: #0f6b86; --radius: 14px; --container: 1200px; --ease: cubic-bezier(.2, .9, .3, 1); }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: "Inter", system-ui, sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; line-height: 1.6; }
@@ -77,8 +72,6 @@
         #stripe-modal .modal-content { max-width: 420px; }
         #card-element { border: 1px solid #ddd; padding: 12px; border-radius: 6px; margin: 15px 0; }
         #card-errors { color: #b00020; margin-top: 8px; min-height: 18px; font-size: 14px; }
-        
-        /* About Us Modal Styles */
         #aboutModal .modal-content { max-width: 80%; }
         .team-photo { width: 100%; max-width: 500px; display: block; margin: 20px auto; border-radius: var(--radius); box-shadow: 0 8px 26px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.04); }
         .team-container { display: flex; gap: 25px; justify-content: space-around; flex-wrap: wrap; margin-top: 10px; }
@@ -92,9 +85,8 @@
         .team-member hr { border: none; border-top: 1px solid #eee; margin: 15px 0; }
         .team-member h5 { font-family: "Playfair Display", serif; margin-bottom: 8px; color: var(--text); font-size: 16px; text-align: center; }
         .team-member .bio { font-size: 14px; text-align: left; line-height: 1.5; color: var(--muted); }
-
         footer { margin-top: 36px; padding: 28px 0; border-top: 1px solid rgba(16, 18, 20, 0.03); color: var(--muted); text-align: center; }
-        @media (max-width: 768px) { .wrap { padding: 18px; } header { flex-wrap: wrap; justify-content: center; } .hero-photo { height: 420px; } }
+        @media (max-width: 768px) { .wrap { padding: 18px; } header { flex-wrap: wrap; justify-content: center; } .hero-photo { height: 420px; } .team-member-header { flex-direction: column; } .team-member-info { text-align: center; } }
         @media (prefers-reduced-motion: reduce) { .blob, .hero-photo, .carousel, .slide { transition: none !important; animation: none !important; } }
     </style>
 </head>
@@ -140,14 +132,14 @@
             </div>
         </section>
 
-<section id="social" style="padding-top: 100px; margin-top: -60px;">
-    <h3 class="section-title">Connect With Us</h3>
-    <div style="margin-top:20px; display:flex; justify-content:center; gap:28px; font-size:32px;">
-        <a href="https://www.facebook.com/awl.jm2" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:#1877F2;"><i class="fab fa-facebook"></i></a>
-        <a href="https://www.instagram.com/aw.lounge" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:#E4405F;"><i class="fab fa-instagram"></i></a>
-        <a href="mailto:awl.jm2@gmail.com" aria-label="Email" style="color:#333;"><i class="fas fa-envelope"></i></a>
-    </div>
-</section>
+        <section id="social" style="padding-top: 100px; margin-top: -60px;">
+            <h3 class="section-title">Connect With Us</h3>
+            <div style="margin-top:20px; display:flex; justify-content:center; gap:28px; font-size:32px;">
+                <a href="https://www.facebook.com/awl.jm2" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:#1877F2;"><i class="fab fa-facebook"></i></a>
+                <a href="https://www.instagram.com/aw.lounge" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:#E4405F;"><i class="fab fa-instagram"></i></a>
+                <a href="mailto:awl.jm2@gmail.com" aria-label="Email" style="color:#333;"><i class="fas fa-envelope"></i></a>
+            </div>
+        </section>
     </div>
 
     <div id="bookingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
@@ -194,15 +186,15 @@
         </div>
     </div>
 
-        <div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle">
+    <div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle">
         <div class="modal-content">
             <button class="closeBtn" aria-label="Close about modal">×</button>
             <h2 id="aboutModalTitle" class="section-title">Meet Our Team</h2>
-            <img src="awl_team.webp" alt="Aesthetics & Wellness Lounge Team" class="team-photo">
+            <img src="https://via.placeholder.com/800x400/eeeeee/cccccc?text=Our+Team+Photo" alt="Aesthetics & Wellness Lounge Team" class="team-photo">
             <div class="team-container">
                 <div class="team-member">
                     <div class="team-member-header">
-                        <img src="awl_jessa.webp" alt="Jessa Cordezar">
+                        <img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=J" alt="Jessa Cordezar">
                         <div class="team-member-info">
                             <h3>Jessa Cordezar</h3>
                             <h4>Co-Owner/Manager</h4>
@@ -210,11 +202,12 @@
                         </div>
                     </div>
                     <hr>
+                    <h5>About me</h5>
                     <p class="bio">Born in the Philippines and now living in Woodstock for over 10 years. Proud mom with a lifelong passion for helping others feel their best. Specializes in Indian Head Massage, Hand Reflexology, and Foot Reflexology. Passion for massage started as a child, helping my mom and relatives relieve pain and tension, sparking a deep love for healing touch. Dedicated to providing treatments that leave clients feeling relaxed, renewed, and truly cared for.</p>
                 </div>
                 <div class="team-member">
                     <div class="team-member-header">
-                        <img src="awl_maricel.webp" alt="Maricel Tamburri">
+                        <img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=M" alt="Maricel Tamburri">
                         <div class="team-member-info">
                             <h3>Maricel Tamburri</h3>
                             <h4>Co-Owner/Manager</h4>
@@ -222,11 +215,12 @@
                         </div>
                     </div>
                     <hr>
+                    <h5>About me</h5>
                     <p class="bio">I was born and raised in Etobicoke, ON. My family has been in Woodstock since 1996. I am a proud Canadian-Filipina. A wife and mother to 2 great kids. I have been a licensed Registered Practical Nurse since 2012. I’ve had a great sense of accomplishment helping others during my nursing career. Now, I am pursuing my passion to help women from all walks of life. For our clients coming to our 'Beauty Sanctuary', we want them to feel at ease and to be themselves when they come in and when they leave our spa. During your service with me; I take pride in taking my time to assess your skin and facial features, to really understand your needs and preferences. That way you can have the best outcome possible when you leave our lounge.</p>
                 </div>
                 <div class="team-member">
                     <div class="team-member-header">
-                        <img src="awl_trechan.webp" alt="Trechan Legria">
+                        <img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=T" alt="Trechan Legria">
                         <div class="team-member-info">
                             <h3>Trechan Legria</h3>
                             <h4>Co-Owner/Manager</h4>
@@ -234,6 +228,7 @@
                         </div>
                     </div>
                     <hr>
+                    <h5>About me</h5>
                     <p class="bio">Born in the Philippines, my family and I have been in Woodstock since 2000. Mother of two boys. Experienced aesthetician with 10+ years of client services. Passionate about enhancing one's beauty. As well as bringing confidence and self-love to my clients. Background in healthcare for a well-rounded, and holistic approach to beauty and wellness.</p>
                 </div>
             </div>
@@ -260,13 +255,25 @@
             };
             const SLIDE_INTERVAL = 4000;
             const USER_PAUSE_INTERVAL = 15000;
-
             const bookingModal = document.getElementById('bookingModal');
             const aboutModal = document.getElementById('aboutModal');
+            const allModals = document.querySelectorAll('.modal');
             const openBookingLink = document.getElementById('openBookingLink');
             const navAbout = document.getElementById('navAbout');
+            const categorySelect = document.getElementById('serviceCategorySelect');
+            const serviceSelect = document.getElementById('serviceSelect');
+            const performerSelect = document.getElementById('performerSelect');
+            const nameInput = document.getElementById('nameInput');
+            const phoneInput = document.getElementById('phoneInput');
+            const emailInput = document.getElementById('emailInput');
+            const calendarEl = document.getElementById('calendar');
+            const monthYearEl = document.getElementById('monthYear');
+            const prevMonthBtn = document.getElementById('prevMonth');
+            const nextMonthBtn = document.getElementById('nextMonth');
+            const timeSlotsEl = document.getElementById('timeSlots');
+            const nextBtn = document.getElementById('nextBtn');
+            let selectedDate = null, selectedSlot = null, currentDate = new Date();
 
-            // --- DYNAMIC CONTENT ---
             function populateCarouselsAndButtons(services) {
                 const carouselContainer = document.getElementById('carousel-container');
                 const buttonsContainer = document.querySelector('.service-buttons');
@@ -286,7 +293,7 @@
                     carouselDiv.className = 'service-carousel';
                     let slidesHTML = '';
                     servicesByCategory[category].forEach(service => {
-                        const imageUrl = service.imageUrl ? `${BASE_URL}/${service.imageUrl}` : `https://via.placeholder.com/320x200/eee/999?text=${encodeURIComponent(service.name)}`;
+                        const imageUrl = service.imageUrl ? service.imageUrl : `https://via.placeholder.com/320x200/eee/999?text=${encodeURIComponent(service.name)}`;
                         const descriptionText = service.description || `Provided by ${service.performer}`;
                         slidesHTML += `<div class="slide" data-service-name="${service.name}" data-service-category="${service.category}"><img src="${imageUrl}" alt="${service.name}"><h3>${service.name}</h3><p>${descriptionText}</p></div>`;
                     });
@@ -299,7 +306,6 @@
 
             function populateCategoryDropdown(services) {
                 const uniqueCategories = [...new Set(services.map(s => s.category))];
-                const categorySelect = document.getElementById('serviceCategorySelect');
                 while (categorySelect.options.length > 1) { categorySelect.remove(1); }
                 uniqueCategories.forEach(category => {
                     const option = document.createElement('option');
@@ -309,7 +315,6 @@
                 });
             }
 
-            // --- CAROUSEL LOGIC ---
             function showCarousel(sectionId) {
                 document.querySelectorAll('.service-buttons button').forEach(b => b.classList.toggle('active', b.dataset.section === sectionId));
                 document.querySelectorAll('.service-carousel').forEach(c => c.classList.toggle('active', c.id === sectionId + '-carousel'));
@@ -390,27 +395,10 @@
                 });
             }
             
-            // --- UI & NAVIGATION ---
             if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) { const frame = document.querySelector('.hero-frame'); if(frame) { const blob = frame.querySelector('.blob'); const photo = frame.querySelector('#heroPhoto'); if (blob && photo) { frame.addEventListener('pointermove', ev => { const r = frame.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width - 0.5; const y = (ev.clientY - r.top) / r.height - 0.5; blob.style.transform = `translate(${x * 8}%, ${y * -8}%) rotate(8deg)`; photo.style.transform = `scale(1.02) translate(${x * -4}px, ${y * -6}px)`; }); frame.addEventListener('pointerleave', () => { blob.style.transform = 'translate(12%, -12%) rotate(12deg)'; photo.style.transform = ''; }); } } }
             document.getElementById('navServices').addEventListener('click', function(e) { e.preventDefault(); const header = document.querySelector('header'); const target = document.getElementById('services'); const headerHeight = header ? header.offsetHeight + 18 : 70; const targetPosition = target ? target.offsetTop : 0; window.scrollTo({ top: targetPosition - headerHeight, behavior: 'smooth' }); });
             document.querySelectorAll('a[href^="#"]:not(#navServices)').forEach(anchor => { anchor.addEventListener('click', function (e) { if (this.id === 'openBookingLink' || this.id === 'navAbout') return; const href = this.getAttribute('href'); if (href === "#") return; const targetEl = document.querySelector(href); if (targetEl) { e.preventDefault(); targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }); });
             
-            // --- MODAL LOGIC ---
-            const allModals = document.querySelectorAll('.modal');
-            const categorySelect = document.getElementById('serviceCategorySelect');
-            const serviceSelect = document.getElementById('serviceSelect');
-            const performerSelect = document.getElementById('performerSelect');
-            const nameInput = document.getElementById('nameInput');
-            const phoneInput = document.getElementById('phoneInput');
-            const emailInput = document.getElementById('emailInput');
-            const calendarEl = document.getElementById('calendar');
-            const monthYearEl = document.getElementById('monthYear');
-            const prevMonthBtn = document.getElementById('prevMonth');
-            const nextMonthBtn = document.getElementById('nextMonth');
-            const timeSlotsEl = document.getElementById('timeSlots');
-            const nextBtn = document.getElementById('nextBtn');
-            let selectedDate = null, selectedSlot = null, currentDate = new Date();
-
             openBookingLink.addEventListener('click', e => { e.preventDefault(); bookingModal.style.display = 'flex'; resetBookingForm(); currentDate = new Date(); currentDate.setDate(1); renderCalendar(currentDate); autoSelectToday(); });
             navAbout.addEventListener('click', e => { e.preventDefault(); aboutModal.style.display = 'flex'; });
 
@@ -494,7 +482,8 @@
                     startAutoRotation();
                 } catch (error) {
                     console.error("Initialization failed:", error);
-                    document.getElementById('services').innerHTML = `<p style="text-align:center; color: red;">Could not load services.</p>`;
+                    const servicesSection = document.getElementById('services');
+                    if (servicesSection) servicesSection.innerHTML = `<p style="text-align:center; color: red;">Could not load services.</p>`;
                 }
             }
             

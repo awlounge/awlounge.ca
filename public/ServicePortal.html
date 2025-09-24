@@ -73,7 +73,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const BASE_URL = ''; // This should be empty for live deployment
+        const BASE_URL = '';
         let token = localStorage.getItem('token');
         let username = localStorage.getItem('username');
         let role = localStorage.getItem('role');
@@ -143,7 +143,7 @@
             tbody.innerHTML = "";
             data.forEach(s => {
                 const tr = document.createElement("tr");
-                const imageCell = s.imageUrl ? `<img src="${BASE_URL}/${s.imageUrl}" alt="${s.name}" class="image-preview">` : 'No Image';
+                const imageCell = s.imageUrl ? `<img src="${s.imageUrl}" alt="${s.name}" class="image-preview">` : 'No Image';
                 tr.innerHTML = `
                     <td>${imageCell}</td>
                     <td>${s.name}</td>

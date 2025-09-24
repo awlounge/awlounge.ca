@@ -10,8 +10,28 @@ import Stripe from "stripe";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 import pg from "pg";
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
 dotenv.config();
+
+// --- Cloudinary Configuration ---
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'awl_services',
+        format: async (req, file) => 'jpg',
+        public_id: (req, file) => Date.now().toString(),
+    },
+});
+
+const upload = multer({ storage: storage });
 
 // --- PostgreSQL Database Setup ---
 const { Pool } = pg;
@@ -76,11 +96,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'public/images'),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
-});
-const upload = multer({ storage: storage });
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
@@ -181,7 +196,7 @@ app.get("/services", authenticate, async (req, res) => {
 
 app.post("/services", authenticate, upload.single('image'), async (req, res) => {
     const { name, performer, duration, price, category, description } = req.body;
-    const imageUrl = req.file ? `images/${req.file.filename}` : null;
+    const imageUrl = req.file ? req.file.path : null;
     try {
         const result = await pool.query(
             "INSERT INTO services (name, performer, duration, price, category, imageUrl, description) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
@@ -199,7 +214,7 @@ app.post("/services", authenticate, upload.single('image'), async (req, res) => 
 app.put("/services/:id", authenticate, upload.single('image'), async (req, res) => {
     const { id } = req.params;
     const { name, performer, duration, price, category, description, existingImageUrl } = req.body;
-    let imageUrl = req.file ? `images/${req.file.filename}` : existingImageUrl;
+    let imageUrl = req.file ? req.file.path : existingImageUrl;
     try {
         await pool.query(
             "UPDATE services SET name = $1, performer = $2, duration = $3, price = $4, category = $5, imageUrl = $6, description = $7 WHERE id = $8",
@@ -326,5 +341,5 @@ app.post("/book/:calendarId", async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
