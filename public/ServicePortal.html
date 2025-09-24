@@ -1,100 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Service Manager</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6f8; }
-    h1, h2 { color: #333; }
-    form { display: flex; flex-direction: column; gap: 10px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    input, select, button, textarea { padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; }
-    textarea { width: 100%; min-height: 60px; font-family: Arial, sans-serif; }
-    button { background-color: #007BFF; color: #fff; border: none; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); table-layout: fixed; }
-    th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; word-wrap: break-word; }
-    th { background: #007BFF; color: #fff; }
-    td button { background-color: #dc3545; margin-right: 5px; }
-    td button.edit { background-color: #28a745; }
-    .image-preview { max-width: 50px; max-height: 50px; }
-    th:last-child, td:last-child { width: 130px; text-align: center; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Service Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6f8; }
+        h1, h2 { color: #333; }
+        form { display: flex; flex-direction: column; gap: 10px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        input, select, button, textarea { padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; }
+        textarea { width: 100%; min-height: 60px; font-family: Arial, sans-serif; }
+        button { background-color: #007BFF; color: #fff; border: none; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); table-layout: fixed; }
+        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; word-wrap: break-word; }
+        th { background: #007BFF; color: #fff; }
+        td button { background-color: #dc3545; margin-right: 5px; }
+        td button.edit { background-color: #28a745; }
+        .image-preview { max-width: 50px; max-height: 50px; }
+        th:last-child, td:last-child { width: 130px; text-align: center; }
+    </style>
 </head>
 <body>
-  <div id="loginDiv">
-    <h2>Login</h2>
-    <input type="text" id="loginUser" placeholder="Username" required>
-    <input type="password" id="loginPass" placeholder="Password" required>
-    <button id="loginBtn">Login</button>
-  </div>
-  <div id="adminDiv" style="display:none;">
-    <p>Logged in as <span id="loggedInUser"></span> (<span id="userRole"></span>) <button id="logoutBtn" style="background-color: #6c757d;">Logout</button></p>
-    <h1>Manage Your Services</h1>
-    <form id="serviceForm">
-      <input type="hidden" id="serviceId" name="id">
-      <input type="hidden" id="existingImageUrl" name="existingImageUrl">
-      <div class="form-row">
-          <select id="category" name="category" required>
-              <option value="">Category</option>
-              <option value="relaxation">Relaxation</option>
-              <option value="beauty">Beauty</option>
-              <option value="aesthetics">Aesthetics</option>
-              <option value="hairtreatment">Hair Treatment</option>
-              <option value="photography">Photography</option>
-              <option value="rejuvenate">Rejuvenate</option>
-          </select>
-          <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
-          <select id="performer" name="performer" required></select>
-          <input type="number" id="duration" name="duration" placeholder="Duration (min)" required>
-          <input type="number" id="price" name="price" placeholder="Price (cents)" required>
-          <input type="file" id="image" name="image" accept="image/*">
-      </div>
-      <textarea id="description" name="description" placeholder="Enter service description here..."></textarea>
-      <div class="form-row">
-          <button type="submit">Save Service</button>
-      </div>
-    </form>
-    <table id="servicesTable">
-      <thead>
-        <tr>
-          <th>Image</th><th>Name</th><th>Description</th><th>Provider</th><th>Duration</th><th>Price</th><th>Actions</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+    <div id="loginDiv">
+        <h2>Login</h2>
+        <input type="text" id="loginUser" placeholder="Username" required>
+        <input type="password" id="loginPass" placeholder="Password" required>
+        <button id="loginBtn">Login</button>
+    </div>
+
+    <div id="adminDiv" style="display:none;">
+        <p>Logged in as <span id="loggedInUser"></span> (<span id="userRole"></span>) <button id="logoutBtn" style="background-color: #6c757d;">Logout</button></p>
+        <h1>Manage Your Services</h1>
+        <form id="serviceForm">
+            <input type="hidden" id="serviceId" name="id">
+            <input type="hidden" id="existingImageUrl" name="existingImageUrl">
+            <div class="form-row">
+                <select id="category" name="category" required>
+                    <option value="">Category</option>
+                    <option value="relaxation">Relaxation</option>
+                    <option value="beauty">Beauty</option>
+                    <option value="aesthetics">Aesthetics</option>
+                    <option value="hairtreatment">Hair Treatment</option>
+                    <option value="photography">Photography</option>
+                    <option value="rejuvenate">Rejuvenate</option>
+                </select>
+                <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
+                <select id="performer" name="performer" required></select>
+                <input type="number" id="duration" name="duration" placeholder="Duration (min)" required>
+                <input type="number" id="price" name="price" placeholder="Price (cents)" required>
+                <input type="file" id="image" name="image" accept="image/*">
+            </div>
+            <textarea id="description" name="description" placeholder="Enter service description here..."></textarea>
+            <div class="form-row">
+                <button type="submit">Save Service</button>
+            </div>
+        </form>
+        <table id="servicesTable">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Provider</th>
+                    <th>Duration</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // All variables and setup functions are the same
+        const BASE_URL = ''; // This should be empty for live deployment
         let token = localStorage.getItem('token');
         let username = localStorage.getItem('username');
         let role = localStorage.getItem('role');
+
         const loginDiv = document.getElementById('loginDiv');
         const adminDiv = document.getElementById('adminDiv');
 
-        function showAdminPortal() { /* ... unchanged ... */ }
-        if (token && username && role) { showAdminPortal(); }
-        document.getElementById("loginBtn").onclick = async () => { /* ... unchanged ... */ };
-        document.getElementById("logoutBtn").onclick = () => { /* ... unchanged ... */ };
-        function populatePerformers() { /* ... unchanged ... */ }
-        async function loadServices() { /* ... unchanged ... */ }
+        function showAdminPortal() {
+            document.getElementById("loggedInUser").innerText = username;
+            document.getElementById("userRole").innerText = role;
+            loginDiv.style.display = "none";
+            adminDiv.style.display = "block";
+            populatePerformers();
+            loadServices();
+        }
+
+        if (token && username && role) {
+            showAdminPortal();
+        }
+
+        document.getElementById("loginBtn").onclick = async () => {
+            const user = document.getElementById("loginUser").value;
+            const pass = document.getElementById("loginPass").value;
+            const res = await fetch(`${BASE_URL}/admin/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+            const data = await res.json();
+            if (data.success) {
+                token = data.token;
+                username = data.username;
+                role = data.role;
+                localStorage.setItem("token", token);
+                localStorage.setItem("username", username);
+                localStorage.setItem("role", role);
+                showAdminPortal();
+            } else {
+                alert(data.error);
+            }
+        };
+
+        document.getElementById("logoutBtn").onclick = () => {
+            localStorage.clear();
+            window.location.reload();
+        };
+
+        function populatePerformers() {
+            const performerSelect = document.getElementById("performer");
+            const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"];
+            performerSelect.innerHTML = "";
+            allPerformers.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p;
+                option.text = p;
+                performerSelect.appendChild(option);
+            });
+        }
+
+        async function loadServices() {
+            if (!token) return;
+            const res = await fetch(`${BASE_URL}/services`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const data = await res.json();
+            const tbody = document.querySelector("#servicesTable tbody");
+            tbody.innerHTML = "";
+            data.forEach(s => {
+                const tr = document.createElement("tr");
+                const imageCell = s.imageUrl ? `<img src="${BASE_URL}/${s.imageUrl}" alt="${s.name}" class="image-preview">` : 'No Image';
+                tr.innerHTML = `
+                    <td>${imageCell}</td>
+                    <td>${s.name}</td>
+                    <td>${s.description || ''}</td>
+                    <td>${s.performer}</td>
+                    <td>${s.duration} min</td>
+                    <td>$${(s.price / 100).toFixed(2)}</td>
+                    <td>
+                        <button class="edit" onclick='editService(${JSON.stringify(s)})'>Edit</button>
+                        <button onclick="deleteService(${s.id})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
         document.getElementById("serviceForm").onsubmit = async e => {
             e.preventDefault();
             const form = e.target;
             const id = form.serviceId.value;
             const formData = new FormData(form);
-            const url = id ? `http://localhost:3000/services/${id}` : "http://localhost:3000/services";
+            
+            const url = id ? `${BASE_URL}/services/${id}` : `${BASE_URL}/services`;
             const method = id ? "PUT" : "POST";
-            const res = await fetch(url, { method, headers: { "Authorization": `Bearer ${token}` }, body: formData });
+
+            const res = await fetch(url, {
+                method: method,
+                headers: { "Authorization": `Bearer ${token}` },
+                body: formData,
+            });
 
             if (res.ok) {
                 form.reset();
                 document.getElementById('serviceId').value = '';
                 document.getElementById('existingImageUrl').value = '';
                 loadServices();
-                // **THE FIX**: Send signal that services have been updated
                 localStorage.setItem('servicesUpdated', Date.now());
             } else {
                 alert('Failed to save service.');
@@ -103,23 +188,26 @@
 
         window.deleteService = async function(id) {
             if (!confirm("Are you sure?")) return;
-            const res = await fetch(`http://localhost:3000/services/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
+            const res = await fetch(`${BASE_URL}/services/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
             if (res.ok) {
                 loadServices();
-                // **THE FIX**: Send signal that services have been updated
                 localStorage.setItem('servicesUpdated', Date.now());
             }
         };
 
-        window.editService = function(service) { /* ... unchanged ... */ };
-        
-        // --- Full, unchanged functions for brevity ---
-        function showAdminPortal() { document.getElementById("loggedInUser").innerText = username; document.getElementById("userRole").innerText = role; loginDiv.style.display = "none"; adminDiv.style.display = "block"; populatePerformers(); loadServices(); }
-        document.getElementById("loginBtn").onclick = async () => { const user = document.getElementById("loginUser").value; const pass = document.getElementById("loginPass").value; const res = await fetch("http://localhost:3000/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: user, password: pass }) }); const data = await res.json(); if (data.success) { token = data.token; username = data.username; role = data.role; localStorage.setItem("token", token); localStorage.setItem("username", username); localStorage.setItem("role", role); showAdminPortal(); } else { alert(data.error); } };
-        document.getElementById("logoutBtn").onclick = () => { localStorage.clear(); window.location.reload(); };
-        function populatePerformers() { const performerSelect = document.getElementById("performer"); const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"]; performerSelect.innerHTML = ""; allPerformers.forEach(p => { const option = document.createElement("option"); option.value = p; option.text = p; performerSelect.appendChild(option); }); }
-        async function loadServices() { if (!token) return; const res = await fetch("http://localhost:3000/services", { headers: { "Authorization": `Bearer ${token}` } }); const data = await res.json(); const tbody = document.querySelector("#servicesTable tbody"); tbody.innerHTML = ""; data.forEach(s => { const tr = document.createElement("tr"); const imageCell = s.imageUrl ? `<img src="http://localhost:3000/${s.imageUrl}" alt="${s.name}" class="image-preview">` : 'No Image'; tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button onclick="deleteService(${s.id})">Delete</button></td>`; tbody.appendChild(tr); }); }
-        window.editService = function(service) { document.getElementById("serviceId").value = service.id; document.getElementById("category").value = service.category; document.getElementById("name").value = service.name; document.getElementById("performer").value = service.performer; document.getElementById("duration").value = service.duration; document.getElementById("price").value = service.price; document.getElementById("existingImageUrl").value = service.imageUrl || ''; document.getElementById("description").value = service.description || ''; }
+        window.editService = function(service) {
+            document.getElementById("serviceId").value = service.id;
+            document.getElementById("category").value = service.category;
+            document.getElementById("name").value = service.name;
+            document.getElementById("performer").value = service.performer;
+            document.getElementById("duration").value = service.duration;
+            document.getElementById("price").value = service.price;
+            document.getElementById("existingImageUrl").value = service.imageUrl || '';
+            document.getElementById("description").value = service.description || '';
+        }
     });
 </script>
 </body>
