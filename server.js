@@ -201,6 +201,13 @@ app.get("/services", authenticate, async (req, res) => {
 app.post("/services", authenticate, upload.single('image'), async (req, res) => {
     const { name, performer, duration, price, category, description } = req.body;
     const imageUrl = req.file ? req.file.path : null;
+
+    // DEBUGGING LINES ADDED HERE
+    console.log("Cloudinary file object received:", req.file);
+    const imageUrl = req.file ? req.file.path : null;
+    console.log("Attempting to save this URL to database:", imageUrl);
+
+    
     try {
         const result = await pool.query(
             "INSERT INTO services (name, performer, duration, price, category, imageUrl, description) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
@@ -219,6 +226,12 @@ app.put("/services/:id", authenticate, upload.single('image'), async (req, res) 
     const { id } = req.params;
     const { name, performer, duration, price, category, description, existingImageUrl } = req.body;
     let imageUrl = req.file ? req.file.path : existingImageUrl;
+    
+    // DEBUGGING LINES ADDED HERE
+    console.log("Cloudinary file object received (for update):", req.file);
+    let imageUrl = req.file ? req.file.path : existingImageUrl;
+    console.log("Attempting to save this URL to database (for update):", imageUrl);
+    
     try {
         await pool.query(
             "UPDATE services SET name = $1, performer = $2, duration = $3, price = $4, category = $5, imageUrl = $6, description = $7 WHERE id = $8",
