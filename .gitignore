@@ -1,0 +1,8 @@
+# Dependencies
+node_modules
+
+# Environment Variables File
+.env
+
+# Local Database File (no longer needed)
+services.db

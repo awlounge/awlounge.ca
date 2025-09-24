@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Appointment Scheduler - Availability View</title>
+  <style>
+    .slot {
+      padding: 8px 12px;
+      margin: 4px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .slot.busy {
+      background: #f88;
+      cursor: not-allowed;
+      text-decoration: line-through;
+      color: #900;
+    }
+    .slot.selected {
+      background: #4caf50;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Select Date and Time Slot</h1>
+
+  <label>Select calendar:</label>
+  <select id="calendarSelect">
+    <option value="mark.adam.grabowski@gmail.com">Mark Cal</option>
+    <option value="calendar2@gmail.com">Calendar 2</option>
+    <option value="calendar3@gmail.com">Calendar 3</option>
+  </select>
+
+  <br><br>
+  <label>Select date:</label>
+  <input type="date" id="datePicker" />
+
+  <h3>Available Time Slots</h3>
+  <div id="slotsContainer"></div>
+
+  <h3>Selected Slot</h3>
+  <div>
+    Start: <input type="datetime-local" id="startTime" />
+    End: <input type="datetime-local" id="endTime" />
+  </div>
+
+  <br>
+  <label>Appointment details:</label><br/>
+  <input type="text" id="summary" placeholder="Title" />
+  <br><br>
+  <textarea id="description" placeholder="Description (optional)"></textarea>
+  <br><br>
+  <button id="bookBtn" onclick="bookAppointment()">Book Appointment</button>
+
+  <p id="result"></p>
+
+<script>
+  const slotsContainer = document.getElementById('slotsContainer');
+  let selectedSlotIndex = null;
+  const slotDurationMinutes = 30; // length of each slot
+
+  document.getElementById('datePicker').addEventListener('change', loadAvailability);
+  document.getElementById('calendarSelect').addEventListener('change', loadAvailability);
+
+  async function loadAvailability() {
+    const calendarId = document.getElementById('calendarSelect').value;
+    const dateStr = document.getElementById('datePicker').value;
+    slotsContainer.innerHTML = '';
+    selectedSlotIndex = null;
+    if (!dateStr) return;
+
+    // Construct start and end ISO strings for the day
+    const dayStart = new Date(dateStr + 'T00:00:00');
+    const dayEnd = new Date(dateStr + 'T23:59:59');
+
+    // Call your backend freebusy endpoint
+    const timeMin = dayStart.toISOString();
+    const timeMax = dayEnd.toISOString();
+
+    try {
+      const response = await fetch(`/freebusy/${encodeURIComponent(calendarId)}?timeMin=${timeMin}&timeMax=${timeMax}`);
+      if (!response.ok) throw new Error('Failed to fetch availability');
+      const data = await response.json();
+
+      const busyTimes = data.calendars[calendarId]?.busy || [];
+
+      // Generate slots from 9:00 to 17:00 (business hours)
+      const slots = [];
+      let slotStart = new Date(dayStart);
+      slotStart.setHours(9, 0, 0, 0);
+      const dayEndBusiness = new Date(dayStart);
+      dayEndBusiness.setHours(17, 0, 0, 0);
+
+      while (slotStart < dayEndBusiness) {
+        const slotEnd = new Date(slotStart.getTime() + slotDurationMinutes * 60000);
+
+        // Check if slot overlaps with busy times
+        const isBusy = busyTimes.some(busy => {
+          const busyStart = new Date(busy.start);
+          const busyEnd = new Date(busy.end);
+          return slotStart < busyEnd && slotEnd > busyStart;
+        });
+
+        slots.push({ start: new Date(slotStart), end: slotEnd, busy: isBusy });
+
+        slotStart = slotEnd;
+      }
+
+      // Render slots
+      slots.forEach((slot, i) => {
+        const div = document.createElement('div');
+        div.textContent = slot.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        div.className = 'slot' + (slot.busy ? ' busy' : '');
+        if (!slot.busy) {
+          div.addEventListener('click', () => selectSlot(i, slots));
+        }
+        slotsContainer.appendChild(div);
+      });
+
+    } catch (err) {
+      slotsContainer.textContent = 'Error loading availability';
+    }
+  }
+
+  function selectSlot(index, slots) {
+    if (selectedSlotIndex !== null) {
+      slotsContainer.children[selectedSlotIndex].classList.remove('selected');
+    }
+    selectedSlotIndex = index;
+    slotsContainer.children[index].classList.add('selected');
+
+    // Set start and end time inputs
+    const slot = slots[index];
+    const startInput = document.getElementById('startTime');
+    const endInput = document.getElementById('endTime');
+
+    // Format for datetime-local input (yyyy-MM-ddTHH:mm)
+    startInput.value = slot.start.toISOString().slice(0,16);
+    endInput.value = slot.end.toISOString().slice(0,16);
+  }
+
+  async function bookAppointment() {
+    const calendarId = document.getElementById('calendarSelect').value;
+    const summary = document.getElementById('summary').value;
+    const description = document.getElementById('description').value;
+    const startDateTime = document.getElementById('startTime').value;
+    const endDateTime = document.getElementById('endTime').value;
+    if (!summary || !startDateTime || !endDateTime) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    const response = await fetch(`/book/${encodeURIComponent(calendarId)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ summary, description, startDateTime, endDateTime })
+    });
+    if (response.ok) {
+      const data = await response.json();
+      document.getElementById('result').textContent = 'Appointment booked successfully!';
+      loadAvailability(); // refresh availability after booking
+    } else {
+      document.getElementById('result').textContent = 'Failed to book appointment.';
+    }
+  }
+</script>
+</body>
+</html>

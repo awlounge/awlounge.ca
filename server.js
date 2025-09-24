@@ -1,0 +1,313 @@
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import bodyParser from "body-parser";
+import cors from "cors";
+import { google } from "googleapis";
+import dotenv from "dotenv";
+import nodemailer from "nodemailer";
+import Stripe from "stripe";
+import jwt from "jsonwebtoken";
+import multer from "multer";
+import pg from "pg"; // Use the PostgreSQL library
+
+dotenv.config();
+
+// --- PostgreSQL Database Setup ---
+const { Pool } = pg;
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
+
+// --- Function to Create Tables and Seed Data ---
+async function initDB() {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS services (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                performer TEXT NOT NULL,
+                duration INTEGER NOT NULL,
+                price INTEGER NOT NULL,
+                category TEXT,
+                imageUrl TEXT,
+                description TEXT
+            );
+        `);
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS service_logs (
+                id SERIAL PRIMARY KEY,
+                username TEXT,
+                action TEXT,
+                service_id INTEGER,
+                details TEXT,
+                timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        const res = await pool.query("SELECT COUNT(*) FROM services");
+        if (res.rows[0].count === "0") {
+            console.log("No services found, seeding database...");
+            const seedData = [
+                { category: "relaxation", name: "Foot Reflexology", performer: "Jessa", duration: 45, price: 6000, description: "A therapeutic method of relieving pain and tension by stimulating specific points on the feet." },
+                { category: "beauty", name: "Special Event Makeover", performer: "Trechan", duration: 90, price: 10000, description: "Look stunning for any occasion with our professional makeover services." },
+                { category: "aesthetics", name: "Manicure", performer: "Trechan", duration: 60, price: 6000, description: "Pamper your hands with our professional manicure services." },
+                { category: "hairtreatment", name: "Hair Wash & Style", performer: "Maricel", duration: 90, price: 9000, description: "Refresh your hair with a deep cleanse and a smooth, voluminous style." }
+            ];
+            for (const s of seedData) {
+                await pool.query(
+                    "INSERT INTO services (category, name, performer, duration, price, description) VALUES ($1, $2, $3, $4, $5, $6)",
+                    [s.category, s.name, s.performer, s.duration, s.price, s.description]
+                );
+            }
+            console.log("Database seeded successfully.");
+        }
+    } catch (err) {
+        console.error("Error during database initialization:", err);
+    }
+}
+initDB();
+
+// --- Middleware and Setup ---
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'public/images'),
+  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+});
+const upload = multer({ storage: storage });
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+
+const auth = new google.auth.GoogleAuth({
+    credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
+    scopes: ["https://www.googleapis.com/auth/calendar"],
+});
+const calendar = google.calendar({ version: "v3", auth });
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+// --- Auth Functions ---
+function authenticate(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: "Unauthorized" });
+    const token = authHeader.split(" ")[1];
+    try {
+        req.user = jwt.verify(token, JWT_SECRET);
+        next();
+    } catch (err) {
+        res.status(401).json({ error: "Invalid token" });
+    }
+}
+
+app.post("/admin/login", (req, res) => {
+    const { username, password } = req.body;
+    const allowedUsers = [];
+    for (let i = 1; i <= 10; i++) {
+        const user = process.env[`AWLOUNGE_USER_${i}`];
+        const pass = process.env[`AWLOUNGE_PASS_${i}`];
+        const role = process.env[`AWLOUNGE_ROLE_${i}`] || "user";
+        if (user && pass) allowedUsers.push({ user, pass, role });
+    }
+    const validUser = allowedUsers.find(u => u.user === username && u.pass === password);
+    if (validUser) {
+        const token = jwt.sign({ username: validUser.user, role: validUser.role }, JWT_SECRET, { expiresIn: "4h" });
+        res.json({ success: true, token, username: validUser.user, role: validUser.role });
+    } else {
+        res.status(401).json({ success: false, error: "Invalid credentials" });
+    }
+});
+
+// --- Helper Functions ---
+async function logChange(username, action, serviceId, details) {
+    await pool.query(
+        "INSERT INTO service_logs (username, action, service_id, details) VALUES ($1, $2, $3, $4)",
+        [username, action, serviceId, JSON.stringify(details)]
+    );
+}
+
+// --- API Routes ---
+app.get("/api/services", async (req, res) => {
+    try {
+        res.setHeader('Cache-Control', 'no-store');
+        const result = await pool.query("SELECT * FROM services ORDER BY category, name");
+        res.json(result.rows);
+    } catch (error) {
+        console.error('API Error fetching services:', error);
+        res.status(500).json({ error: "Failed to retrieve services." });
+    }
+});
+
+app.get("/services", authenticate, async (req, res) => {
+    try {
+        let result;
+        if (req.user && req.user.role && req.user.role.toLowerCase() === "admin") {
+            result = await pool.query("SELECT * FROM services ORDER BY category, name");
+        } else {
+            result = await pool.query("SELECT * FROM services WHERE performer ILIKE $1 ORDER BY category, name", [`%${req.user.username}%`]);
+        }
+        res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch services for portal." });
+    }
+});
+
+app.post("/services", authenticate, upload.single('image'), async (req, res) => {
+    const { name, performer, duration, price, category, description } = req.body;
+    const imageUrl = req.file ? `images/${req.file.filename}` : null;
+    try {
+        const result = await pool.query(
+            "INSERT INTO services (name, performer, duration, price, category, imageUrl, description) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+            [name, performer, duration, price, category, imageUrl, description]
+        );
+        const newId = result.rows[0].id;
+        await logChange(req.user.username, "ADD", newId, req.body);
+        res.json({ success: true, id: newId });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to add service." });
+    }
+});
+
+app.put("/services/:id", authenticate, upload.single('image'), async (req, res) => {
+    const { id } = req.params;
+    const { name, performer, duration, price, category, description, existingImageUrl } = req.body;
+    let imageUrl = req.file ? `images/${req.file.filename}` : existingImageUrl;
+    try {
+        await pool.query(
+            "UPDATE services SET name = $1, performer = $2, duration = $3, price = $4, category = $5, imageUrl = $6, description = $7 WHERE id = $8",
+            [name, performer, duration, price, category, imageUrl, description, id]
+        );
+        await logChange(req.user.username, "EDIT", id, req.body);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to update service." });
+    }
+});
+
+app.delete("/services/:id", authenticate, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const serviceRes = await pool.query("SELECT * FROM services WHERE id = $1", [id]);
+        if (serviceRes.rows.length === 0) return res.status(404).json({ error: "Service not found" });
+        await pool.query("DELETE FROM services WHERE id = $1", [id]);
+        await logChange(req.user.username, "DELETE", id, serviceRes.rows[0]);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to delete service." });
+    }
+});
+
+// --- Booking and Payment Routes ---
+app.post("/create-payment-intent", async (req, res) => {
+    try {
+        const { serviceId } = req.body;
+        const serviceRes = await pool.query("SELECT * FROM services WHERE id = $1", [serviceId]);
+        if (serviceRes.rows.length === 0) return res.status(400).json({ error: "Service not found" });
+        
+        const service = serviceRes.rows[0];
+        const amount = Math.round(service.price * 0.25);
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency: "cad",
+            description: `25% deposit for ${service.name}`,
+        });
+        res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to create payment intent" });
+    }
+});
+
+app.get("/freebusy/:calendarId", async (req, res) => {
+    try {
+        const { calendarId } = req.params;
+        const { timeMin, timeMax } = req.query;
+        const result = await calendar.freebusy.query({
+            requestBody: { timeMin, timeMax, items: [{ id: calendarId }] },
+        });
+        res.json(result.data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch availability" });
+    }
+});
+
+app.post("/book/:calendarId", async (req, res) => {
+    const { calendarId } = req.params;
+    try {
+        const { name, phone, email, service, performer, dateTime } = req.body;
+        const startDateTime = new Date(dateTime);
+
+        const serviceRes = await pool.query("SELECT duration FROM services WHERE name = $1 AND performer ILIKE $2", [service, `%${performer}%`]);
+        const duration = serviceRes.rows[0]?.duration || 60;
+        const endDateTime = new Date(startDateTime.getTime() + duration * 60 * 1000);
+
+        const event = {
+            summary: `Booking: ${name} - ${service}`,
+            description: `Client: ${name}\nPhone: ${phone}\nEmail: ${email}\nService: ${service}\nProvider: ${performer}`,
+            start: { dateTime: startDateTime.toISOString(), timeZone: "America/Toronto" },
+            end: { dateTime: endDateTime.toISOString(), timeZone: "America/Toronto" },
+        };
+        await calendar.events.insert({ calendarId, requestBody: event });
+        
+        // ** EMAIL LOGIC IS RESTORED HERE **
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email, // Send to the client's email
+            subject: "Your Appointment is Confirmed!",
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; color: #333;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <img src="cid:logo" alt="AWL Logo" style="max-width: 150px; height: auto;">
+                    </div>
+                    <h2 style="text-align: center; color: #2a2a2a;">Appointment Confirmed!</h2>
+                    <p style="text-align: center;">Hi <strong>${name}</strong>,</p>
+                    <p style="text-align: center;">Your appointment for <strong>${service}</strong> with <strong>${performer}</strong> is confirmed.</p>
+                    <div style="background: #f7f7f7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <p style="margin: 5px 0;"><strong>Date & Time:</strong> ${startDateTime.toLocaleString('en-CA', { 
+                            timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', 
+                            day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true 
+                        })}</p>
+                        <p style="margin: 5px 0;"><strong>Provider:</strong> ${performer}</p>
+                        <p style="margin: 5px 0;"><strong>Service:</strong> ${service}</p>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                    <div style="text-align: center;">
+                        <img src="cid:banner" alt="AWL Banner" style="max-width: 350px; height: auto;"><br>
+                        <p style="font-size: 14px; color: #777; text-align: center;">
+                            Aesthetics and Wellness Lounge<br>
+                            www.awlounge.ca<br>
+                            577 Dundas St, Woodstock, ON | 226-796-5138 | awl.jm2@gmail.com
+                        </p>
+                    </div>
+                </div>
+            `,
+            attachments: [
+                { filename: 'AWL_Logo.jpg', path: path.join(__dirname, 'public', 'AWL_Logo.jpg'), cid: 'logo' },
+                { filename: 'AWL_Banner.jpg', path: path.join(__dirname, 'public', 'AWL_Banner.jpg'), cid: 'banner' }
+            ]
+        });
+
+        console.log(`✅ Booking created and email sent for ${name} on ${startDateTime}`);
+        res.json({ success: true, message: "Booking confirmed" });
+
+    } catch (err) {
+        console.error("Booking Error:", err);
+        res.status(500).json({ error: "Failed to create booking" });
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

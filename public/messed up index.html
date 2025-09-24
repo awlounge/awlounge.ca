@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aesthetics & Wellness Lounge</title>
+  <meta name="description" content="Aesthetics — curated skincare, advanced treatments and restorative wellness in a boutique lounge." />
+  <meta name="theme-color" content="#FBFAF8">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+  
+  <script src="https://js.stripe.com/v3/"></script>
+  
+  <style>
+    /* ========== Variables ========== */
+    :root{
+      --bg: #FBFAF8;
+      --text: #111114;
+      --muted: #7B7B80;
+      --surface: #FFFFFF;
+      --gold: #d4af37;
+      --gold-2: #B78E46;
+      --blue: #0f6b86;
+      --radius: 14px;
+      --container: 1200px;
+      --ease: cubic-bezier(.2,.9,.3,1);
+    }
+
+    /* ========== Reset & Base ========== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      color:var(--text);
+      background:var(--bg);
+      -webkit-font-smoothing:antialiased;
+      line-height:1.6;
+    }
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%}
+    .wrap{max-width:var(--container);margin:0 auto;padding:36px 28px}
+
+    /* ========== Header ========== */
+    header{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px;
+      border-radius:12px;
+      position:sticky;
+      top:18px;
+      z-index:60;
+      background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.85));
+      backdrop-filter: blur(6px) saturate(120%);
+      border:1px solid rgba(16,18,20,0.04);
+      box-shadow: 0 6px 20px rgba(16,20,28,0.04);
+      margin-bottom:18px;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:52px;height:52px;border-radius:10px;
+      background:linear-gradient(135deg,var(--gold-2),var(--gold));
+      color:white;display:inline-flex;align-items:center;justify-content:center;
+      font-family:"Playfair Display",serif;font-weight:600;font-size:18px;
+      box-shadow: 0 8px 26px rgba(183,142,70,0.16);
+    }
+    .brand .name{font-family:"Playfair Display",serif;font-size:18px}
+    .brand .sub{font-size:14px;color:var(--muted)}
+    nav{display:flex;gap:16px;align-items:center}
+    nav a{font-weight:600;color:var(--muted);font-size:14px;padding:8px;border-radius:10px}
+    nav a:hover{color:var(--text);background:rgba(16,18,20,0.02)}
+    .header-ctas{display:flex;gap:10px;align-items:center}
+    .header-cta{background:transparent;border:1px solid rgba(16,18,20,0.06);padding:8px 12px;border-radius:12px;font-weight:700;color:var(--text)}
+    .primary-cta{background:linear-gradient(90deg,var(--gold),var(--gold-2));color:white;padding:9px 14px;border-radius:12px;font-weight:700;box-shadow:0 12px 30px rgba(183,142,70,0.12)}
+
+    /* ========== HERO ========== */
+    .hero{display:grid;gap:20px;align-items:center;margin-top:6px}
+    .hero-frame{
+      position:relative;border-radius:18px;overflow:hidden;min-height:520px;
+      box-shadow: 0 36px 90px rgba(20,24,30,0.06);border:1px solid rgba(16,18,20,0.04);
+    }
+    .blob{
+      position:absolute;inset:auto -8% auto auto;width:520px;height:520px;border-radius:50%;
+      transform:translate(12%, -12%) rotate(12deg);
+      background: radial-gradient(circle at 30% 30%, rgba(183,142,70,0.14), rgba(201,179,141,0.08) 30%, transparent 60%);
+      filter: blur(46px);pointer-events:none;will-change:transform;transition:transform 1.2s var(--ease);
+    }
+    .hero-photo{
+      width:100%;height:520px;background-image:url('https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/2025-03-30-09_47_01-881-0400-high.jpg');
+      background-size:cover;background-position:center;display:block;transform-origin:center;transition:transform 0.9s var(--ease);
+    }
+    .hero-content{
+      position:absolute;left:32px;bottom:36px;max-width:640px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.98));
+      backdrop-filter: blur(6px);padding:24px;border-radius:14px;border:1px solid rgba(16,18,20,0.04);
+      box-shadow: 0 18px 40px rgba(16,20,28,0.06);
+    }
+    .kicker{font-size:13px;color:var(--muted);letter-spacing:0.6px;font-weight:700}
+    .hero-title{font-family:"Playfair Display",serif;font-size:34px;margin:6px 0 6px 0;line-height:1.02;color:var(--text)}
+    .hero-sub{color:var(--muted);font-size:15px;max-width:82%}
+    .hero-actions{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
+    .btn{border-radius:12px;padding:11px 14px;font-weight:700;display:inline-flex;gap:10px;align-items:center;transition:transform .18s var(--ease), box-shadow .18s var(--ease)}
+    .btn-ghost{background:transparent;border:1px solid rgba(16,18,20,0.06);color:var(--text)}
+    .btn-primary{background:linear-gradient(90deg,var(--gold),var(--gold-2));color:white;box-shadow:0 12px 30px rgba(183,142,70,0.12)}
+
+    /* ========== Services showcase (buttons + containers) ========== */
+    .button-container{
+      display:flex;justify-content:center;gap:10px;margin:18px 0 6px 0;flex-wrap:wrap;
+    }
+    .button-container button{
+      padding:10px 14px;font-size:15px;background:transparent;color:var(--text);border:2px solid rgba(16,18,20,0.06);
+      border-radius:9px;cursor:pointer;font-weight:700;min-width:140px;transition:all .24s ease;
+    }
+    .button-container button:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(183,142,70,0.85)}
+    .button-container button.selected{background:linear-gradient(90deg,var(--gold),rgba(183,142,70,0.85));color:white;border-color:transparent;box-shadow:0 12px 12px rgba(183,142,70,0.85)}
+
+    .services-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  padding: 10px;
+  width: 100%;
+  margin: 0 auto;
+  justify-items: center;
+  background: transparent;
+}
+    .services-container.hidden{display:none !important;opacity:0;transform:translateY(8px)}
+    .service{
+      background:var(--surface);border-radius:12px;padding:12px;border:1px solid rgba(16,18,20,0.04);
+      box-shadow: 0 8px 26px rgba(16,20,28,0.04);text-align:center;width:100%;max-width:350px;transition:transform .3s ease;
+    }
+    .service:hover{transform:translateY(-8px)}
+    .service img{width:100%;height:auto;border-radius:8px;margin-top:10px;object-fit:cover}
+    .service h2{margin:8px 0;font-size:20px}
+    .service p{font-size:14px;color:var(--muted);line-height:1.45}
+    .book-now{display:block;width:210px;margin:18px auto;padding:12px;background:linear-gradient(90deg,var(--gold),var(--gold-2));color:white;text-align:center;border-radius:10px;font-weight:700;text-decoration:none;border:1px solid rgba(0,0,0,0.04)}
+
+    /* ========== Smaller services grid (below showcase) ========== */
+    .services{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:28px;align-items:start}
+    .svc{background:var(--surface);border-radius:12px;padding:18px;border:1px solid rgba(16,18,20,0.04);box-shadow: 0 8px 26px rgba(16,20,28,0.04);transition:transform .22s var(--ease), box-shadow .22s var(--ease)}
+    .svc:hover{transform:translateY(-8px);box-shadow:0 26px 60px rgba(16,20,28,0.08)}
+    .svc .icon{width:56px;height:56px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700;font-family:"Playfair Display",serif;margin-right:12px}
+    .svc h4{margin:8px 0 6px 0;font-family:"Playfair Display",serif}
+    .svc p{color:var(--muted);font-size:14px;margin:0}
+
+    /* ========== Treatments / gallery / contact ========== */
+    .treatments{margin-top:28px;display:grid;gap:12px}
+    .treat{display:flex;justify-content:space-between;align-items:center;padding:14px;border-radius:12px;background:#F4F2EF;border:1px solid rgba(16,18,20,0.03)}
+    .meta{color:var(--muted);font-size:13px}
+    .split-2{display:grid;grid-template-columns:1fr 420px;gap:18px;margin-top:28px;align-items:start}
+    .test-card{padding:18px;border-radius:12px;background:var(--surface);border:1px solid rgba(16,18,20,0.03);box-shadow:0 8px 26px rgba(16,20,28,0.04)}
+    .stars{color:#E7C77B}
+    .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+    .gallery-grid img{width:100%;height:120px;object-fit:cover;border-radius:8px;transition:transform .25s ease}
+    .gallery-grid img:hover{transform:scale(1.03)}
+    .contact{margin-top:18px;display:grid;grid-template-columns:1fr 360px;gap:18px}
+    form{background:var(--surface);padding:18px;border-radius:12px;border:1px solid rgba(16,18,20,0.03);box-shadow:0 8px 26px rgba(16,20,28,0.04)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input,textarea,select{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(16,18,20,0.06);font-size:14px}
+    textarea{min-height:120px;resize:vertical}
+
+    /* ========== Footer ========== */
+    footer{margin-top:36px;padding-top:28px;border-top:1px solid rgba(16,18,20,0.03);color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+
+    /* ========== Reveal utils & responsive ========== */
+    .reveal{opacity:0;transform:translateY(8px);transition:opacity .6s var(--ease), transform .6s var(--ease)}
+    .reveal.show{opacity:1;transform:none}
+
+    @media (max-width:1100px){
+      .services{grid-template-columns:repeat(2,1fr)}
+      .split-2{grid-template-columns:1fr}
+      .contact{grid-template-columns:1fr}
+    }
+    @media (max-width:768px){
+      header{padding:10px}
+      .hero-photo{height:420px;background-position:center}
+      .hero-content{left:18px;right:18px;bottom:20px;padding:16px}
+      .services-container{display:flex !important;flex-direction:row;gap:12px;overflow-x:auto;height:440px;padding:10px 6px;align-items:flex-start}
+      .service{flex:0 0 auto;width:260px;margin-right:8px;max-width:260px}
+      .gallery-grid{grid-template-columns:repeat(2,1fr)}
+      .wrap{padding:18px}
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .blob, .hero-photo, .svc, .reveal { transition: none !important; animation: none !important; }
+    }
+	
+	/* Modal styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  overflow: auto;
+  background: rgba(0,0,0,0.6);
+  font-family: Arial, sans-serif;
+}
+
+.modal-content {
+  background: #fff;
+  margin: 50px auto;
+  padding: 20px 25px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #333;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+#calendar div {
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 6px;
+  user-select: none;
+}
+
+#calendar div.header {
+  font-weight: bold;
+  cursor: default;
+  background: #eee;
+}
+
+#calendar div:hover:not(.header) {
+  background: #f0c040;
+  color: #fff;
+}
+
+#calendar div.selected {
+  background: #f5a623;
+  color: #fff;
+}
+
+#timeSlots {
+  margin-top: 15px;
+  min-height: 50px;
+}
+
+.time-slot {
+  padding: 6px 10px;
+  background: #007bff;
+  color: white;
+  border-radius: 4px;
+  margin: 5px 5px 0 0;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+}
+
+.time-slot.selected {
+  background: #0056b3;
+}
+
+/* Responsive for mobile */
+@media (max-width: 480px) {
+  .modal-content {
+    max-width: 95%;
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  #calendar div {
+    padding: 8px;
+  }
+}
+
+
+
+/* Basic modal + stripe modal styles (paste into head or keep here) */
+  .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; }
+  .modal .modal-content { background: #fff; margin: auto; padding: 18px; border-radius: 8px; max-width: 720px; width: 96%; box-sizing: border-box; position: relative; }
+  .modal .closeBtn { position: absolute; right: 12px; top: 8px; background: transparent; border: none; font-size: 24px; cursor: pointer; }
+  #calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 8px 0 14px; }
+  #calendar div { padding: 8px; text-align: center; border-radius: 6px; cursor: pointer; background: #fff; box-shadow: 0 0 0 1px #eee inset; }
+  #calendar div.header { background: transparent; box-shadow: none; font-weight: 600; cursor: default; }
+  #calendar div.selected { background: #007bff; color: #fff; }
+  #timeSlots { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; min-height:40px; }
+  .time-slot { padding:6px 10px; background:#f2f2f2; border-radius:6px; cursor:pointer; user-select:none; }
+  .time-slot.selected { background:#007bff; color:#fff; }
+  label { display:block; margin-top:8px; font-weight:600; }
+  select,input { margin-top:6px; padding:8px; width:100%; box-sizing:border-box; }
+  .row { display:flex; gap:8px; }
+  .row > * { flex:1; }
+  .modal-cta { display:flex; justify-content:space-between; gap:8px; margin-top:12px; }
+  .btn { padding:10px 14px; border-radius:6px; border:none; cursor:pointer; }
+  .btn.primary { background:#007bff; color:white; }
+  .btn.ghost { background:#f2f2f2; }
+  /* Stripe modal overlay */
+  #stripe-modal { display:none; position:fixed; z-index:1100; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; }
+  #stripe-modal .stripe-content { background:white; padding:20px; border-radius:8px; width:420px; max-width:95%; box-sizing:border-box; position:relative; }
+  #stripe-modal .close-stripe { position:absolute; right:10px; top:8px; border:none; background:transparent; font-size:20px; cursor:pointer; }
+  #card-element { border:1px solid #ddd; padding:12px; border-radius:6px; }
+  #card-errors { color: #b00020; margin-top:8px; min-height:18px; }
+
+
+	
+  </style>
+  
+  
+</head>
+<body>
+  <div class="wrap" id="top">
+    <!-- Header -->
+    <header role="banner" aria-label="Top navigation">
+<a class="brand" href="#top" aria-label="Valence Aesthetics">
+  <img src="AWL_Logo.jpg" alt="AWL Logo" class="logo" aria-hidden="true" />
+  <div>
+    <div class="name">Aesthetics & Wellness Lounge</div>
+    <div class="sub">577 Dundas St, Woodstock, ON</div>
+  </div>
+</a>
+
+      <nav role="navigation" aria-label="Primary">
+        <a href="#services" id="navServices">Services</a>
+        <a href="#treatments">Treatments</a>
+        <a href="#testimonials">Testimonials</a>
+        
+      </nav>
+
+      <div class="header-ctas">
+        <a class="header-cta" href="tel:+12267965138" aria-label="Call us">(226) 796-5138</a>
+        <a class="primary-cta" id="openBookingLink" href="javascript:void(0)">Book Now</a>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero" aria-label="Hero">
+      <div class="hero-frame" role="img" aria-label="Lounge interior with soft lighting">
+        <div class="blob" aria-hidden="true"></div>
+        <div class="hero-photo" id="heroPhoto" aria-hidden="true"></div>
+      </div>
+
+      <!-- Buttons for Toggling (use data-section attributes; no inline onclicks) -->
+      <div style="width:100%;margin-top:10px">
+        <div class="button-container" role="tablist" aria-label="Service categories">
+          <button data-section="relaxation" type="button">Relaxation</button>
+          <button data-section="beauty" type="button">Beauty</button>
+          <button data-section="aesthetics" type="button">Aesthetics</button>
+          <button data-section="hairtreatment" type="button">Hair Treatment</button>
+          <button data-section="photography" type="button">Photography</button>
+          <button data-section="rejuvenate" type="button">Rejuvenate</button>
+        </div>
+
+        <!-- Relaxation (shown initially) -->
+        <div id="relaxation" class="services-container">
+          <div class="service">
+            <h2>Scalp & Shoulder Massage</h2>
+            <p>Relaxing therapy that involves massaging the head, neck, and shoulders to relieve stress and improve circulation.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/2025-03-23-12_32_53-791-0400-high.jpg" alt="Scalp & Shoulder Massage">
+          </div>
+          <div class="service">
+            <h2>Foot Reflexology</h2>
+            <p>Foot reflexology is a therapeutic method of relieving pain and tension by stimulating specific points on the feet.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/2025-03-23-16_22_29-041-0400-high.jpg" alt="Foot Reflexology">
+          </div>
+          <div class="service">
+            <h2>Hand Reflexology</h2>
+            <p>Hand reflexology focuses on specific points on the hands to improve overall health and promote relaxation.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/2025-03-23-16_07_28-498-0400-flip-high.jpg" alt="Hand Reflexology">
+          </div>
+        </div>
+
+        <!-- Beauty (hidden initially) -->
+        <div id="beauty" class="services-container hidden">
+          <div class="service">
+            <h2>Event Makeover</h2>
+            <p>Look stunning for any occasion with our professional makeover services, ensuring you feel confident and camera-ready.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/messenger_creation_eb9e7e51-07eb-4ba1-9f8d-442d87477ec2-high.jpg" alt="Event Makeover">
+          </div>
+          <div class="service">
+            <h2>Eyebrow Lamination</h2>
+            <p>Achieve perfectly shaped, full, and defined brows with our eyebrow lamination and tinting services for a polished, natural look.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/pngtree-eye-and-eyebrow-with-an_15714335-1-high.jpg" alt="Eyebrow Lamination">
+          </div>
+          <div class="service">
+            <h2>Lash Extensions</h2>
+            <p>Get longer, fuller lashes with our professional lash extension service, perfect for any event or everyday beauty.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/2025-03-23-12_43_54-719-0400-high.jpg" alt="Lash Extensions">
+          </div>
+          <div class="service">
+            <h2>Eyelash Lift & Tint</h2>
+            <p>Enhance your natural lashes with our eyelash lift service — curl and lift for a longer, open-eyed look without extensions.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/pngtree-women-s-eye-with-long_2452998-high.png" alt="Eyelash Lift & Tint">
+          </div>
+        </div>
+
+        <!-- Aesthetics -->
+        <div id="aesthetics" class="services-container hidden">
+          <div class="service">
+            <h2>Microblading</h2>
+            <p>Transform your brows with our professional microblading services, creating fuller, more defined eyebrows that complement your face.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/young-woman-going-through-microblading-treatment-high.jpg" alt="Microblading">
+          </div>
+          <div class="service">
+            <h2>Manicure</h2>
+            <p>Pamper your hands with our professional manicure services — shaping, cuticle care, and polish.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/pxl_20241128_212248143-portrait-2-high.jpg" alt="Manicure">
+          </div>
+          <div class="service">
+            <h2>Pedicure</h2>
+            <p>Treat your feet to our rejuvenating pedicure services — leaving your feet smooth and refreshed.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/pngtree-pedicure-of-wealthy-woman-feet_8085793-high-uytage.jpg" alt="Pedicure">
+          </div>
+        </div>
+
+        <!-- Hair Treatment -->
+        <div id="hairtreatment" class="services-container hidden">
+          <div class="service">
+            <h2>Hair Wash, Blow Out or Style</h2>
+            <p>Refresh your hair with a deep cleanse and a smooth, voluminous blowout — perfect for any occasion.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/2025-03-23-14_42_24-368-0400-high.jpg" alt="Hair Wash">
+          </div>
+          <div class="service">
+            <h2>Hair Lamination</h2>
+            <p>Smooth, shine and strengthen hair. Includes wash, blow dry and style.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/2025-03-23-19_59_23-511-0400-high.jpg" alt="Hair Lamination">
+          </div>
+          <div class="service">
+            <h2>Hair Treatments; Blow Dry and Style</h2>
+            <p>Premium treatments (Milkshake, Olaplex) followed by a polished blow dry. Price varies by length/thickness.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/2025-03-23-13_27_48-896-0400-high.jpg" alt="Hair Treatments">
+          </div>
+        </div>
+
+        <!-- Photography -->
+        <div id="photography" class="services-container hidden">
+          <div class="service">
+            <h2>Event Photography</h2>
+            <p>Capture your moments with our photography services — creating lasting memories and professional results.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/photomixer_1735672205040-2-high.jpg" alt="Event Photography">
+          </div>
+        </div>
+
+        <!-- Rejuvenate -->
+        <div id="rejuvenate" class="services-container hidden">
+          <div class="service">
+            <h2>Blissful Back</h2>
+            <p>Focused back massage with shea & lavender cream to ease tension and invigorate.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/backbliss-standard.jpg" alt="Blissful Back">
+          </div>
+          <div class="service">
+            <h2>Facial & Swedish Relaxation Combo</h2>
+            <p>Hydrating facial plus head-to-toe Swedish relaxation. Leaves you glowing and calm.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/pngtree-a-woman-receiving-a-massage_15990054-high-zixxl7.jpg" alt="Facial & Swedish">
+          </div>
+          <div class="service">
+            <h2>Ayurvedic Scalp Massage / Swedish Combo</h2>
+            <p>Hot oil scalp + Swedish massage for relaxation and glossy hair.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/ayurvedic-scalp-massage-swedish-combo-high.jpg" alt="Ayurvedic Scalp">
+          </div>
+          <div class="service">
+            <h2>Heavenly Soak</h2>
+            <p>Warm aromatic foot soak, sugar scrub and full massage for tired legs and feet.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/pngtree-foot-massage-female-legs-spa_6541366222-high-pp52oz.jpg" alt="Heavenly Soak">
+          </div>
+          <div class="service">
+            <h2>Hot Stones Aromatherapy Massage</h2>
+            <p>Head-to-toe hot stone therapy with essential oils for deep relaxation.</p>
+            <img src="https://primary.jwwb.nl/public/j/k/e/temp-vbdvzdoqdcqcnimwhfbe/pngtree-woman-enjoying-a-hot-stone_7725085-1-2222222-high-wszqd4.jpg" alt="Hot Stones">
+          </div>
+        </div>
+
+        <a href="https://www.picktime.com/2ca4a156-689a-4b47-9a58-06ac924b641e" class="book-now" target="_blank">~All Services~ Book Now</a>
+      </div>
+    </section>
+
+    <!-- Services mini-grid (keeps your other services block) -->
+    <div class="services reveal" id="services">
+      <div class="svc">
+        <div style="display:flex;align-items:center">
+          <div class="icon" style="background:linear-gradient(135deg,#D7B58B,#E6D6B6)">F</div>
+          <div>
+            <h4>Advanced Facials</h4>
+            <p>Medical-grade resurfacing, nourishing restorative protocols, and long-term plans.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="svc">
+        <div style="display:flex;align-items:center">
+          <div class="icon" style="background:linear-gradient(135deg,#B78E46,#C9B38D)">L</div>
+          <div>
+            <h4>Laser & Light</h4>
+            <p>Precision pigment correction, hair reduction and tightening with modern lasers.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="svc">
+        <div style="display:flex;align-items:center">
+          <div class="icon" style="background:linear-gradient(135deg,#E9DCC2,#F6EFE6);color:#6B4A2F">I</div>
+          <div>
+            <h4>Injectables</h4>
+            <p>Conservative, natural-looking neuromodulator and filler treatments by expert clinicians.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Treatments -->
+    <div class="treatments reveal" id="treatments" style="margin-top:6px">
+      <div class="treat">
+        <div>
+          <div style="font-weight:700">Signature Glow Facial</div>
+          <div class="meta">Restorative · 60 minutes</div>
+        </div>
+        <div style="font-weight:700">$195</div>
+      </div>
+
+      <div class="treat">
+        <div>
+          <div style="font-weight:700">Laser Hair Reduction — Small Area</div>
+          <div class="meta">Series recommended · 20 minutes</div>
+        </div>
+        <div style="font-weight:700">$140</div>
+      </div>
+
+      <div class="treat">
+        <div>
+          <div style="font-weight:700">Microdose Neurotoxin</div>
+          <div class="meta">Precision smoothing · 15 minutes</div>
+        </div>
+        <div style="font-weight:700">$160</div>
+      </div>
+    </div>
+
+    <!-- Gallery & Testimonials -->
+    <section class="split-2" aria-label="Gallery and testimonials" style="margin-top:28px">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:end">
+          <div>
+            <div style="font-size:13px;color:var(--muted);font-weight:700">Gallery</div>
+            <h3 style="font-family:'Playfair Display',serif;margin:6px 0 0 0">Lounge & results</h3>
+          </div>
+          <div style="color:var(--muted)">Photography — replace with brand assets</div>
+        </div>
+
+        <div class="gallery-grid reveal" style="margin-top:12px">
+          <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=800&auto=format&fit=crop" alt="Lounge interior">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop" alt="Treatment room">
+          <img src="https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=800&auto=format&fit=crop" alt="Product close-up">
+        </div>
+      </div>
+
+      <aside>
+        <div style="display:flex;justify-content:space-between;align-items:end">
+          <div>
+            <div style="font-size:13px;color:var(--muted);font-weight:700">Testimonials</div>
+            <h3 style="font-family:'Playfair Display',serif;margin:6px 0 0 0" id="testimonials">Client stories</h3>
+          </div>
+          <div style="color:var(--muted)">Verified feedback</div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="test-card reveal" style="margin-bottom:12px">
+            <div class="stars">★★★★★</div>
+            <p style="color:var(--muted);margin-top:8px">"Thoughtful and professional. My skin has never looked better — clinical expertise with a calm, modern lounge experience."</p>
+            <div style="margin-top:10px;font-weight:700">— L. Matthews</div>
+          </div>
+
+          <div class="test-card reveal">
+            <div class="stars">★★★★★</div>
+            <p style="color:var(--muted);margin-top:8px">"I appreciated the transparency and the individualized plan. Skilled clinicians and attentive aftercare."</p>
+            <div style="margin-top:10px;font-weight:700">— R. Singh</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" aria-labelledby="contactTitle" style="margin-top:28px">
+      <div style="display:flex;justify-content:space-between;align-items:end">
+        <div>
+          <div style="font-size:13px;color:var(--muted);font-weight:700">Connect</div>
+          <h3 id="contactTitle" style="font-family:'Playfair Display',serif;margin:6px 0 0 0">Book a consultation or send a message</h3>
+        </div>
+        <div style="color:var(--muted)">We typically respond within 24 hours</div>
+      </div>
+
+      <div class="contact reveal" style="margin-top:12px">
+        <form id="contactForm" onsubmit="handleContact(event)" aria-label="Contact form">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <label for="fullname">Full name</label>
+              <input id="fullname" name="fullname" type="text" required placeholder="Your name">
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required placeholder="you@domain.com">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+            <div>
+              <label for="service">Interested in</label>
+              <select id="service" name="service">
+                <option value="">Select service</option>
+                <option>Signature Facial</option>
+                <option>Laser</option>
+                <option>Injectables</option>
+                <option>Wellness Program</option>
+              </select>
+            </div>
+            <div>
+              <label for="date">Preferred date</label>
+              <input id="date" name="date" type="text" placeholder="Flexible / MM-DD">
+            </div>
+          </div>
+
+          <div style="margin-top:10px">
+            <label for="message">Message / goals</label>
+            <textarea id="message" name="message" placeholder="Tell us about your goals or concerns"></textarea>
+          </div>
+
+          <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+            <button type="submit" class="btn btn-primary">Send Request</button>
+            <div style="color:var(--muted);font-size:13px">Or call <strong style="color:var(--text)">(555) 123-4567</strong></div>
+          </div>
+        </form>
+
+        <aside style="background:var(--surface);padding:18px;border-radius:12px;border:1px solid rgba(16,18,20,0.03);box-shadow:0 8px 26px rgba(16,20,28,0.04)">
+          <div style="font-weight:700">Visit</div>
+          <div style="color:var(--muted);margin-top:8px">123 Meridian Ave<br>Suite 4<br>Citytown, ST 00000</div>
+
+          <div style="margin-top:14px">
+            <div style="font-weight:700">Hours</div>
+            <div style="color:var(--muted);margin-top:6px">Mon–Fri 9am–6pm<br>Sat 9am–2pm</div>
+          </div>
+
+          <div style="margin-top:14px">
+            <div style="font-weight:700">Follow</div>
+            <div style="display:flex;gap:10px;margin-top:8px">
+              <a href="#" aria-label="Instagram" style="color:var(--muted)">Instagram</a>
+              <a href="#" aria-label="Facebook" style="color:var(--muted)">Facebook</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+
+<!-- Booking modal -->
+<div id="bookingModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+  <div class="modal-content">
+    <button class="closeBtn" aria-label="Close booking modal">&times;</button>
+    <h2 id="modalTitle">Book an Appointment</h2>
+
+    <!-- Service Category -->
+    <label for="servicecategorySelect">Service category</label>
+    <select id="servicecategorySelect" aria-describedby="serviceDesc">
+      <option value="">-- Select category --</option>
+      <option value="relaxation">Relaxation</option>
+      <option value="beauty">Beauty</option>
+      <option value="aesthetics">Aesthetics</option>
+      <option value="hairtreatment">Hair Treatment</option>
+      <option value="photography">Photography</option>
+      <option value="rejuvenate">Rejuvenate</option>
+    </select>
+
+    <!-- Specific service -->
+    <label for="serviceSelect">Service</label>
+    <select id="serviceSelect"><option value="">-- Select service --</option></select>
+
+    <!-- Performer -->
+    <label for="performerSelect">Provider</label>
+    <select id="performerSelect"><option value="">-- Select provider --</option></select>
+
+    <!-- Hidden calendar select (keeps existing flow) -->
+    <select id="calendarSelect" style="display:none;">
+      <option value="mark.adam.grabowski@gmail.com">Mark Cal</option>
+      <option value="calendar2@gmail.com">Calendar 2</option>
+      <option value="calendar3@gmail.com">Calendar 3</option>
+    </select>
+
+    <!-- Calendar UI -->
+    <div class="calendar-header row" style="align-items:center;">
+      <button id="prevMonth" class="btn ghost" aria-label="Previous month">&#8592;</button>
+      <h3 id="monthYear" style="text-align:center;flex:1;margin:0;"></h3>
+      <button id="nextMonth" class="btn ghost" aria-label="Next month">&#8594;</button>
+    </div>
+    <div id="calendar" role="grid" aria-label="Calendar"></div>
+
+    <h3>Available Time Slots</h3>
+    <div id="timeSlots" aria-live="polite" aria-atomic="true">Select a service and provider first.</div>
+
+    <!-- User info -->
+    <h3>Your information</h3>
+    <label for="nameInput">Name (required)</label>
+    <input type="text" id="nameInput" placeholder="Full name" required />
+    <label for="phoneInput">Phone (required)</label>
+    <input type="tel" id="phoneInput" placeholder="Phone number" required />
+    <label for="emailInput">Email (required)</label>
+    <input type="email" id="emailInput" placeholder="Email address" required />
+
+    <div class="modal-cta">
+      <button id="cancelBookingBtn" class="btn ghost">Cancel</button>
+      <!-- Next opens Stripe modal -->
+      <button id="nextBtn" class="btn primary" disabled>Next — Pay 25% deposit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stripe payment modal -->
+<div id="stripe-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999;">
+  <div style="background:#fff; padding:20px; border-radius:8px; width:400px; max-width:90%;">
+    <button id="close-stripe-modal" style="float:right; border:none; background:none; font-size:20px; cursor:pointer;">&times;</button>
+    <h2>Secure Payment</h2>
+    <p>Please pay a 25% deposit to confirm your booking.</p>
+    <div id="payment-info" style="margin-bottom:10px; color:#333;"></div>
+    <div id="card-element" style="padding:10px; border:1px solid #ccc; border-radius:4px; margin:15px 0;"></div>
+    <div id="card-errors" role="alert" style="color:red; font-size:14px; margin-bottom:10px;"></div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+      <button id="back-to-booking" class="btn ghost">Back</button>
+      <button id="pay-deposit-btn" class="btn primary">Pay 25% Deposit</button>
+    </div>
+  </div>
+</div>
+
+
+
+    <footer role="contentinfo" style="margin-top:30px">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+        <div style="color:var(--muted)">© <strong>Valence</strong> — All rights reserved</div>
+        <div style="display:flex;gap:12px;color:var(--muted)">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  /* ================= Services Carousel ================= */
+  let autoLoopTimer = null;
+  let restartLoopTimer = null;
+  const sectionsOrder = ['relaxation','beauty','aesthetics','hairtreatment','photography','rejuvenate'];
+  let currentSection = 'relaxation';
+  const LOOP_INTERVAL = 10000;
+  const SCROLL_SPEED = 0.6;
+
+  function startAutoScroll(container) {
+    stopAutoScroll(container);
+    const totalWidth = container.scrollWidth - container.clientWidth;
+    if (totalWidth <= 0) return;
+    let forward = true;
+
+    function step() {
+      if (forward) {
+        container.scrollLeft = Math.min(container.scrollLeft + SCROLL_SPEED, totalWidth);
+        if (container.scrollLeft >= totalWidth) { forward=false; setTimeout(()=>container._raf=requestAnimationFrame(step),900); return; }
+      } else {
+        container.scrollLeft = Math.max(container.scrollLeft - SCROLL_SPEED*1.6,0);
+        if (container.scrollLeft <=0){ forward=true; setTimeout(()=>container._raf=requestAnimationFrame(step),600); return; }
+      }
+      container._raf = requestAnimationFrame(step);
+    }
+    container._raf = requestAnimationFrame(step);
+  }
+
+  function stopAutoScroll(container){
+    if(container && container._raf){ cancelAnimationFrame(container._raf); container._raf=null; }
+  }
+
+  function showSectionAndScroll(sectionId){
+    document.querySelectorAll('.services-container').forEach(c=>{
+      if(c.id===sectionId){ c.classList.remove('hidden'); c.scrollLeft=0; setTimeout(()=>startAutoScroll(c),80);}
+      else { stopAutoScroll(c); c.classList.add('hidden'); }
+    });
+    document.querySelectorAll('.button-container button').forEach(btn=>{
+      if(btn.dataset.section===sectionId) btn.classList.add('selected'); else btn.classList.remove('selected');
+    });
+    currentSection=sectionId;
+  }
+
+  function startLoop(){
+    if(autoLoopTimer) clearInterval(autoLoopTimer);
+    autoLoopTimer=setInterval(()=>{
+      const idx=sectionsOrder.indexOf(currentSection);
+      const next=sectionsOrder[(idx+1)%sectionsOrder.length];
+      currentSection=next;
+      showSectionAndScroll(currentSection);
+    },LOOP_INTERVAL);
+  }
+
+  function stopLoopAndShowSection(sectionId){
+    if(autoLoopTimer){ clearInterval(autoLoopTimer); autoLoopTimer=null;}
+    if(restartLoopTimer){ clearTimeout(restartLoopTimer); restartLoopTimer=null;}
+    showSectionAndScroll(sectionId);
+    restartLoopTimer=setTimeout(()=>startLoop(),LOOP_INTERVAL);
+  }
+
+  document.querySelectorAll('.button-container button').forEach(btn=>{
+    btn.addEventListener('click',()=>stopLoopAndShowSection(btn.dataset.section));
+    btn.addEventListener('pointerdown',()=>{
+      if(autoLoopTimer){ clearInterval(autoLoopTimer); autoLoopTimer=null; }
+      if(restartLoopTimer){ clearTimeout(restartLoopTimer); restartLoopTimer=null; }
+    });
+  });
+
+  document.querySelectorAll('.services-container').forEach(container=>{
+    container.addEventListener('pointerenter',()=>{ stopAutoScroll(container); if(autoLoopTimer){ clearInterval(autoLoopTimer); autoLoopTimer=null; } });
+    container.addEventListener('pointerleave',()=>{ startAutoScroll(container); if(!autoLoopTimer){ if(restartLoopTimer) clearTimeout(restartLoopTimer); restartLoopTimer=setTimeout(()=>startLoop(),4000); } });
+    container.addEventListener('touchstart',()=>{ stopAutoScroll(container); if(autoLoopTimer){ clearInterval(autoLoopTimer); autoLoopTimer=null; } }, {passive:true});
+    container.addEventListener('touchend',()=>{ startAutoScroll(container); if(!autoLoopTimer){ if(restartLoopTimer) clearTimeout(restartLoopTimer); restartLoopTimer=setTimeout(()=>startLoop(),4000); } }, {passive:true});
+  });
+
+  (function(){
+    const io = new IntersectionObserver(entries=>{ entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('show'); }); },{threshold:0.12});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  })();
+
+  (function(){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const frame=document.querySelector('.hero-frame');
+    const blob=document.querySelector('.blob');
+    const photo=document.getElementById('heroPhoto');
+    if(!frame||!blob||!photo) return;
+    frame.addEventListener('pointermove', ev=>{
+      const r=frame.getBoundingClientRect();
+      const x=(ev.clientX-r.left)/r.width-0.5;
+      const y=(ev.clientY-r.top)/r.height-0.5;
+      blob.style.transform=`translate(${x*8}%,${y*-8}%) rotate(8deg)`;
+      photo.style.transform=`scale(1.02) translate(${x*-4}px,${y*-6}px)`;
+    });
+    frame.addEventListener('pointerleave',()=>{
+      blob.style.transform='translate(12%,-12%) rotate(12deg)';
+      photo.style.transform='';
+    });
+  })();
+
+  window.handleContact=function(e){
+    e.preventDefault();
+    const form=e.target;
+    const name=form.fullname.value.trim();
+    const email=form.email.value.trim();
+    if(!name||!email){ alert('Please enter name and email.'); return; }
+    const btn=form.querySelector('button[type="submit"]');
+    const prev=btn.textContent;
+    btn.disabled=true; btn.textContent='Sending…';
+    setTimeout(()=>{
+      alert('Request sent — we will reply within 24 hours.');
+      form.reset();
+      btn.disabled=false; btn.textContent=prev;
+    },800);
+  };
+
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      const href=a.getAttribute('href');
+      if(href==='#'||href==='#top') return;
+      const el=document.querySelector(href);
+      if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth',block:'start'}); if(href==='#contact') setTimeout(()=>{ const f=document.getElementById('fullname'); if(f) f.focus(); },600);}
+    });
+  });
+
+  // Init
+  document.querySelectorAll('.services-container').forEach(c=>{ if(c.id!=='relaxation') c.classList.add('hidden'); });
+  const firstBtn=document.querySelector('.button-container button[data-section="relaxation"]');
+  if(firstBtn) firstBtn.classList.add('selected');
+  const initContainer=document.getElementById('relaxation');
+  if(initContainer) startAutoScroll(initContainer);
+  startLoop();
+
+/* ================= Booking Modal ================= */
+const openBooking = document.getElementById('openBookingLink');
+const modal = document.getElementById('bookingModal');
+const calendarEl = document.getElementById('calendar');
+const monthYearEl = document.getElementById('monthYear');
+const prevMonthBtn = document.getElementById('prevMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
+const timeSlotsEl = document.getElementById('timeSlots');
+const confirmBtn = document.getElementById('nextBtn'); // Now → opens Stripe
+const calendarSelect = document.getElementById('calendarSelect');
+const closeBtn = modal.querySelector('.closeBtn');
+const nameInput = document.getElementById('nameInput');
+const phoneInput = document.getElementById('phoneInput');
+const emailInput = document.getElementById('emailInput');
+const serviceSelect = document.getElementById('serviceSelect');
+const categorySelect = document.getElementById('servicecategorySelect');
+const performerSelect = document.getElementById('performerSelect');
+const bookingModal = document.getElementById("bookingModal");
+
+let selectedDate = null,
+    selectedSlot = null,
+    currentDate = new Date();
+
+/* Performer → Calendar mapping */
+const performerCalendars = {
+  jessa: "mark.adam.grabowski@gmail.com",
+  maricel: "maricelcalendar@gmail.com",
+  trechan: "trechancalendar@gmail.com",
+  maryann: "maryanncalendar@gmail.com"
+};
+
+/* Services data (keep your existing serviceData object) */
+const serviceData = { /* ... */ };
+
+/* ========== Form validation ========== */
+function validateForm() {
+  return selectedSlot &&
+         nameInput.value.trim() &&
+         phoneInput.value.trim() &&
+         emailInput.value.trim();
+}
+function updateConfirmBtnState() {
+  confirmBtn.disabled = !validateForm();
+}
+[nameInput, phoneInput, emailInput].forEach(i =>
+  i.addEventListener('input', updateConfirmBtnState)
+);
+
+/* ========== Select slot ========== */
+function selectSlot(slot, el) {
+  document.querySelectorAll('.time-slot.selected')
+    .forEach(x => x.classList.remove('selected'));
+  el.classList.add('selected');
+
+  const [hours, minutes] = slot.startTime.split(':');
+  const startDateTime = new Date(selectedDate);
+  startDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+  selectedSlot = { ...slot, startDateTime };
+  updateConfirmBtnState();
+}
+
+/* Populate services, performers, calendar, etc... (keep your existing logic) */
+
+/* ========== Open/close modal ========== */
+openBooking.addEventListener('click', e => {
+  e.preventDefault();
+  modal.style.display = 'block';
+  modal.setAttribute('aria-hidden', 'false');
+  selectedDate = null;
+  selectedSlot = null;
+  confirmBtn.disabled = true;
+  currentDate = new Date();
+  currentDate.setDate(1);
+  renderCalendar(currentDate);
+  autoSelectToday();
+});
+closeBtn.addEventListener('click', () => {
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+});
+window.addEventListener('click', e => {
+  if (e.target === modal) closeBtn.click();
+});
+
+/* ========== Calendar rendering + loadAvailability (unchanged from your code) ========== */
+// keep renderCalendar, selectDate, autoSelectToday, loadAvailability, generateTimeSlots
+
+/* ================= STRIPE INTEGRATION ================= */
+// Init Stripe
+const stripe = Stripe("pk_live_51Qg6aWC5NlBSaGb82hFsSiw6V7Ubh1Sffz1LwZwofupdkR2aRmrm3LYobssPE0zizn8oxlvQCDbQLTbZX6rcz8zC00wkHNHt5w"); // 🔑 your publishable key
+const elements = stripe.elements();
+const cardElement = elements.create("card");
+cardElement.mount("#card-element");
+
+// Stripe modal
+const stripeModal = document.getElementById("stripe-modal");
+const closeStripeModal = document.getElementById("close-stripe-modal");
+const backBtn = document.getElementById("back-to-booking");
+const payBtn = document.getElementById("pay-deposit-btn");
+
+function openStripeModal() {
+  stripeModal.style.display = "flex";
+}
+function closeStripe() {
+  stripeModal.style.display = "none";
+}
+
+// Open Stripe modal instead of booking
+confirmBtn.onclick = () => {
+  if (!validateForm()) return alert("Fill all required fields and select a slot.");
+  openStripeModal();
+};
+
+// Close/back buttons
+closeStripeModal.onclick = closeStripe;
+backBtn.onclick = () => {
+  closeStripe();
+  bookingModal.style.display = "block";
+};
+
+/* ===== Payment handling ===== */
+payBtn.onclick = async () => {
+  payBtn.disabled = true;
+  payBtn.innerText = "Processing...";
+
+  try {
+    // Create PaymentIntent
+    const res = await fetch("/create-payment-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ service: serviceSelect.value })
+    });
+    const { clientSecret } = await res.json();
+
+    // Confirm payment
+    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: cardElement,
+        billing_details: {
+          name: nameInput.value,
+          email: emailInput.value
+        }
+      }
+    });
+
+    if (error) {
+      alert(error.message);
+      payBtn.disabled = false;
+      payBtn.innerText = "Pay 25% Deposit";
+      return;
+    }
+
+    if (paymentIntent.status === "succeeded") {
+      // Book appointment after successful payment
+      const bookingRes = await fetch(`/book/${calendarSelect.value}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: nameInput.value.trim(),
+          phone: phoneInput.value.trim(),
+          email: emailInput.value.trim(),
+          service: serviceSelect.value,
+          performer: performerSelect.value,
+          dateTime: selectedSlot.startDateTime
+        })
+      });
+
+      const result = await bookingRes.json();
+      if (result.success) {
+        alert("✅ Payment and booking confirmed!");
+        closeStripe();
+        modal.style.display = "none";
+
+        // reset form
+        nameInput.value = phoneInput.value = emailInput.value = "";
+        serviceSelect.value = performerSelect.value = categorySelect.value = "";
+        selectedSlot = null;
+        selectedDate = null;
+        confirmBtn.disabled = true;
+        timeSlotsEl.textContent = "Select a service and provider first.";
+      } else {
+        alert("Payment succeeded but booking failed. Contact support.");
+      }
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Payment or booking failed. Try again.");
+  } finally {
+    payBtn.disabled = false;
+    payBtn.innerText = "Pay 25% Deposit";
+  }
+};
+
+
+});
+</script>
+
+
+
+
+
+
+</body>
+</html>
