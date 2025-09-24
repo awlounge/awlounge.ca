@@ -127,7 +127,9 @@ const transporter = nodemailer.createTransport({
 // --- Auth Functions ---
 function authenticate(req, res, next) {
     const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: "Unauthorized" });
+    if (!authHeader) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
     const token = authHeader.split(" ")[1];
     try {
         req.user = jwt.verify(token, JWT_SECRET);
@@ -144,7 +146,9 @@ app.post("/admin/login", (req, res) => {
         const user = process.env[`AWLOUNGE_USER_${i}`];
         const pass = process.env[`AWLOUNGE_PASS_${i}`];
         const role = process.env[`AWLOUNGE_ROLE_${i}`] || "user";
-        if (user && pass) allowedUsers.push({ user, pass, role });
+        if (user && pass) {
+            allowedUsers.push({ user, pass, role });
+        }
     }
     const validUser = allowedUsers.find(u => u.user === username && u.pass === password);
     if (validUser) {
@@ -232,7 +236,9 @@ app.delete("/services/:id", authenticate, async (req, res) => {
     const { id } = req.params;
     try {
         const serviceRes = await pool.query("SELECT * FROM services WHERE id = $1", [id]);
-        if (serviceRes.rows.length === 0) return res.status(404).json({ error: "Service not found" });
+        if (serviceRes.rows.length === 0) {
+            return res.status(404).json({ error: "Service not found" });
+        }
         await pool.query("DELETE FROM services WHERE id = $1", [id]);
         await logChange(req.user.username, "DELETE", id, serviceRes.rows[0]);
         res.json({ success: true });
@@ -247,7 +253,9 @@ app.post("/create-payment-intent", async (req, res) => {
     try {
         const { serviceId } = req.body;
         const serviceRes = await pool.query("SELECT * FROM services WHERE id = $1", [serviceId]);
-        if (serviceRes.rows.length === 0) return res.status(400).json({ error: "Service not found" });
+        if (serviceRes.rows.length === 0) {
+            return res.status(400).json({ error: "Service not found" });
+        }
         
         const service = serviceRes.rows[0];
         const amount = Math.round(service.price * 0.25);
