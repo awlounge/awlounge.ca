@@ -26,8 +26,10 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'awl_services',
-        format: async (req, file) => 'jpg',
-        public_id: (req, file) => Date.now().toString(),
+        format: 'jpg', // Set a consistent format
+        // ** THE CHANGE IS HERE **
+        // Use the original filename (without the extension) as the public ID
+        public_id: (req, file) => path.parse(file.originalname).name,
     },
 });
 
@@ -47,24 +49,15 @@ async function initDB() {
     try {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS services (
-                id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL,
-                performer TEXT NOT NULL,
-                duration INTEGER NOT NULL,
-                price INTEGER NOT NULL,
-                category TEXT,
-                imageUrl TEXT,
-                description TEXT
+                id SERIAL PRIMARY KEY, name TEXT NOT NULL, performer TEXT NOT NULL,
+                duration INTEGER NOT NULL, price INTEGER NOT NULL, category TEXT,
+                imageUrl TEXT, description TEXT
             );
         `);
         await pool.query(`
             CREATE TABLE IF NOT EXISTS service_logs (
-                id SERIAL PRIMARY KEY,
-                username TEXT,
-                action TEXT,
-                service_id INTEGER,
-                details TEXT,
-                timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                id SERIAL PRIMARY KEY, username TEXT, action TEXT, service_id INTEGER,
+                details TEXT, timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
             );
         `);
 
@@ -200,11 +193,7 @@ app.get("/services", authenticate, async (req, res) => {
 
 app.post("/services", authenticate, upload.single('image'), async (req, res) => {
     const { name, performer, duration, price, category, description } = req.body;
-    
-    console.log("Cloudinary file object received:", req.file);
     const imageUrl = req.file ? req.file.path : null;
-    console.log("Attempting to save this URL to database:", imageUrl);
-
     try {
         const result = await pool.query(
             "INSERT INTO services (name, performer, duration, price, category, imageUrl, description) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
@@ -222,11 +211,7 @@ app.post("/services", authenticate, upload.single('image'), async (req, res) => 
 app.put("/services/:id", authenticate, upload.single('image'), async (req, res) => {
     const { id } = req.params;
     const { name, performer, duration, price, category, description, existingImageUrl } = req.body;
-    
-    console.log("Cloudinary file object received (for update):", req.file);
     let imageUrl = req.file ? req.file.path : existingImageUrl;
-    console.log("Attempting to save this URL to database (for update):", imageUrl);
-
     try {
         await pool.query(
             "UPDATE services SET name = $1, performer = $2, duration = $3, price = $4, category = $5, imageUrl = $6, description = $7 WHERE id = $8",
