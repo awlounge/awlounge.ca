@@ -9,7 +9,7 @@ import nodemailer from "nodemailer";
 import Stripe from "stripe";
 import jwt from "jsonwebtoken";
 import multer from "multer";
-import pg from "pg"; // Use the PostgreSQL library
+import pg from "pg";
 
 dotenv.config();
 
@@ -88,7 +88,15 @@ app.use(express.static('public'));
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
 const auth = new google.auth.GoogleAuth({
-    credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
+    credentials: {
+        type: "service_account",
+        project_id: process.env.GOOGLE_PROJECT_ID,
+        private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        universe_domain: "googleapis.com",
+    },
     scopes: ["https://www.googleapis.com/auth/calendar"],
 });
 const calendar = google.calendar({ version: "v3", auth });
@@ -134,10 +142,14 @@ app.post("/admin/login", (req, res) => {
 
 // --- Helper Functions ---
 async function logChange(username, action, serviceId, details) {
-    await pool.query(
-        "INSERT INTO service_logs (username, action, service_id, details) VALUES ($1, $2, $3, $4)",
-        [username, action, serviceId, JSON.stringify(details)]
-    );
+    try {
+        await pool.query(
+            "INSERT INTO service_logs (username, action, service_id, details) VALUES ($1, $2, $3, $4)",
+            [username, action, serviceId, JSON.stringify(details)]
+        );
+    } catch (err) {
+        console.error("Failed to log change:", err);
+    }
 }
 
 // --- API Routes ---
@@ -162,6 +174,7 @@ app.get("/services", authenticate, async (req, res) => {
         }
         res.json(result.rows);
     } catch (err) {
+        console.error('Portal service fetch error:', err);
         res.status(500).json({ error: "Failed to fetch services for portal." });
     }
 });
@@ -178,6 +191,7 @@ app.post("/services", authenticate, upload.single('image'), async (req, res) => 
         await logChange(req.user.username, "ADD", newId, req.body);
         res.json({ success: true, id: newId });
     } catch (err) {
+        console.error('Add service error:', err);
         res.status(500).json({ error: "Failed to add service." });
     }
 });
@@ -194,6 +208,7 @@ app.put("/services/:id", authenticate, upload.single('image'), async (req, res) 
         await logChange(req.user.username, "EDIT", id, req.body);
         res.json({ success: true });
     } catch (err) {
+        console.error('Update service error:', err);
         res.status(500).json({ error: "Failed to update service." });
     }
 });
@@ -207,6 +222,7 @@ app.delete("/services/:id", authenticate, async (req, res) => {
         await logChange(req.user.username, "DELETE", id, serviceRes.rows[0]);
         res.json({ success: true });
     } catch (err) {
+        console.error('Delete service error:', err);
         res.status(500).json({ error: "Failed to delete service." });
     }
 });
@@ -227,6 +243,7 @@ app.post("/create-payment-intent", async (req, res) => {
         });
         res.json({ clientSecret: paymentIntent.client_secret });
     } catch (err) {
+        console.error('Payment intent error:', err);
         res.status(500).json({ error: "Failed to create payment intent" });
     }
 });
@@ -240,6 +257,7 @@ app.get("/freebusy/:calendarId", async (req, res) => {
         });
         res.json(result.data);
     } catch (err) {
+        console.error('Free/busy error:', err);
         res.status(500).json({ error: "Failed to fetch availability" });
     }
 });
@@ -262,10 +280,9 @@ app.post("/book/:calendarId", async (req, res) => {
         };
         await calendar.events.insert({ calendarId, requestBody: event });
         
-        // ** EMAIL LOGIC IS RESTORED HERE **
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
-            to: email, // Send to the client's email
+            to: email,
             subject: "Your Appointment is Confirmed!",
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; color: #333;">
