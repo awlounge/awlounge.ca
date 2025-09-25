@@ -26,7 +26,7 @@
         .portal-view { display: none; }
         .portal-view.active { display: block; }
         .container { background: var(--surface); padding: 25px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        h1, h2 { font-family: "Playfair Display", serif; margin-top: 0; }
+        h1, h2, h3 { font-family: "Playfair Display", serif; margin-top: 0; }
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
         form { display: flex; flex-direction: column; gap: 15px; }
         input, select, button, textarea { padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; font-family: "Inter", sans-serif; }
@@ -35,13 +35,13 @@
         .form-row { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
         .form-row > * { flex: 1; }
         #category-wrapper { display: flex; flex: 1; gap: 10px; align-items: center; }
-        #category-wrapper > select, #category-wrapper > input { flex: 1; }
+        #category-wrapper > select { flex: 1; }
         .form-row > select, .form-row > input[type=number] { flex-basis: 150px; flex-grow: 0; }
         .btn { text-decoration: none; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; transition: opacity 0.2s; }
         .btn-main { background-color: var(--blue); color: white; }
         .btn-danger { background-color: var(--red); color: white; }
         .btn-secondary { background-color: #6c757d; color: white; }
-        .btn-small { padding: 8px 12px; font-size: 12px; border-radius: 8px; }
+        .btn-small { padding: 10px 14px; font-size: 14px; font-weight: 600; border-radius: 8px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; vertical-align: middle; }
         th { background: var(--blue); color: #fff; }
@@ -97,7 +97,6 @@
                         <div class="form-row">
                             <div id="category-wrapper">
                                 <select id="category" name="category" required></select>
-                                <input type="text" id="newCategoryInput" placeholder="Enter new category name" class="hidden">
                                 <button type="button" id="manageCategoriesBtn" class="btn-secondary btn-small">Manage</button>
                             </div>
                             <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
@@ -161,6 +160,14 @@
                 <button class="close-btn">&times;</button>
             </div>
             <div id="category-list"></div>
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+            <form id="add-category-form">
+                <h3 style="margin-top:0; font-family: 'Playfair Display', serif;">Add New Category</h3>
+                <div class="form-row">
+                    <input type="text" id="addCategoryNameInput" placeholder="New category name" required style="flex: 2;">
+                    <button type="submit" class="btn-main" style="flex: 1;">Add</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -240,20 +247,6 @@
                     });
                 });
             }
-
-            const categorySelect = document.getElementById('category');
-            if(categorySelect) {
-                categorySelect.addEventListener('change', (e) => {
-                    const categoryWrapper = document.getElementById('category-wrapper');
-                    const selectInput = categoryWrapper.querySelector('select');
-                    const textInput = categoryWrapper.querySelector('input');
-                    if (e.target.value === 'addNewCategory') {
-                        selectInput.classList.add('hidden');
-                        textInput.classList.remove('hidden');
-                        textInput.focus();
-                    }
-                });
-            }
             
             const serviceForm = document.getElementById("serviceForm");
             if(serviceForm) {
@@ -262,12 +255,7 @@
                     const form = e.target;
                     const id = form.serviceId.value;
                     const formData = new FormData();
-                    let categoryValue = form.category.value;
-                    const newCategoryInput = document.getElementById('newCategoryInput');
-                    if (!newCategoryInput.classList.contains('hidden') && newCategoryInput.value.trim()) {
-                        categoryValue = newCategoryInput.value.trim();
-                    }
-                    formData.append('category', categoryValue);
+                    formData.append('category', form.category.value);
                     ['id', 'name', 'duration', 'price', 'description'].forEach(fieldName => { if (form[fieldName]) formData.append(fieldName, form[fieldName].value); });
                     const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
                     formData.append('performer', selectedPerformers.join(', '));
@@ -278,8 +266,6 @@
                     if (res.ok) {
                         form.reset();
                         document.getElementById('serviceId').value = '';
-                        newCategoryInput.classList.add('hidden');
-                        document.getElementById('category').classList.remove('hidden');
                         loadServices();
                         loadCategories();
                         localStorage.setItem('servicesUpdated', Date.now());
@@ -326,6 +312,30 @@
                     if (deleteBtn) {
                         const categoryName = deleteBtn.dataset.categoryName;
                         deleteCategory(categoryName);
+                    }
+                });
+            }
+            
+            const addCategoryForm = document.getElementById('add-category-form');
+            if(addCategoryForm) {
+                addCategoryForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const input = document.getElementById('addCategoryNameInput');
+                    const name = input.value.trim();
+                    if (!name) return;
+                    const res = await fetch(`${BASE_URL}/api/categories`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ name })
+                    });
+                    if (res.ok) {
+                        input.value = '';
+                        await loadCategories();
+                        await populateCategoryModal();
+                        localStorage.setItem('servicesUpdated', Date.now());
+
+                    } else {
+                        alert('Failed to add category.');
                     }
                 });
             }
@@ -377,10 +387,9 @@
             categories.forEach(cat => {
                 const option = document.createElement('option');
                 option.value = cat;
-                option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+                option.textContent = cat;
                 categorySelect.appendChild(option);
             });
-            categorySelect.innerHTML += '<option value="addNewCategory" style="font-weight:bold; color:var(--blue);">+ Add New Category</option>';
         }
 
         function populatePerformers() {
@@ -415,7 +424,6 @@
             categoryListDiv.innerHTML = '';
             if (categories.length === 0) {
                 categoryListDiv.innerHTML = '<p>No categories found.</p>';
-                return;
             }
             categories.forEach(cat => {
                 const item = document.createElement('div');
@@ -459,6 +467,7 @@
             Array.from(performerSelect.options).forEach(option => {
                 option.selected = performers.includes(option.value);
             });
+            document.querySelector('.portal-nav-link[data-target="services-view"]').click();
             window.scrollTo(0, 0);
         };
 
