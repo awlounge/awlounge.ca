@@ -34,11 +34,14 @@
         textarea { width: 100%; min-height: 80px; }
         .form-row { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
         .form-row > * { flex: 1; }
+        #category-wrapper { display: flex; flex: 1; gap: 10px; align-items: center; }
+        #category-wrapper > select, #category-wrapper > input { flex: 1; }
         .form-row > select, .form-row > input[type=number] { flex-basis: 150px; flex-grow: 0; }
         .btn { text-decoration: none; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; transition: opacity 0.2s; }
         .btn-main { background-color: var(--blue); color: white; }
         .btn-danger { background-color: var(--red); color: white; }
         .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-small { padding: 8px 12px; font-size: 12px; border-radius: 8px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; vertical-align: middle; }
         th { background: var(--blue); color: #fff; }
@@ -57,11 +60,19 @@
         .edit-profile-form { display: grid; grid-template-columns: 200px 1fr; gap: 40px; }
         .form-left-col img { width: 100%; aspect-ratio: 1 / 1; border-radius: 50%; object-fit: cover; border: 4px solid var(--bg); margin-bottom: 15px; }
         .form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 20px; border-top: 1px solid #eee; }
+        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: var(--surface); padding: 25px; border-radius: var(--radius); width: 100%; max-width: 400px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { margin: 0; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); }
+        #category-list .category-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+        #category-list .category-item:last-child { border-bottom: none; }
+        .delete-category-btn { background: none; border: none; color: var(--red); cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
     <div id="loginDiv">
-        <h2>AWL Portal Login</h2>
+        <h2>Portal Login</h2>
         <input type="text" id="loginUser" placeholder="Username" required>
         <input type="password" id="loginPass" placeholder="Password" required>
         <button id="loginBtn">Login</button>
@@ -84,9 +95,10 @@
                     <form id="serviceForm">
                         <input type="hidden" id="serviceId" name="id">
                         <div class="form-row">
-                            <div id="category-wrapper" style="flex: 1;">
+                            <div id="category-wrapper">
                                 <select id="category" name="category" required></select>
-                                <input type="text" id="newCategoryInput" placeholder="Enter new category name and save" class="hidden" style="width: 100%;">
+                                <input type="text" id="newCategoryInput" placeholder="Enter new category name" class="hidden">
+                                <button type="button" id="manageCategoriesBtn" class="btn-secondary btn-small">Manage</button>
                             </div>
                             <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
                             <select id="performer" name="performer" required multiple></select>
@@ -142,320 +154,319 @@
         </div>
     </div>
 
+    <div id="categoryModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Manage Categories</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div id="category-list"></div>
+        </div>
+    </div>
+
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // --- State & Config ---
-    const BASE_URL = '';
-    let token = localStorage.getItem('token');
-    let username = localStorage.getItem('username');
-    let role = localStorage.getItem('role');
-    const teamData = {
-        jessa: { id: "jessa", name: "Jessa Cordezar", title: "Co-Owner/Manager", role: "owner", specialty: "~Massage/Reflexology~", bio: "Born in the Philippines...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=J" },
-        maricel: { id: "maricel", name: "Maricel Tamburri", title: "Co-Owner/Manager", role: "owner", specialty: "~Microblading/Brows/Lashes~", bio: "I was born and raised in Etobicoke, ON...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=M" },
-        trechan: { id: "trechan", name: "Trechan Legria", title: "Co-Owner/Manager", role: "owner", specialty: "~Makeover/Mani-Pedi~", bio: "Born in the Philippines, my family and I...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=T" }
-    };
+    document.addEventListener('DOMContentLoaded', () => {
+        const BASE_URL = '';
+        let token = localStorage.getItem('token');
+        let username = localStorage.getItem('username');
+        let role = localStorage.getItem('role');
+        const teamData = {
+            jessa: { id: "jessa", name: "Jessa Cordezar", title: "Co-Owner/Manager", role: "owner", specialty: "~Massage/Reflexology~", bio: "Born in the Philippines...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=J" },
+            maricel: { id: "maricel", name: "Maricel Tamburri", title: "Co-Owner/Manager", role: "owner", specialty: "~Microblading/Brows/Lashes~", bio: "I was born and raised in Etobicoke, ON...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=M" },
+            trechan: { id: "trechan", name: "Trechan Legria", title: "Co-Owner/Manager", role: "owner", specialty: "~Makeover/Mani-Pedi~", bio: "Born in the Philippines, my family and I...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=T" }
+        };
+        const loginDiv = document.getElementById('loginDiv');
+        const adminDiv = document.getElementById('adminDiv');
+        const categoryModal = document.getElementById('categoryModal');
+        const categoryListDiv = document.getElementById('category-list');
 
-    // --- Element Selectors ---
-    const loginDiv = document.getElementById('loginDiv');
-    const adminDiv = document.getElementById('adminDiv');
-    const portalNav = document.querySelector('.portal-nav');
-    const portalViews = document.querySelectorAll('.portal-view');
-    const teamListView = document.getElementById('team-list-view');
-    const editProfileView = document.getElementById('edit-profile-view');
-    const categoryModal = document.getElementById('categoryModal');
-    const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
-    const categoryListDiv = document.getElementById('category-list');
-
-    // --- Core Functions ---
-    function showAdminPortal() {
-        document.getElementById("loggedInUser").innerText = username;
-        document.getElementById("userRole").innerText = role;
-        loginDiv.classList.add('hidden');
-        adminDiv.classList.remove('hidden');
-        adminDiv.classList.add(`role-${role}`);
-        const addNewMemberBtn = document.getElementById('addNewMemberBtn');
-        if (addNewMemberBtn) {
-            if (role !== 'admin') { addNewMemberBtn.classList.add('hidden'); } 
-            else { addNewMemberBtn.classList.remove('hidden'); }
-        }
-        loadPortalContent();
-    }
-
-    function loadPortalContent() {
-        populatePerformers();
-        loadCategories();
-        loadServices();
-        renderTeamList();
-    }
-
-    // --- Event Listeners Setup ---
-    function setupEventListeners() {
-        document.getElementById("loginBtn").onclick = async () => {
-            const user = document.getElementById("loginUser").value;
-            const pass = document.getElementById("loginPass").value;
-            try {
-                const res = await fetch(`${BASE_URL}/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: user, password: pass }) });
-                const data = await res.json();
-                if (data.success) {
-                    token = data.token; username = data.username; role = data.role;
-                    localStorage.setItem("token", token); 
-                    localStorage.setItem("username", username); 
-                    localStorage.setItem("role", role);
-                    showAdminPortal();
-                } else { 
-                    alert(data.error || 'Login failed'); 
-                }
-            } catch (error) {
-                alert('Could not connect to the server.');
+        function showAdminPortal() {
+            document.getElementById("loggedInUser").innerText = username;
+            document.getElementById("userRole").innerText = role;
+            loginDiv.classList.add('hidden');
+            adminDiv.classList.remove('hidden');
+            adminDiv.classList.add(`role-${role}`);
+            const addNewMemberBtn = document.getElementById('addNewMemberBtn');
+            if (addNewMemberBtn) {
+                if (role !== 'admin') { addNewMemberBtn.classList.add('hidden'); } 
+                else { addNewMemberBtn.classList.remove('hidden'); }
             }
-        };
-        
-        document.getElementById("logoutBtn").onclick = () => {
-            localStorage.clear();
-            window.location.reload();
-        };
-
-        if(portalNav) {
-            portalNav.addEventListener('click', (event) => {
-                const navLink = event.target.closest('.portal-nav-link');
-                if (!navLink) return;
-                const targetId = navLink.dataset.target;
-                portalNav.querySelector('.active').classList.remove('active');
-                navLink.classList.add('active');
-                document.querySelectorAll('.portal-view').forEach(view => {
-                    view.classList.toggle('active', view.id === targetId);
-                });
-            });
+            loadPortalContent();
         }
 
-        const categorySelect = document.getElementById('category');
-        if(categorySelect) {
-            categorySelect.addEventListener('change', (e) => {
-                const categoryWrapper = document.getElementById('category-wrapper');
-                const selectInput = categoryWrapper.querySelector('select');
-                const textInput = categoryWrapper.querySelector('input');
-                if (e.target.value === 'addNewCategory') {
-                    selectInput.classList.add('hidden');
-                    textInput.classList.remove('hidden');
-                    textInput.focus();
-                }
-            });
+        function loadPortalContent() {
+            populatePerformers();
+            loadCategories();
+            loadServices();
+            renderTeamList();
         }
-        
-        const serviceForm = document.getElementById("serviceForm");
-        if(serviceForm) {
-            serviceForm.onsubmit = async (e) => {
-                e.preventDefault();
-                const form = e.target;
-                const id = form.serviceId.value;
-                const formData = new FormData();
-                let categoryValue = form.category.value;
-                const newCategoryInput = document.getElementById('newCategoryInput');
-                if (!newCategoryInput.classList.contains('hidden') && newCategoryInput.value.trim()) {
-                    categoryValue = newCategoryInput.value.trim();
+
+        function setupEventListeners() {
+            document.getElementById("loginBtn").onclick = async () => {
+                const user = document.getElementById("loginUser").value;
+                const pass = document.getElementById("loginPass").value;
+                try {
+                    const res = await fetch(`${BASE_URL}/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: user, password: pass }) });
+                    const data = await res.json();
+                    if (data.success) {
+                        token = data.token; username = data.username; role = data.role;
+                        localStorage.setItem("token", token); 
+                        localStorage.setItem("username", username); 
+                        localStorage.setItem("role", role);
+                        showAdminPortal();
+                    } else { 
+                        alert(data.error || 'Login failed'); 
+                    }
+                } catch (error) {
+                    alert('Could not connect to the server.');
                 }
-                formData.append('category', categoryValue);
-                ['id', 'name', 'duration', 'price', 'description'].forEach(fieldName => { if (form[fieldName]) formData.append(fieldName, form[fieldName].value); });
-                const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
-                formData.append('performer', selectedPerformers.join(', '));
-                if (form.image.files[0]) { formData.append('image', form.image.files[0]); }
-                const url = id ? `${BASE_URL}/services/${id}` : `${BASE_URL}/services`;
-                const method = id ? "PUT" : "POST";
-                const res = await fetch(url, { method, headers: { "Authorization": `Bearer ${token}` }, body: formData });
-                if (res.ok) {
-                    form.reset();
-                    document.getElementById('serviceId').value = '';
-                    newCategoryInput.classList.add('hidden');
-                    document.getElementById('category').classList.remove('hidden');
-                    loadServices();
-                    loadCategories();
-                    localStorage.setItem('servicesUpdated', Date.now());
-                } else { alert('Failed to save service.'); }
             };
-        }
+            
+            document.getElementById("logoutBtn").onclick = () => {
+                localStorage.clear();
+                window.location.reload();
+            };
 
-        const teamListContainer = document.querySelector('.team-list-container');
-        if(teamListContainer) {
-            teamListContainer.addEventListener('click', (event) => {
-                const editButton = event.target.closest('.edit-btn');
-                if (editButton) {
-                    event.preventDefault();
-                    const memberRow = event.target.closest('.team-member-row');
-                    showEditView(memberRow.dataset.memberId);
-                }
-            });
+            const portalNav = document.querySelector('.portal-nav');
+            if(portalNav) {
+                portalNav.addEventListener('click', (event) => {
+                    const navLink = event.target.closest('.portal-nav-link');
+                    if (!navLink) return;
+                    const targetId = navLink.dataset.target;
+                    portalNav.querySelector('.active').classList.remove('active');
+                    navLink.classList.add('active');
+                    document.querySelectorAll('.portal-view').forEach(view => {
+                        view.classList.toggle('active', view.id === targetId);
+                    });
+                });
+            }
+
+            const categorySelect = document.getElementById('category');
+            if(categorySelect) {
+                categorySelect.addEventListener('change', (e) => {
+                    const categoryWrapper = document.getElementById('category-wrapper');
+                    const selectInput = categoryWrapper.querySelector('select');
+                    const textInput = categoryWrapper.querySelector('input');
+                    if (e.target.value === 'addNewCategory') {
+                        selectInput.classList.add('hidden');
+                        textInput.classList.remove('hidden');
+                        textInput.focus();
+                    }
+                });
+            }
+            
+            const serviceForm = document.getElementById("serviceForm");
+            if(serviceForm) {
+                serviceForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const form = e.target;
+                    const id = form.serviceId.value;
+                    const formData = new FormData();
+                    let categoryValue = form.category.value;
+                    const newCategoryInput = document.getElementById('newCategoryInput');
+                    if (!newCategoryInput.classList.contains('hidden') && newCategoryInput.value.trim()) {
+                        categoryValue = newCategoryInput.value.trim();
+                    }
+                    formData.append('category', categoryValue);
+                    ['id', 'name', 'duration', 'price', 'description'].forEach(fieldName => { if (form[fieldName]) formData.append(fieldName, form[fieldName].value); });
+                    const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
+                    formData.append('performer', selectedPerformers.join(', '));
+                    if (form.image.files[0]) { formData.append('image', form.image.files[0]); }
+                    const url = id ? `${BASE_URL}/services/${id}` : `${BASE_URL}/services`;
+                    const method = id ? "PUT" : "POST";
+                    const res = await fetch(url, { method, headers: { "Authorization": `Bearer ${token}` }, body: formData });
+                    if (res.ok) {
+                        form.reset();
+                        document.getElementById('serviceId').value = '';
+                        newCategoryInput.classList.add('hidden');
+                        document.getElementById('category').classList.remove('hidden');
+                        loadServices();
+                        loadCategories();
+                        localStorage.setItem('servicesUpdated', Date.now());
+                    } else { alert('Failed to save service.'); }
+                };
+            }
+
+            const teamListContainer = document.querySelector('.team-list-container');
+            if(teamListContainer) {
+                teamListContainer.addEventListener('click', (event) => {
+                    const editButton = event.target.closest('.edit-btn');
+                    if (editButton) {
+                        event.preventDefault();
+                        const memberRow = event.target.closest('.team-member-row');
+                        showEditView(memberRow.dataset.memberId);
+                    }
+                });
+            }
+            
+            const addNewMemberBtn = document.getElementById('addNewMemberBtn');
+            if(addNewMemberBtn) {
+                addNewMemberBtn.addEventListener('click', (e) => { e.preventDefault(); showEditView(null); });
+            }
+
+            const backLink = document.querySelector('#edit-profile-view .back-link');
+            if(backLink) {
+                backLink.addEventListener('click', (e) => { e.preventDefault(); showListView(); });
+            }
+
+            const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
+            if(manageCategoriesBtn) {
+                manageCategoriesBtn.addEventListener('click', () => {
+                    populateCategoryModal();
+                    categoryModal.classList.remove('hidden');
+                });
+            }
+
+            if(categoryModal) {
+                categoryModal.addEventListener('click', (event) => {
+                    if (event.target.classList.contains('close-btn') || event.target.classList.contains('modal')) {
+                        categoryModal.classList.add('hidden');
+                    }
+                    const deleteBtn = event.target.closest('.delete-category-btn');
+                    if (deleteBtn) {
+                        const categoryName = deleteBtn.dataset.categoryName;
+                        deleteCategory(categoryName);
+                    }
+                });
+            }
         }
         
-        const addNewMemberBtn = document.getElementById('addNewMemberBtn');
-        if(addNewMemberBtn) {
-            addNewMemberBtn.addEventListener('click', (e) => { e.preventDefault(); showEditView(null); });
+        function renderTeamList() {
+             const container = document.querySelector('.team-list-container');
+             if(!container) return;
+             container.innerHTML = '';
+             Object.values(teamData).forEach(member => {
+                 const canEdit = (role === 'admin' || username === member.id);
+                 const editButtonHTML = canEdit ? `<a href="#" class="btn edit-btn"><i class="fas fa-pen"></i> Edit</a>` : '';
+                 const memberHtml = `<div class="team-member-row" data-member-id="${member.id}"><img src="${member.imageUrl}" alt="${member.name}"><div class="team-member-info"><h3>${member.name}</h3><p>${member.title}</p><span class="role-badge role-${member.role}">${member.role}</span></div>${editButtonHTML}</div>`;
+                 container.innerHTML += memberHtml;
+             });
         }
 
-        const backLink = document.querySelector('#edit-profile-view .back-link');
-        if(backLink) {
-            backLink.addEventListener('click', (e) => { e.preventDefault(); showListView(); });
+        function showListView() {
+            document.getElementById('edit-profile-view').classList.add('hidden');
+            document.getElementById('team-list-view').classList.remove('hidden');
+        }
+
+        function showEditView(memberId) {
+             const deleteButton = document.querySelector('#edit-profile-view .btn-danger');
+             if (role !== 'admin') { deleteButton.classList.add('hidden'); } else { deleteButton.classList.remove('hidden'); }
+             const member = teamData[memberId];
+             if (!memberId) {
+                 document.getElementById('edit-form-title').textContent = "Add New Team Member";
+                 document.querySelector('.edit-profile-form').reset();
+                 document.getElementById('profileImagePreview').src = "https://via.placeholder.com/150/ccc/FFFFFF?text=New";
+             } else {
+                 document.getElementById('edit-form-title').textContent = `Edit Profile: ${member.name}`;
+                 document.getElementById('profileImagePreview').src = member.imageUrl;
+                 document.getElementById('edit-name').value = member.name;
+                 document.getElementById('edit-title').value = member.title;
+                 document.getElementById('edit-role').value = member.role;
+                 document.getElementById('edit-specialty').value = member.specialty;
+                 document.getElementById('edit-bio').value = member.bio;
+             }
+             document.getElementById('team-list-view').classList.add('hidden');
+             document.getElementById('edit-profile-view').classList.remove('hidden');
         }
         
-        if(manageCategoriesBtn) {
-            manageCategoriesBtn.addEventListener('click', () => {
-                populateCategoryModal();
-                categoryModal.classList.remove('hidden');
+        async function loadCategories() {
+            const res = await fetch(`${BASE_URL}/api/categories`);
+            const categories = await res.json();
+            const categorySelect = document.getElementById('category');
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+                categorySelect.appendChild(option);
+            });
+            categorySelect.innerHTML += '<option value="addNewCategory" style="font-weight:bold; color:var(--blue);">+ Add New Category</option>';
+        }
+
+        function populatePerformers() {
+            const performerSelect = document.getElementById("performer");
+            const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"];
+            performerSelect.innerHTML = "";
+            allPerformers.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p;
+                option.text = p;
+                performerSelect.appendChild(option);
             });
         }
 
-        if(categoryModal) {
-            categoryModal.addEventListener('click', (event) => {
-                if (event.target.classList.contains('close-btn') || event.target.classList.contains('modal')) {
-                    categoryModal.classList.add('hidden');
-                }
-                const deleteBtn = event.target.closest('.delete-category-btn');
-                if (deleteBtn) {
-                    const categoryName = deleteBtn.dataset.categoryName;
-                    deleteCategory(categoryName);
-                }
+        async function loadServices() {
+            if (!token) return;
+            const res = await fetch(`${BASE_URL}/services`, { headers: { "Authorization": `Bearer ${token}` } });
+            const data = await res.json();
+            const tbody = document.querySelector("#servicesTable tbody");
+            tbody.innerHTML = "";
+            data.forEach(s => {
+                const tr = document.createElement("tr");
+                const imageCell = s.imageurl ? `<img src="${s.imageurl}" alt="${s.name}" class="image-preview">` : 'No Image';
+                tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.category}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="btn btn-main edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button class="btn btn-danger" onclick="deleteService(${s.id})">Delete</button></td>`;
+                tbody.appendChild(tr);
             });
         }
-    }
-    
-    // --- Data Loading & Rendering Functions ---
-    function renderTeamList() {
-         const container = document.querySelector('.team-list-container');
-         if(!container) return;
-         container.innerHTML = '';
-         Object.values(teamData).forEach(member => {
-             const canEdit = (role === 'admin' || username === member.id);
-             const editButtonHTML = canEdit ? `<a href="#" class="btn edit-btn"><i class="fas fa-pen"></i> Edit</a>` : '';
-             const memberHtml = `<div class="team-member-row" data-member-id="${member.id}"><img src="${member.imageUrl}" alt="${member.name}"><div class="team-member-info"><h3>${member.name}</h3><p>${member.title}</p><span class="role-badge role-${member.role}">${member.role}</span></div>${editButtonHTML}</div>`;
-             container.innerHTML += memberHtml;
-         });
-    }
 
-    function showListView() {
-        document.getElementById('edit-profile-view').classList.add('hidden');
-        document.getElementById('team-list-view').classList.remove('hidden');
-    }
-
-    function showEditView(memberId) {
-         const deleteButton = document.querySelector('#edit-profile-view .btn-danger');
-         if (role !== 'admin') { deleteButton.classList.add('hidden'); } else { deleteButton.classList.remove('hidden'); }
-         const member = teamData[memberId];
-         if (!memberId) {
-             document.getElementById('edit-form-title').textContent = "Add New Team Member";
-             document.querySelector('.edit-profile-form').reset();
-             document.getElementById('profileImagePreview').src = "https://via.placeholder.com/150/ccc/FFFFFF?text=New";
-         } else {
-             document.getElementById('edit-form-title').textContent = `Edit Profile: ${member.name}`;
-             document.getElementById('profileImagePreview').src = member.imageUrl;
-             document.getElementById('edit-name').value = member.name;
-             document.getElementById('edit-title').value = member.title;
-             document.getElementById('edit-role').value = member.role;
-             document.getElementById('edit-specialty').value = member.specialty;
-             document.getElementById('edit-bio').value = member.bio;
-         }
-         document.getElementById('team-list-view').classList.add('hidden');
-         document.getElementById('edit-profile-view').classList.remove('hidden');
-    }
-    
-    async function loadCategories() {
-        const res = await fetch(`${BASE_URL}/api/categories`);
-        const categories = await res.json();
-        const categorySelect = document.getElementById('category');
-        categorySelect.innerHTML = '<option value="">Select Category</option>';
-        categories.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat;
-            option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
-            categorySelect.appendChild(option);
-        });
-        categorySelect.innerHTML += '<option value="addNewCategory" style="font-weight:bold; color:var(--blue);">+ Add New Category</option>';
-    }
-
-    function populatePerformers() {
-        const performerSelect = document.getElementById("performer");
-        const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"];
-        performerSelect.innerHTML = "";
-        allPerformers.forEach(p => {
-            const option = document.createElement("option");
-            option.value = p;
-            option.text = p;
-            performerSelect.appendChild(option);
-        });
-    }
-
-    async function loadServices() {
-        if (!token) return;
-        const res = await fetch(`${BASE_URL}/services`, { headers: { "Authorization": `Bearer ${token}` } });
-        const data = await res.json();
-        const tbody = document.querySelector("#servicesTable tbody");
-        tbody.innerHTML = "";
-        data.forEach(s => {
-            const tr = document.createElement("tr");
-            const imageCell = s.imageurl ? `<img src="${s.imageurl}" alt="${s.name}" class="image-preview">` : 'No Image';
-            tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.category}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="btn btn-main edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button class="btn btn-danger" onclick="deleteService(${s.id})">Delete</button></td>`;
-            tbody.appendChild(tr);
-        });
-    }
-
-    async function populateCategoryModal() {
-        const res = await fetch(`${BASE_URL}/api/categories`);
-        const categories = await res.json();
-        categoryListDiv.innerHTML = '';
-        if (categories.length === 0) {
-            categoryListDiv.innerHTML = '<p>No categories found.</p>';
-            return;
+        async function populateCategoryModal() {
+            const res = await fetch(`${BASE_URL}/api/categories`);
+            const categories = await res.json();
+            categoryListDiv.innerHTML = '';
+            if (categories.length === 0) {
+                categoryListDiv.innerHTML = '<p>No categories found.</p>';
+                return;
+            }
+            categories.forEach(cat => {
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                item.innerHTML = `<span>${cat}</span><button class="delete-category-btn" data-category-name="${cat}" title="Delete Category"><i class="fas fa-trash-alt"></i></button>`;
+                categoryListDiv.appendChild(item);
+            });
         }
-        categories.forEach(cat => {
-            const item = document.createElement('div');
-            item.className = 'category-item';
-            item.innerHTML = `<span>${cat}</span><button class="delete-category-btn" data-category-name="${cat}" title="Delete Category"><i class="fas fa-trash-alt"></i></button>`;
-            categoryListDiv.appendChild(item);
-        });
-    }
 
-    async function deleteCategory(name) {
-        if (!confirm(`Are you sure you want to delete the category "${name}"? This cannot be undone.`)) return;
-        const res = await fetch(`${BASE_URL}/api/categories`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ name })
-        });
-        if (res.ok) {
-            await loadCategories();
-            await populateCategoryModal();
-            localStorage.setItem('servicesUpdated', Date.now());
-        } else {
-            alert('Failed to delete category. It might still be in use by some services.');
+        async function deleteCategory(name) {
+            if (!confirm(`Are you sure you want to delete the category "${name}"? This cannot be undone.`)) return;
+            const res = await fetch(`${BASE_URL}/api/categories`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ name })
+            });
+            if (res.ok) {
+                await loadCategories();
+                await populateCategoryModal();
+                localStorage.setItem('servicesUpdated', Date.now());
+            } else {
+                alert('Failed to delete category. It might still be in use by some services.');
+            }
         }
-    }
 
-    // --- Global Functions (from your original code) ---
-    window.deleteService = async function(id) {
-        if (!confirm("Are you sure?")) return;
-        const res = await fetch(`${BASE_URL}/services/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
-        if (res.ok) { loadServices(); localStorage.setItem('servicesUpdated', Date.now()); }
-    };
+        window.deleteService = async function(id) {
+            if (!confirm("Are you sure?")) return;
+            const res = await fetch(`${BASE_URL}/services/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
+            if (res.ok) { loadServices(); localStorage.setItem('servicesUpdated', Date.now()); }
+        };
 
-    window.editService = function(service) {
-        document.getElementById("serviceId").value = service.id;
-        document.getElementById("category").value = service.category;
-        document.getElementById("name").value = service.name;
-        document.getElementById("duration").value = service.duration;
-        document.getElementById("price").value = service.price;
-        document.getElementById("description").value = service.description || '';
-        const performerSelect = document.getElementById("performer");
-        const performers = service.performer.split(',').map(p => p.trim());
-        Array.from(performerSelect.options).forEach(option => {
-            option.selected = performers.includes(option.value);
-        });
-        window.scrollTo(0, 0);
-    };
+        window.editService = function(service) {
+            document.getElementById("serviceId").value = service.id;
+            document.getElementById("category").value = service.category;
+            document.getElementById("name").value = service.name;
+            document.getElementById("duration").value = service.duration;
+            document.getElementById("price").value = service.price;
+            document.getElementById("description").value = service.description || '';
+            const performerSelect = document.getElementById("performer");
+            const performers = service.performer.split(',').map(p => p.trim());
+            Array.from(performerSelect.options).forEach(option => {
+                option.selected = performers.includes(option.value);
+            });
+            window.scrollTo(0, 0);
+        };
 
-    // --- Initialize the Page ---
-    setupEventListeners();
-    if (token) {
-        showAdminPortal();
-    }
-});
+        setupEventListeners();
+        if (token) {
+            showAdminPortal();
+        }
+    });
 </script>
 </body>
 </html>
