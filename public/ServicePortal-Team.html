@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Team - Service Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root { 
+            --bg: #f8f9fa; --text: #111114; --muted: #7B7B80; --surface: #FFFFFF; --gold: #d4af37; --gold-2: #B78E46; --blue: #0f6b86; --red: #d9534f; --radius: 14px; --container: 900px;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Inter", system-ui, sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; line-height: 1.6; padding: 30px; }
+        .portal-container { max-width: var(--container); margin: 0 auto; }
+        
+        /* Helper class to hide/show sections */
+        .hidden { display: none !important; }
+
+        /* --- List View Styles --- */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        h1 { font-family: "Playfair Display", serif; margin: 0; color: #333; }
+        .add-new-btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; background: var(--blue); color: #fff; padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 15px; transition: background-color 0.2s; }
+        .add-new-btn:hover { background: #0d5a71; }
+        .team-list-container { display: grid; gap: 15px; }
+        .team-member-row { display: flex; align-items: center; background: var(--surface); padding: 15px 20px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); cursor: pointer; transition: box-shadow 0.2s ease-in-out; }
+        .team-member-row:hover { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); }
+        .team-member-row img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 20px; border: 2px solid var(--bg); }
+        .team-member-info { flex-grow: 1; }
+        .team-member-info h3 { margin: 0; font-family: "Playfair Display", serif; font-size: 18px; }
+        .team-member-info p { margin: 0; color: var(--muted); font-size: 14px; }
+        .role-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .role-owner { background-color: rgba(183, 142, 70, 0.15); color: var(--gold-2); }
+        .role-employee { background-color: rgba(123, 123, 128, 0.15); color: var(--muted); }
+        .edit-btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; background: var(--gold-2); color: #fff; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: background-color 0.2s; }
+        .edit-btn:hover { background: var(--gold); }
+
+        /* --- Edit Form Styles --- */
+        .edit-page-header { display: flex; align-items: center; margin-bottom: 30px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--muted); font-weight: 600; margin-right: 20px; cursor: pointer; }
+        .back-link:hover { color: var(--text); }
+        #edit-form-title { font-size: 28px; }
+        .edit-profile-form { background: var(--surface); padding: 30px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); display: grid; grid-template-columns: 200px 1fr; gap: 40px; }
+        .form-left-col img { width: 100%; aspect-ratio: 1 / 1; border-radius: 50%; object-fit: cover; border: 4px solid var(--bg); margin-bottom: 15px; }
+        .upload-btn-wrapper { position: relative; overflow: hidden; display: block; width: 100%; }
+        .btn-upload { border: 2px solid var(--gold-2); color: var(--gold-2); background-color: white; padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; }
+        .upload-btn-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
+        .form-right-col { display: flex; flex-direction: column; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; font-family: "Inter", sans-serif; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 20px; border-top: 1px solid #eee; }
+        .btn { text-decoration: none; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.85; }
+        .btn-save { background-color: var(--blue); color: white; }
+        .btn-delete { background-color: transparent; color: var(--red); font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="portal-container">
+
+        <div id="team-list-view">
+            <div class="page-header">
+                <h1>Manage Team Profiles</h1>
+                <a href="#" class="add-new-btn">
+                    <i class="fas fa-plus"></i> Add New Team Member
+                </a>
+            </div>
+            <div class="team-list-container">
+                <div class="team-member-row" data-member-id="jessa">
+                    <img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=J" alt="Jessa Cordezar">
+                    <div class="team-member-info">
+                        <h3>Jessa Cordezar</h3>
+                        <p>Co-Owner/Manager</p>
+                        <span class="role-badge role-owner">Owner</span>
+                    </div>
+                    <a href="#" class="edit-btn"><i class="fas fa-pen"></i> Edit</a>
+                </div>
+                <div class="team-member-row" data-member-id="maricel">
+                    <img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=M" alt="Maricel Tamburri">
+                    <div class="team-member-info">
+                        <h3>Maricel Tamburri</h3>
+                        <p>Co-Owner/Manager</p>
+                        <span class="role-badge role-owner">Owner</span>
+                    </div>
+                    <a href="#" class="edit-btn"><i class="fas fa-pen"></i> Edit</a>
+                </div>
+                <div class="team-member-row" data-member-id="trechan">
+                    <img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=T" alt="Trechan Legria">
+                    <div class="team-member-info">
+                        <h3>Trechan Legria</h3>
+                        <p>Co-Owner/Manager</p>
+                        <span class="role-badge role-owner">Owner</span>
+                    </div>
+                    <a href="#" class="edit-btn"><i class="fas fa-pen"></i> Edit</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="edit-profile-view" class="hidden">
+            <div class="edit-page-header">
+                <a class="back-link"><i class="fas fa-arrow-left"></i> Back to Team List</a>
+                <h1 id="edit-form-title">Edit Profile</h1>
+            </div>
+            <form class="edit-profile-form" onsubmit="return false;">
+                <div class="form-left-col">
+                    <img src="" alt="Profile Image" id="profileImagePreview">
+                    <div class="upload-btn-wrapper">
+                        <button class="btn-upload">Change Picture</button>
+                        <input type="file" name="profileImage" id="profileImage" accept="image/*" />
+                    </div>
+                </div>
+                <div class="form-right-col">
+                    <div class="form-group"><label for="name">Full Name</label><input type="text" id="name"></div>
+                    <div class="form-group"><label for="title">Title</label><input type="text" id="title"></div>
+                    <div class="form-group"><label for="role">Role</label><select id="role"><option value="owner">Owner</option><option value="employee">Employee</option></select></div>
+                    <div class="form-group"><label for="specialty">Specialty</label><input type="text" id="specialty"></div>
+                    <div class="form-group"><label for="bio">Bio / About Me</label><textarea id="bio" rows="6"></textarea></div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-delete">Delete Member</button>
+                        <button type="submit" class="btn btn-save">Save Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- Temporary data store, this will come from a database later ---
+        const teamData = {
+            jessa: {
+                name: "Jessa Cordezar",
+                title: "Co-Owner/Manager",
+                role: "owner",
+                specialty: "~Massage/Reflexology~",
+                bio: "Born in the Philippines...",
+                imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=J"
+            },
+            maricel: {
+                name: "Maricel Tamburri",
+                title: "Co-Owner/Manager",
+                role: "owner",
+                specialty: "~Microblading/Brows/Lashes~",
+                bio: "I was born and raised in Etobicoke, ON...",
+                imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=M"
+            },
+            trechan: {
+                name: "Trechan Legria",
+                title: "Co-Owner/Manager",
+                role: "owner",
+                specialty: "~Makeover/Mani-Pedi~",
+                bio: "Born in the Philippines, my family and I...",
+                imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=T"
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const teamListView = document.getElementById('team-list-view');
+            const editProfileView = document.getElementById('edit-profile-view');
+
+            const editFormTitle = document.getElementById('edit-form-title');
+            const profileImagePreview = document.getElementById('profileImagePreview');
+            const nameInput = document.getElementById('name');
+            const titleInput = document.getElementById('title');
+            const roleSelect = document.getElementById('role');
+            const specialtyInput = document.getElementById('specialty');
+            const bioTextarea = document.getElementById('bio');
+
+            // --- Function to switch to the main list view ---
+            function showListView() {
+                editProfileView.classList.add('hidden');
+                teamListView.classList.remove('hidden');
+            }
+
+            // --- Function to switch to the edit form view ---
+            function showEditView(memberId) {
+                const member = teamData[memberId];
+                if (!member) return;
+
+                // Populate the form with the member's data
+                editFormTitle.textContent = `Edit Profile: ${member.name}`;
+                profileImagePreview.src = member.imageUrl;
+                nameInput.value = member.name;
+                titleInput.value = member.title;
+                roleSelect.value = member.role;
+                specialtyInput.value = member.specialty;
+                bioTextarea.value = member.bio;
+
+                // Switch the view
+                teamListView.classList.add('hidden');
+                editProfileView.classList.remove('hidden');
+            }
+            
+            // --- Event Listeners ---
+            
+            // Use event delegation for the "Edit" buttons
+            teamListView.addEventListener('click', (event) => {
+                const editButton = event.target.closest('.edit-btn');
+                if (editButton) {
+                    event.preventDefault();
+                    const memberRow = event.target.closest('.team-member-row');
+                    const memberId = memberRow.dataset.memberId;
+                    showEditView(memberId);
+                }
+            });
+
+            // Listen for clicks on the "Back" link
+            editProfileView.querySelector('.back-link').addEventListener('click', (event) => {
+                event.preventDefault();
+                showListView();
+            });
+        });
+    </script>
+</body>
+</html>
