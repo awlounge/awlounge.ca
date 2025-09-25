@@ -146,7 +146,7 @@ nav a:hover {
     position: relative;
     border-radius: 18px;
     overflow: hidden;
-    min-height: 275px;
+    min-height: 180px;
     box-shadow: 0 36px 90px rgba(20, 24, 30, 0.06);
     border: 1px solid rgba(16, 18, 20, 0.04);
 }
@@ -206,18 +206,19 @@ nav a:hover {
         /* === START: FINAL, STABLE CAROUSEL === */
         #carousel-container {
             /* This container needs space, but no centering styles */
-            min-height: 450px;
+            min-height: 500px;
         }
         .service-carousel {
             display: none;
         }
         .service-carousel.active {
-            display: block;
-            /* The entire component (carousel + arrows) is a single block */
-            width: 500px; /* Wider than the carousel for arrow spacing */
-            margin: 40px auto; /* Rock-solid centering */
-            position: relative;
-        }
+			/* This now stacks the carousel and its navigation vertically */
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin: 40px auto;
+			position: relative;
+}
         .carousel_wrapper {
             width: 360px;
             height: 350px;
@@ -254,32 +255,38 @@ nav a:hover {
             cursor: pointer;
             transform-origin: center center; /* THE CRITICAL FIX */
         }
-        .slide img { width: 80%; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+        .slide img { width: 50%; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
         .slide h3 { font-family: "Playfair Display", serif; font-size: 14px; margin: 4px 0; color: #5a3e36; }
         .slide p { font-family: "Inter", sans-serif; font-size: 10px; margin: 0; color: #333; }
         .slide-details { display: flex; justify-content: space-between; width: 100%; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 10px; color: var(--muted); font-weight: 600; }
         .slide-details span { display: flex; align-items: center; gap: 5px; }
         .slide-details i { color: var(--gold-2); }
         .carousel-nav {
-            position: static;
-        }
-        .carousel-nav button {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-10%);
-            z-index: 10;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: transparent;
-            color: var(--gold-2);
-            border: 2px solid var(--gold-2);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+    /* This container now positions the buttons underneath the carousel */
+    display: flex;
+    justify-content: space-between; /* Pushes buttons to the sides */
+    width: 300px; /* Controls the distance between buttons */
+    margin-top: 25px; /* The space between the slides and the arrows */
+    position: static;
+		}
+	.carousel-nav button {
+    /* REMOVED absolute positioning to put buttons in the normal flow */
+    position: static;
+    transform: none; /* Reset transform */
+    
+    /* All your appearance styles are preserved */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    color: var(--gold-2);
+    border: 2px solid var(--gold-2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+	}
         .carousel-nav button:hover { background: var(--gold-2); color: #fff; }
         .carousel-nav .prev { left: 0; }
         .carousel-nav .next { right: 0; }
