@@ -203,36 +203,37 @@ nav a:hover {
     box-shadow: 0 12px 12px rgba(183, 142, 70, 0.85);
 }
 
-/* --- START: Final Carousel Centering & Arrow Fix --- */
+/* --- START: FINAL Carousel Rewrite (Back to Basics) --- */
 
 .service-carousel {
-    display: none; /* Hides inactive carousels */
+    display: none;
 }
 .service-carousel.active {
-    display: flex; /* Use flex to guarantee centering of the wrapper */
-    justify-content: center;
-    position: relative; /* Positioning context for the arrows */
-	perspective: 1200px;
+    display: block;
+    position: relative;
+    /* This is the container for the whole component (slides + arrows) */
+    width: 480px; /* 360px for the carousel + 60px on each side for arrows */
+    margin: 40px auto; /* Classic, stable centering for the whole component */
 }
 #carousel-container {
-    display: flex;
-    justify-content: center;
-    padding: 40px 0;
-    overflow-x: hidden;
+    /* This container no longer needs centering styles */
+    min-height: 450px; /* Ensures it has space */
 }
 .carousel_wrapper {
-    max-width: 360px;
-    width: 100%;
+    width: 360px;
     height: 350px;
+    margin: 0 auto; /* Centers the 3D scene within the 480px container */
+    
+    /* The 3D context, now free of any conflicts */
     perspective: 1200px;
     transform: rotateX(20deg);
-    position: relative;
-    flex-shrink: 0; /* Prevents the wrapper from shrinking in the flex container */
 }
 .carousel {
     width: 100%;
     height: 100%;
     position: absolute;
+    top: 0;
+    left: 0;
     transform-style: preserve-3d;
     transition: transform 1s;
 }
@@ -290,17 +291,14 @@ nav a:hover {
     color: var(--gold-2);
 }
 .carousel-nav {
-    /* This container is now only for holding the buttons in the HTML */
-    margin-top: 0;
     position: static;
 }
 .carousel-nav button {
-    position: absolute; /* Position arrows relative to the active carousel container */
+    position: absolute;
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
-
-    /* Appearance styles */
+    /* Your appearance styles are preserved */
     width: 45px;
     height: 45px;
     border-radius: 50%;
@@ -318,21 +316,17 @@ nav a:hover {
     color: #fff;
 }
 .carousel-nav .prev {
-    /* Position based on the center, minus half the carousel, minus spacing */
-    /* calc(50% - half_carousel_width - desired_space) */
-    left: calc(50% - 180px - 30px);
+    left: 0; /* Aligns to the far left edge of the 480px container */
 }
 .carousel-nav .next {
-    /* calc(50% - half_carousel_width - desired_space) */
-    right: calc(50% - 180px - 30px);
+    right: 0; /* Aligns to the far right edge of the 480px container */
 }
 .carousel-nav button svg {
     width: 22px;
     height: 22px;
     stroke-width: 3;
 }
-
-/* --- END: Final Carousel Fix --- */
+/* --- END: FINAL Carousel Rewrite --- */
 
 .section-title {
     font-family: 'Playfair Display', serif;
