@@ -536,10 +536,50 @@ footer {
     .wrap {
         padding: 18px;
     }
-    header {
-        flex-wrap: wrap;
-        justify-content: center;
+     header {
+        flex-wrap: nowrap; /* Prevent items from wrapping to a new line */
+        justify-content: space-between; /* Space items out to the edges */
+        padding: 6px 10px; /* Reduce top/bottom and side padding */
+        gap: 8px;
     }
+
+    .logo {
+        width: 40px; /* Make the logo smaller */
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .brand .name {
+        font-size: 14px; /* Make the brand name text smaller */
+    }
+
+    .brand .sub {
+        display: none; /* Hide the address on mobile to save space */
+    }
+
+    /* 2. Replace the phone number text with an icon */
+    .header-cta {
+        font-size: 0; /* This makes the text "(226) 796-5138" invisible */
+        padding: 8px 12px; /* Adjust padding for a square icon button */
+    }
+
+    .header-cta::before {
+        content: '\f095'; /* This is the Font Awesome unicode for a phone icon */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: 16px; /* This sets the size of the new icon */
+    }
+    
+    /* Ensure the "Book Now" button doesn't also get an icon */
+    .primary-cta::before {
+        content: none;
+    }
+    
+    .primary-cta {
+        font-size: 14px; /* Keep the font size for the "Book Now" button */
+        padding: 8px 12px;
+    }
+}
     .hero-photo {
         height: 160px;
     }
