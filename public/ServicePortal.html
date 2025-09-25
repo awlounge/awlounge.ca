@@ -45,7 +45,7 @@
         td .btn { padding: 6px 10px; font-size: 12px; margin-right: 5px; }
         .image-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
         .team-list-container { display: grid; gap: 15px; }
-        .team-member-row { display: flex; align-items: center; background: var(--surface); padding: 15px 20px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; }
+        .team-member-row { display: flex; align-items: center; background: var(--surface); padding: 15px 20px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .team-member-row img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 20px; }
         .team-member-info { flex-grow: 1; }
         .team-member-info h3 { margin: 0; font-family: "Playfair Display", serif; font-size: 18px; }
@@ -61,7 +61,7 @@
 </head>
 <body>
     <div id="loginDiv">
-        <h2>Portal Login</h2>
+        <h2>AWL Portal Login</h2>
         <input type="text" id="loginUser" placeholder="Username" required>
         <input type="password" id="loginPass" placeholder="Password" required>
         <button id="loginBtn">Login</button>
@@ -86,7 +86,7 @@
                         <div class="form-row">
                             <div id="category-wrapper" style="flex: 1;">
                                 <select id="category" name="category" required></select>
-                                <input type="text" id="newCategoryInput" placeholder="Enter new category name and save service" class="hidden" style="width: 100%;">
+                                <input type="text" id="newCategoryInput" placeholder="Enter new category name and save" class="hidden" style="width: 100%;">
                             </div>
                             <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
                             <select id="performer" name="performer" required multiple></select>
@@ -166,11 +166,13 @@
             loginDiv.classList.add('hidden');
             adminDiv.classList.remove('hidden');
             adminDiv.classList.add(`role-${role}`);
+            
             const addNewMemberBtn = document.getElementById('addNewMemberBtn');
             if (addNewMemberBtn) {
                 if (role !== 'admin') { addNewMemberBtn.classList.add('hidden'); } 
                 else { addNewMemberBtn.classList.remove('hidden'); }
             }
+            
             loadPortalContent();
         }
 
@@ -225,14 +227,16 @@
             if(categorySelect) {
                 categorySelect.addEventListener('change', (e) => {
                     const categoryWrapper = document.getElementById('category-wrapper');
+                    const selectInput = categoryWrapper.querySelector('select');
+                    const textInput = categoryWrapper.querySelector('input');
                     if (e.target.value === 'addNewCategory') {
-                        categoryWrapper.querySelector('select').classList.add('hidden');
-                        categoryWrapper.querySelector('input').classList.remove('hidden');
-                        categoryWrapper.querySelector('input').focus();
+                        selectInput.classList.add('hidden');
+                        textInput.classList.remove('hidden');
+                        textInput.focus();
                     }
                 });
             }
-
+            
             const serviceForm = document.getElementById("serviceForm");
             if(serviceForm) {
                 serviceForm.onsubmit = async (e) => {
@@ -276,7 +280,7 @@
                     }
                 });
             }
-
+            
             const addNewMemberBtn = document.getElementById('addNewMemberBtn');
             if(addNewMemberBtn) {
                 addNewMemberBtn.addEventListener('click', (e) => { e.preventDefault(); showEditView(null); });
@@ -287,8 +291,8 @@
                 backLink.addEventListener('click', (e) => { e.preventDefault(); showListView(); });
             }
         }
-
-        // --- Functions to be populated with your logic ---
+        
+        // --- Data Loading & Rendering Functions ---
         function renderTeamList() {
              const container = document.querySelector('.team-list-container');
              if(!container) return;
@@ -300,10 +304,12 @@
                  container.innerHTML += memberHtml;
              });
         }
+
         function showListView() {
             document.getElementById('edit-profile-view').classList.add('hidden');
             document.getElementById('team-list-view').classList.remove('hidden');
         }
+
         function showEditView(memberId) {
              const deleteButton = document.querySelector('#edit-profile-view .btn-danger');
              if (role !== 'admin') { deleteButton.classList.add('hidden'); } else { deleteButton.classList.remove('hidden'); }
@@ -324,11 +330,68 @@
              document.getElementById('team-list-view').classList.add('hidden');
              document.getElementById('edit-profile-view').classList.remove('hidden');
         }
-        async function loadCategories() { /* Your full function here */ }
-        function populatePerformers() { /* Your full function here */ }
-        async function loadServices() { /* Your full function here */ }
-        window.deleteService = async function(id) { /* Your full function here */ };
-        window.editService = function(service) { /* Your full function here */ };
+        
+        async function loadCategories() {
+            const res = await fetch(`${BASE_URL}/api/categories`);
+            const categories = await res.json();
+            const categorySelect = document.getElementById('category');
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+                categorySelect.appendChild(option);
+            });
+            categorySelect.innerHTML += '<option value="addNewCategory" style="font-weight:bold; color:var(--blue);">+ Add New Category</option>';
+        }
+
+        function populatePerformers() {
+            const performerSelect = document.getElementById("performer");
+            const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"];
+            performerSelect.innerHTML = "";
+            allPerformers.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p;
+                option.text = p;
+                performerSelect.appendChild(option);
+            });
+        }
+
+        async function loadServices() {
+            if (!token) return;
+            const res = await fetch(`${BASE_URL}/services`, { headers: { "Authorization": `Bearer ${token}` } });
+            const data = await res.json();
+            const tbody = document.querySelector("#servicesTable tbody");
+            tbody.innerHTML = "";
+            data.forEach(s => {
+                const tr = document.createElement("tr");
+                const imageCell = s.imageurl ? `<img src="${s.imageurl}" alt="${s.name}" class="image-preview">` : 'No Image';
+                tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.category}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="btn btn-main edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button class="btn btn-danger" onclick="deleteService(${s.id})">Delete</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Global Functions (from your original code) ---
+        window.deleteService = async function(id) {
+            if (!confirm("Are you sure?")) return;
+            const res = await fetch(`${BASE_URL}/services/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
+            if (res.ok) { loadServices(); localStorage.setItem('servicesUpdated', Date.now()); }
+        };
+
+        window.editService = function(service) {
+            document.getElementById("serviceId").value = service.id;
+            document.getElementById("category").value = service.category;
+            document.getElementById("name").value = service.name;
+            document.getElementById("duration").value = service.duration;
+            document.getElementById("price").value = service.price;
+            document.getElementById("description").value = service.description || '';
+            const performerSelect = document.getElementById("performer");
+            const performers = service.performer.split(',').map(p => p.trim());
+            Array.from(performerSelect.options).forEach(option => {
+                option.selected = performers.includes(option.value);
+            });
+            window.scrollTo(0, 0);
+        };
 
         // --- Initialize the Page ---
         setupEventListeners();
