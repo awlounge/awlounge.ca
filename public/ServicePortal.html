@@ -168,8 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Element Selectors ---
     const loginDiv = document.getElementById('loginDiv');
     const adminDiv = document.getElementById('adminDiv');
-
-    // --- View Switching Elements ---
     const portalNav = document.querySelector('.portal-nav');
     const portalViews = document.querySelectorAll('.portal-view');
     const teamListView = document.getElementById('team-list-view');
@@ -181,8 +179,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("userRole").innerText = role;
         loginDiv.classList.add('hidden');
         adminDiv.classList.remove('hidden');
+        adminDiv.classList.add(`role-${role}`);
         
-        // Initialize portal features
+        const addNewMemberBtn = document.getElementById('addNewMemberBtn');
+        // PERMISSION FIX: Only the 'admin' can see the "Add New" button.
+        if (role !== 'admin') {
+            addNewMemberBtn.classList.add('hidden');
+        } else {
+            addNewMemberBtn.classList.remove('hidden');
+        }
+        
         populatePerformers();
         loadCategories();
         loadServices();
@@ -190,12 +196,59 @@ document.addEventListener('DOMContentLoaded', () => {
         setupEventListeners();
     }
 
-    // --- Authentication ---
-    if (token) {
-        showAdminPortal();
+    // --- Team Management Functions ---
+    function renderTeamList() {
+        const container = document.querySelector('.team-list-container');
+        container.innerHTML = '';
+        Object.values(teamData).forEach(member => {
+            // PERMISSION FIX: An 'admin' can edit everyone. Others can only edit themselves.
+            const canEdit = (role === 'admin' || username === member.id);
+            const editButtonHTML = canEdit 
+                ? `<a href="#" class="edit-btn"><i class="fas fa-pen"></i> Edit</a>` 
+                : ''; 
+
+            const memberHtml = `
+                <div class="team-member-row" data-member-id="${member.id}">
+                    <img src="${member.imageUrl}" alt="${member.name}">
+                    <div class="team-member-info">
+                        <h3>${member.name}</h3>
+                        <p>${member.title}</p>
+                        <span class="role-badge role-${member.role}">${member.role}</span>
+                    </div>
+                    ${editButtonHTML}
+                </div>`;
+            container.innerHTML += memberHtml;
+        });
     }
-    
-    // --- Service Management Functions (Your Original Code, Adapted) ---
+
+    function showEditView(memberId) {
+        const deleteButton = editProfileView.querySelector('.btn-danger');
+        // PERMISSION FIX: Only the 'admin' can see the "Delete" button.
+        if (role !== 'admin') {
+            deleteButton.classList.add('hidden');
+        } else {
+            deleteButton.classList.remove('hidden');
+        }
+
+        const member = teamData[memberId];
+        if (!memberId) {
+            document.getElementById('edit-form-title').textContent = "Add New Team Member";
+            document.querySelector('.edit-profile-form').reset();
+            document.getElementById('profileImagePreview').src = "https://via.placeholder.com/150/ccc/FFFFFF?text=New";
+        } else {
+            document.getElementById('edit-form-title').textContent = `Edit Profile: ${member.name}`;
+            document.getElementById('profileImagePreview').src = member.imageUrl;
+            document.getElementById('edit-name').value = member.name;
+            document.getElementById('edit-title').value = member.title;
+            document.getElementById('edit-role').value = member.role;
+            document.getElementById('edit-specialty').value = member.specialty;
+            document.getElementById('edit-bio').value = member.bio;
+        }
+        teamListView.classList.add('hidden');
+        editProfileView.classList.remove('hidden');
+    }
+
+    // --- Service Management Functions ---
     async function loadCategories() {
         const res = await fetch(`${BASE_URL}/api/categories`);
         const categories = await res.json();
@@ -207,13 +260,12 @@ document.addEventListener('DOMContentLoaded', () => {
             option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
             categorySelect.appendChild(option);
         });
-        // Add the "Add New" option
         categorySelect.innerHTML += '<option value="addNewCategory" style="font-weight:bold; color:var(--blue);">+ Add New Category</option>';
     }
     
     function populatePerformers() {
         const performerSelect = document.getElementById("performer");
-        const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"]; // This should eventually come from the team data
+        const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"];
         performerSelect.innerHTML = "";
         allPerformers.forEach(p => {
             const option = document.createElement("option");
@@ -237,54 +289,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Team Management Functions ---
-    function renderTeamList() {
-        const container = document.querySelector('.team-list-container');
-        container.innerHTML = '';
-        Object.values(teamData).forEach(member => {
-            const memberHtml = `
-                <div class="team-member-row" data-member-id="${member.id}">
-                    <img src="${member.imageUrl}" alt="${member.name}">
-                    <div class="team-member-info">
-                        <h3>${member.name}</h3>
-                        <p>${member.title}</p>
-                        <span class="role-badge role-${member.role}">${member.role}</span>
-                    </div>
-                    <a href="#" class="edit-btn"><i class="fas fa-pen"></i> Edit</a>
-                </div>`;
-            container.innerHTML += memberHtml;
-        });
-    }
-
-    function showListView() {
-        editProfileView.classList.add('hidden');
-        teamListView.classList.remove('hidden');
-    }
-
-    function showEditView(memberId) {
-        const member = teamData[memberId];
-        if (!member) {
-            // This would be for a new member
-            document.getElementById('edit-form-title').textContent = "Add New Team Member";
-            document.querySelector('.edit-profile-form').reset();
-            document.getElementById('profileImagePreview').src = "https://via.placeholder.com/150/ccc/FFFFFF?text=New";
-        } else {
-            // Populate the form for an existing member
-            document.getElementById('edit-form-title').textContent = `Edit Profile: ${member.name}`;
-            document.getElementById('profileImagePreview').src = member.imageUrl;
-            document.getElementById('edit-name').value = member.name;
-            document.getElementById('edit-title').value = member.title;
-            document.getElementById('edit-role').value = member.role;
-            document.getElementById('edit-specialty').value = member.specialty;
-            document.getElementById('edit-bio').value = member.bio;
-        }
-        teamListView.classList.add('hidden');
-        editProfileView.classList.remove('hidden');
-    }
-
     // --- Event Listeners Setup ---
     function setupEventListeners() {
-        // Login & Logout
         document.getElementById("loginBtn").onclick = async () => {
             const user = document.getElementById("loginUser").value;
             const pass = document.getElementById("loginPass").value;
@@ -298,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         document.getElementById("logoutBtn").onclick = () => { localStorage.clear(); window.location.reload(); };
 
-        // Portal Tab Switching
         portalNav.addEventListener('click', (event) => {
             const navLink = event.target.closest('.portal-nav-link');
             if (!navLink) return;
@@ -308,7 +313,6 @@ document.addEventListener('DOMContentLoaded', () => {
             portalViews.forEach(view => view.classList.toggle('active', view.id === targetId));
         });
 
-        // Add New Category (Inline)
         document.getElementById('category').addEventListener('change', (e) => {
             const categoryWrapper = document.getElementById('category-wrapper');
             if (e.target.value === 'addNewCategory') {
@@ -318,34 +322,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Service Form Submission
         document.getElementById("serviceForm").onsubmit = async (e) => {
             e.preventDefault();
             const form = e.target;
             const id = form.serviceId.value;
             const formData = new FormData();
-            
-            // Handle new category input
             let categoryValue = form.category.value;
             const newCategoryInput = document.getElementById('newCategoryInput');
             if (!newCategoryInput.classList.contains('hidden') && newCategoryInput.value.trim()) {
-                // If a new category was typed, we can create it first or send it with the form.
-                // For now, let's just use its value.
                 categoryValue = newCategoryInput.value.trim();
             }
             formData.append('category', categoryValue);
-            
-            ['id', 'name', 'duration', 'price', 'description'].forEach(fieldName => {
-                if (form[fieldName]) formData.append(fieldName, form[fieldName].value);
-            });
+            ['id', 'name', 'duration', 'price', 'description'].forEach(fieldName => { if (form[fieldName]) formData.append(fieldName, form[fieldName].value); });
             const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
             formData.append('performer', selectedPerformers.join(', '));
             if (form.image.files[0]) { formData.append('image', form.image.files[0]); }
-
             const url = id ? `${BASE_URL}/services/${id}` : `${BASE_URL}/services`;
             const method = id ? "PUT" : "POST";
             const res = await fetch(url, { method, headers: { "Authorization": `Bearer ${token}` }, body: formData });
-            
             if (res.ok) {
                 form.reset();
                 Array.from(document.getElementById('performer').options).forEach(opt => opt.selected = false);
@@ -358,7 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else { alert('Failed to save service.'); }
         };
 
-        // Team Management Events
         document.querySelector('.team-list-container').addEventListener('click', (event) => {
             const editButton = event.target.closest('.edit-btn');
             if (editButton) {
@@ -371,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#edit-profile-view .back-link').addEventListener('click', (e) => { e.preventDefault(); showListView(); });
     }
 
-    // --- Global Functions needed for inline HTML onclick ---
+    // --- Global Functions ---
     window.deleteService = async function(id) {
         if (!confirm("Are you sure?")) return;
         const res = await fetch(`${BASE_URL}/services/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
@@ -386,11 +379,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById("description").value = service.description || '';
         const performerSelect = document.getElementById("performer");
         const performers = service.performer.split(',').map(p => p.trim());
-        Array.from(performerSelect.options).forEach(option => {
-            option.selected = performers.includes(option.value);
-        });
-        window.scrollTo(0, 0); // Scroll to top to see the form
+        Array.from(performerSelect.options).forEach(option => { option.selected = performers.includes(option.value); });
+        window.scrollTo(0, 0);
     };
+
+    // --- Initial Check ---
+    if (token) {
+        showAdminPortal();
+    }
 });
 </script>
 </body>
