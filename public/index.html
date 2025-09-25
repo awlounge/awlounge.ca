@@ -543,7 +543,7 @@ footer {
     }
 
     .hero-frame {
-        height: 160px; /* Corrected typo, was missing 'px' */
+        height: 160px;
     }
 
     .team-member-header {
@@ -566,37 +566,43 @@ footer {
         min-width: 100px;
     }
 
-    /* --- START: New Mobile Header Layout --- */
-    
-    /* Hide the full nav menu and show the hamburger button */
-    nav { 
-        display: none; 
+    /* --- START: Your Specific Mobile Header Layout --- */
+
+    /* SHOW the navigation links on mobile. */
+    nav {
+        display: flex;
+        justify-content: center; /* Center the links within their grid cell */
+        align-items: center;
+        gap: 8px; /* Reduce space between links */
+        flex-wrap: wrap; /* Allow wrapping just in case */
     }
     
-    .mobile-nav-toggle { 
-        display: block; 
+    /* Style the nav links to fit on mobile */
+    nav a {
+        font-size: 13px; /* Smaller font size */
+        padding: 2px 4px; /* Reduced padding */
+        font-weight: 500;
     }
 
-    /* Use CSS Grid for the new two-row header layout */
+    /* Use CSS Grid for the precise two-row layout */
     header {
         display: grid;
-        grid-template-columns: auto 1fr auto; /* Col 1: Logo, Col 2: Spacer, Col 3: Phone/Menu */
+        grid-template-columns: auto 1fr auto; /* Col 1: Logo, Col 2: Nav, Col 3: Phone */
         grid-template-rows: auto auto;    /* Row 1, Row 2 */
         align-items: center;
         padding: 8px 15px; /* Skinnier padding */
-        gap: 10px;
+        row-gap: 10px;
     }
 
     /* --- Row 1 Placement --- */
-    .brand { grid-area: 1 / 1 / 2 / 2; } /* Row 1, Col 1 */
-    .header-ctas { grid-area: 1 / 3 / 2 / 4; } /* Row 1, Col 3 */
-    .mobile-nav-toggle { grid-area: 1 / 3 / 2 / 4; justify-self: end; padding-left: 10px;} /* Puts hamburger on the right */
+    .brand { grid-area: 1 / 1 / 2 / 2; }       /* Row 1, Col 1 */
+    nav { grid-area: 1 / 2 / 2 / 3; }          /* Row 1, Col 2 */
+    .header-ctas { grid-area: 1 / 3 / 2 / 4; }  /* Row 1, Col 3 */
 
     /* --- Row 2 Placement --- */
     .primary-cta {
         grid-area: 2 / 1 / 3 / 4; /* Row 2, span all columns */
         justify-self: center;     /* Center it horizontally */
-        margin-top: 8px;
     }
     
     /* --- Styling for a "Thinner" Look --- */
@@ -619,7 +625,7 @@ footer {
         font-weight: 900;
         font-size: 18px;
     }
-    /* --- END: New Mobile Header Layout --- */
+    /* --- END: Your Specific Mobile Header Layout --- */
 }
     </style>
 </head>
@@ -630,11 +636,6 @@ footer {
         <img src="AWL_Logo.jpg" alt="AWL Logo" class="logo" aria-hidden="true" />
         <div><div class="name">Aesthetics & Wellness Lounge</div><div class="sub">577 Dundas St, Woodstock, ON</div></div>
     </a>
-    
-    <button class="mobile-nav-toggle" aria-controls="primary-navigation" aria-expanded="false">
-        <span class="sr-only">Menu</span>
-        <i class="fas fa-bars" aria-hidden="true"></i>
-    </button>
     
     <nav role="navigation">
         <a href="#services" id="navServices">Services</a>
