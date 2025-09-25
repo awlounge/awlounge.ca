@@ -14,14 +14,10 @@
         body { margin: 0; font-family: "Inter", system-ui, sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; line-height: 1.5; padding: 20px; }
         .portal-container { max-width: var(--container); margin: 0 auto; }
         .hidden { display: none !important; }
-
-        /* --- Login Styles --- */
         #loginDiv { max-width: 320px; margin: 100px auto; background: var(--surface); padding: 30px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         #loginDiv h2 { font-family: "Playfair Display", serif; text-align: center; margin-top: 0; }
         #loginDiv input { display: block; width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 8px; }
         #loginDiv button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--blue); color: #fff; font-weight: bold; cursor: pointer; }
-
-        /* --- Main Portal Layout --- */
         .portal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .portal-header p { margin: 0; color: var(--muted); }
         .portal-nav { display: flex; justify-content: flex-start; background-color: var(--surface); padding: 5px; border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 30px; }
@@ -29,8 +25,6 @@
         .portal-nav-link.active { color: #fff; background: var(--blue); }
         .portal-view { display: none; }
         .portal-view.active { display: block; }
-
-        /* --- General UI Components --- */
         .container { background: var(--surface); padding: 25px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
         h1, h2 { font-family: "Playfair Display", serif; margin-top: 0; }
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
@@ -45,15 +39,11 @@
         .btn-main { background-color: var(--blue); color: white; }
         .btn-danger { background-color: var(--red); color: white; }
         .btn-secondary { background-color: #6c757d; color: white; }
-        
-        /* --- Services Table --- */
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; vertical-align: middle; }
         th { background: var(--blue); color: #fff; }
         td .btn { padding: 6px 10px; font-size: 12px; margin-right: 5px; }
         .image-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
-
-        /* --- Team Management Styles --- */
         .team-list-container { display: grid; gap: 15px; }
         .team-member-row { display: flex; align-items: center; background: var(--surface); padding: 15px 20px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; }
         .team-member-row img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 20px; }
@@ -61,6 +51,7 @@
         .team-member-info h3 { margin: 0; font-family: "Playfair Display", serif; font-size: 18px; }
         .team-member-info p { margin: 0; color: var(--muted); font-size: 14px; }
         .role-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 5px; text-transform: uppercase; }
+        .role-admin { background-color: rgba(217, 83, 79, 0.15); color: var(--red); }
         .role-owner { background-color: rgba(183, 142, 70, 0.15); color: var(--gold-2); }
         .role-employee { background-color: rgba(123, 123, 128, 0.15); color: var(--muted); }
         .edit-profile-form { display: grid; grid-template-columns: 200px 1fr; gap: 40px; }
@@ -82,7 +73,6 @@
                 <p>Logged in as <strong id="loggedInUser"></strong> (<span id="userRole"></span>)</p>
                 <button id="logoutBtn" class="btn btn-secondary" style="padding: 8px 15px;">Logout</button>
             </div>
-
             <nav class="portal-nav">
                 <button class="portal-nav-link active" data-target="services-view">Manage Services</button>
                 <button class="portal-nav-link" data-target="team-view">Manage Team Profiles</button>
@@ -153,8 +143,8 @@
     </div>
 
 <script>
-    // This is the complete and final script with all features and fixes.
     document.addEventListener('DOMContentLoaded', () => {
+        // --- State & Config ---
         const BASE_URL = '';
         let token = localStorage.getItem('token');
         let username = localStorage.getItem('username');
@@ -164,13 +154,12 @@
             maricel: { id: "maricel", name: "Maricel Tamburri", title: "Co-Owner/Manager", role: "owner", specialty: "~Microblading/Brows/Lashes~", bio: "I was born and raised in Etobicoke, ON...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=M" },
             trechan: { id: "trechan", name: "Trechan Legria", title: "Co-Owner/Manager", role: "owner", specialty: "~Makeover/Mani-Pedi~", bio: "Born in the Philippines, my family and I...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=T" }
         };
+
+        // --- Element Selectors ---
         const loginDiv = document.getElementById('loginDiv');
         const adminDiv = document.getElementById('adminDiv');
-        const portalNav = document.querySelector('.portal-nav');
-        const portalViews = document.querySelectorAll('.portal-view');
-        const teamListView = document.getElementById('team-list-view');
-        const editProfileView = document.getElementById('edit-profile-view');
 
+        // --- Core Functions ---
         function showAdminPortal() {
             document.getElementById("loggedInUser").innerText = username;
             document.getElementById("userRole").innerText = role;
@@ -178,95 +167,171 @@
             adminDiv.classList.remove('hidden');
             adminDiv.classList.add(`role-${role}`);
             const addNewMemberBtn = document.getElementById('addNewMemberBtn');
-            if (role !== 'admin') { addNewMemberBtn.classList.add('hidden'); } else { addNewMemberBtn.classList.remove('hidden'); }
+            if (addNewMemberBtn) {
+                if (role !== 'admin') { addNewMemberBtn.classList.add('hidden'); } 
+                else { addNewMemberBtn.classList.remove('hidden'); }
+            }
+            loadPortalContent();
+        }
+
+        function loadPortalContent() {
             populatePerformers();
             loadCategories();
             loadServices();
             renderTeamList();
-            setupEventListeners();
         }
-
-        function renderTeamList() {
-            const container = document.querySelector('.team-list-container');
-            container.innerHTML = '';
-            Object.values(teamData).forEach(member => {
-                const canEdit = (role === 'admin' || username === member.id);
-                const editButtonHTML = canEdit ? `<a href="#" class="btn edit-btn"><i class="fas fa-pen"></i> Edit</a>` : '';
-                const memberHtml = `<div class="team-member-row" data-member-id="${member.id}"><img src="${member.imageUrl}" alt="${member.name}"><div class="team-member-info"><h3>${member.name}</h3><p>${member.title}</p><span class="role-badge role-${member.role}">${member.role}</span></div>${editButtonHTML}</div>`;
-                container.innerHTML += memberHtml;
-            });
-        }
-
-        function showEditView(memberId) {
-            const deleteButton = editProfileView.querySelector('.btn-danger');
-            if (role !== 'admin') { deleteButton.classList.add('hidden'); } else { deleteButton.classList.remove('hidden'); }
-            const member = teamData[memberId];
-            if (!memberId) {
-                document.getElementById('edit-form-title').textContent = "Add New Team Member";
-                document.querySelector('.edit-profile-form').reset();
-                document.getElementById('profileImagePreview').src = "https://via.placeholder.com/150/ccc/FFFFFF?text=New";
-            } else {
-                document.getElementById('edit-form-title').textContent = `Edit Profile: ${member.name}`;
-                document.getElementById('profileImagePreview').src = member.imageUrl;
-                document.getElementById('edit-name').value = member.name;
-                document.getElementById('edit-title').value = member.title;
-                document.getElementById('edit-role').value = member.role;
-                document.getElementById('edit-specialty').value = member.specialty;
-                document.getElementById('edit-bio').value = member.bio;
-            }
-            teamListView.classList.add('hidden');
-            editProfileView.classList.remove('hidden');
-        }
-
-        async function loadCategories() { /* Your original function */ }
-        function populatePerformers() { /* Your original function */ }
-        async function loadServices() { /* Your original function */ }
 
         function setupEventListeners() {
             document.getElementById("loginBtn").onclick = async () => {
                 const user = document.getElementById("loginUser").value;
                 const pass = document.getElementById("loginPass").value;
-                const res = await fetch(`${BASE_URL}/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: user, password: pass }) });
-                const data = await res.json();
-                if (data.success) {
-                    token = data.token; username = data.username; role = data.role;
-                    localStorage.setItem("token", token); localStorage.setItem("username", username); localStorage.setItem("role", role);
-                    showAdminPortal();
-                } else { alert(data.error); }
+                try {
+                    const res = await fetch(`${BASE_URL}/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: user, password: pass }) });
+                    const data = await res.json();
+                    if (data.success) {
+                        token = data.token; username = data.username; role = data.role;
+                        localStorage.setItem("token", token); 
+                        localStorage.setItem("username", username); 
+                        localStorage.setItem("role", role);
+                        showAdminPortal();
+                    } else { 
+                        alert(data.error || 'Login failed'); 
+                    }
+                } catch (error) {
+                    alert('Could not connect to the server.');
+                }
             };
-            document.getElementById("logoutBtn").onclick = () => { localStorage.clear(); window.location.reload(); };
-            portalNav.addEventListener('click', (event) => {
-                const navLink = event.target.closest('.portal-nav-link');
-                if (!navLink) return;
-                const targetId = navLink.dataset.target;
-                portalNav.querySelector('.active').classList.remove('active');
-                navLink.classList.add('active');
-                portalViews.forEach(view => view.classList.toggle('active', view.id === targetId));
-            });
-            document.getElementById('category').addEventListener('change', (e) => {
-                const categoryWrapper = document.getElementById('category-wrapper');
-                if (e.target.value === 'addNewCategory') {
-                    categoryWrapper.querySelector('select').classList.add('hidden');
-                    categoryWrapper.querySelector('input').classList.remove('hidden');
-                    categoryWrapper.querySelector('input').focus();
-                }
-            });
-            document.getElementById("serviceForm").onsubmit = async (e) => { /* Your original function */ };
-            document.querySelector('.team-list-container').addEventListener('click', (event) => {
-                const editButton = event.target.closest('.edit-btn');
-                if (editButton) {
-                    event.preventDefault();
-                    const memberRow = event.target.closest('.team-member-row');
-                    showEditView(memberRow.dataset.memberId);
-                }
-            });
-            document.getElementById('addNewMemberBtn').addEventListener('click', (e) => { e.preventDefault(); showEditView(null); });
-            document.querySelector('#edit-profile-view .back-link').addEventListener('click', (e) => { e.preventDefault(); showListView(); });
+            
+            document.getElementById("logoutBtn").onclick = () => {
+                localStorage.clear();
+                window.location.reload();
+            };
+
+            const portalNav = document.querySelector('.portal-nav');
+            if(portalNav) {
+                portalNav.addEventListener('click', (event) => {
+                    const navLink = event.target.closest('.portal-nav-link');
+                    if (!navLink) return;
+                    const targetId = navLink.dataset.target;
+                    portalNav.querySelector('.active').classList.remove('active');
+                    navLink.classList.add('active');
+                    document.querySelectorAll('.portal-view').forEach(view => {
+                        view.classList.toggle('active', view.id === targetId);
+                    });
+                });
+            }
+
+            const categorySelect = document.getElementById('category');
+            if(categorySelect) {
+                categorySelect.addEventListener('change', (e) => {
+                    const categoryWrapper = document.getElementById('category-wrapper');
+                    if (e.target.value === 'addNewCategory') {
+                        categoryWrapper.querySelector('select').classList.add('hidden');
+                        categoryWrapper.querySelector('input').classList.remove('hidden');
+                        categoryWrapper.querySelector('input').focus();
+                    }
+                });
+            }
+
+            const serviceForm = document.getElementById("serviceForm");
+            if(serviceForm) {
+                serviceForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const form = e.target;
+                    const id = form.serviceId.value;
+                    const formData = new FormData();
+                    let categoryValue = form.category.value;
+                    const newCategoryInput = document.getElementById('newCategoryInput');
+                    if (!newCategoryInput.classList.contains('hidden') && newCategoryInput.value.trim()) {
+                        categoryValue = newCategoryInput.value.trim();
+                    }
+                    formData.append('category', categoryValue);
+                    ['id', 'name', 'duration', 'price', 'description'].forEach(fieldName => { if (form[fieldName]) formData.append(fieldName, form[fieldName].value); });
+                    const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
+                    formData.append('performer', selectedPerformers.join(', '));
+                    if (form.image.files[0]) { formData.append('image', form.image.files[0]); }
+                    const url = id ? `${BASE_URL}/services/${id}` : `${BASE_URL}/services`;
+                    const method = id ? "PUT" : "POST";
+                    const res = await fetch(url, { method, headers: { "Authorization": `Bearer ${token}` }, body: formData });
+                    if (res.ok) {
+                        form.reset();
+                        document.getElementById('serviceId').value = '';
+                        newCategoryInput.classList.add('hidden');
+                        document.getElementById('category').classList.remove('hidden');
+                        loadServices();
+                        loadCategories();
+                        localStorage.setItem('servicesUpdated', Date.now());
+                    } else { alert('Failed to save service.'); }
+                };
+            }
+
+            const teamListContainer = document.querySelector('.team-list-container');
+            if(teamListContainer) {
+                teamListContainer.addEventListener('click', (event) => {
+                    const editButton = event.target.closest('.edit-btn');
+                    if (editButton) {
+                        event.preventDefault();
+                        const memberRow = event.target.closest('.team-member-row');
+                        showEditView(memberRow.dataset.memberId);
+                    }
+                });
+            }
+
+            const addNewMemberBtn = document.getElementById('addNewMemberBtn');
+            if(addNewMemberBtn) {
+                addNewMemberBtn.addEventListener('click', (e) => { e.preventDefault(); showEditView(null); });
+            }
+
+            const backLink = document.querySelector('#edit-profile-view .back-link');
+            if(backLink) {
+                backLink.addEventListener('click', (e) => { e.preventDefault(); showListView(); });
+            }
         }
 
-        window.deleteService = async function(id) { /* Your original function */ };
-        window.editService = function(service) { /* Your original function */ };
+        // --- Functions to be populated with your logic ---
+        function renderTeamList() {
+             const container = document.querySelector('.team-list-container');
+             if(!container) return;
+             container.innerHTML = '';
+             Object.values(teamData).forEach(member => {
+                 const canEdit = (role === 'admin' || username === member.id);
+                 const editButtonHTML = canEdit ? `<a href="#" class="btn edit-btn"><i class="fas fa-pen"></i> Edit</a>` : '';
+                 const memberHtml = `<div class="team-member-row" data-member-id="${member.id}"><img src="${member.imageUrl}" alt="${member.name}"><div class="team-member-info"><h3>${member.name}</h3><p>${member.title}</p><span class="role-badge role-${member.role}">${member.role}</span></div>${editButtonHTML}</div>`;
+                 container.innerHTML += memberHtml;
+             });
+        }
+        function showListView() {
+            document.getElementById('edit-profile-view').classList.add('hidden');
+            document.getElementById('team-list-view').classList.remove('hidden');
+        }
+        function showEditView(memberId) {
+             const deleteButton = document.querySelector('#edit-profile-view .btn-danger');
+             if (role !== 'admin') { deleteButton.classList.add('hidden'); } else { deleteButton.classList.remove('hidden'); }
+             const member = teamData[memberId];
+             if (!memberId) {
+                 document.getElementById('edit-form-title').textContent = "Add New Team Member";
+                 document.querySelector('.edit-profile-form').reset();
+                 document.getElementById('profileImagePreview').src = "https://via.placeholder.com/150/ccc/FFFFFF?text=New";
+             } else {
+                 document.getElementById('edit-form-title').textContent = `Edit Profile: ${member.name}`;
+                 document.getElementById('profileImagePreview').src = member.imageUrl;
+                 document.getElementById('edit-name').value = member.name;
+                 document.getElementById('edit-title').value = member.title;
+                 document.getElementById('edit-role').value = member.role;
+                 document.getElementById('edit-specialty').value = member.specialty;
+                 document.getElementById('edit-bio').value = member.bio;
+             }
+             document.getElementById('team-list-view').classList.add('hidden');
+             document.getElementById('edit-profile-view').classList.remove('hidden');
+        }
+        async function loadCategories() { /* Your full function here */ }
+        function populatePerformers() { /* Your full function here */ }
+        async function loadServices() { /* Your full function here */ }
+        window.deleteService = async function(id) { /* Your full function here */ };
+        window.editService = function(service) { /* Your full function here */ };
 
+        // --- Initialize the Page ---
+        setupEventListeners();
         if (token) {
             showAdminPortal();
         }
