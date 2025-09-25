@@ -6,9 +6,11 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6f8; }
         h1, h2 { color: #333; }
-        form { display: flex; flex-direction: column; gap: 10px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        form { display: flex; flex-direction: column; gap: 10px; }
         .form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
         input, select, button, textarea { padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; }
+        select[multiple] { height: 100px; }
         textarea { width: 100%; min-height: 60px; font-family: Arial, sans-serif; }
         button { background-color: #007BFF; color: #fff; border: none; cursor: pointer; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); table-layout: fixed; }
@@ -16,7 +18,7 @@
         th { background: #007BFF; color: #fff; }
         td button { background-color: #dc3545; margin-right: 5px; }
         td button.edit { background-color: #28a745; }
-        .image-preview { max-width: 150px; max-height: 150px; }
+        .image-preview { max-width: 50px; max-height: 50px; }
         th:last-child, td:last-child { width: 130px; text-align: center; }
     </style>
 </head>
@@ -30,41 +32,39 @@
 
     <div id="adminDiv" style="display:none;">
         <p>Logged in as <span id="loggedInUser"></span> (<span id="userRole"></span>) <button id="logoutBtn" style="background-color: #6c757d;">Logout</button></p>
-        <h1>Manage Your Services</h1>
-        <form id="serviceForm">
-            <input type="hidden" id="serviceId" name="id">
-            <input type="hidden" id="existingImageUrl" name="existingImageUrl">
+        
+        <div class="container">
+            <h2>Manage Categories</h2>
             <div class="form-row">
-                <select id="category" name="category" required>
-                    <option value="">Category</option>
-                    <option value="relaxation">Relaxation</option>
-                    <option value="beauty">Beauty</option>
-                    <option value="aesthetics">Aesthetics</option>
-                    <option value="hairtreatment">Hair Treatment</option>
-                    <option value="photography">Photography</option>
-                    <option value="rejuvenate">Rejuvenate</option>
-                </select>
-                <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
-                <select id="performer" name="performer" required></select>
-                <input type="number" id="duration" name="duration" placeholder="Duration (min)" required>
-                <input type="number" id="price" name="price" placeholder="Price (cents)" required>
-                <input type="file" id="image" name="image" accept="image/*">
+                <input type="text" id="newCategoryName" placeholder="New Category Name" style="flex: 1;">
+                <button id="addCategoryBtn">Add Category</button>
             </div>
-            <textarea id="description" name="description" placeholder="Enter service description here..."></textarea>
-            <div class="form-row">
-                <button type="submit">Save Service</button>
-            </div>
-        </form>
+        </div>
+
+        <div class="container">
+            <h2>Manage Services</h2>
+            <form id="serviceForm">
+                <input type="hidden" id="serviceId" name="id">
+                <input type="hidden" id="existingImageUrl" name="existingImageUrl">
+                <div class="form-row">
+                    <select id="category" name="category" required></select>
+                    <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
+                    <select id="performer" name="performer" required multiple></select>
+                    <input type="number" id="duration" name="duration" placeholder="Duration (min)" required>
+                    <input type="number" id="price" name="price" placeholder="Price (cents)" required>
+                    <input type="file" id="image" name="image" accept="image/*">
+                </div>
+                <textarea id="description" name="description" placeholder="Enter service description here..."></textarea>
+                <div class="form-row">
+                    <button type="submit">Save Service</button>
+                </div>
+            </form>
+        </div>
+
         <table id="servicesTable">
             <thead>
                 <tr>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Provider</th>
-                    <th>Duration</th>
-                    <th>Price</th>
-                    <th>Actions</th>
+                    <th>Image</th><th>Name</th><th>Description</th><th>Provider(s)</th><th>Duration</th><th>Price</th><th>Actions</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -87,10 +87,11 @@
             loginDiv.style.display = "none";
             adminDiv.style.display = "block";
             populatePerformers();
+            loadCategories();
             loadServices();
         }
 
-        if (token && username && role) {
+        if (token) {
             showAdminPortal();
         }
 
@@ -121,6 +122,41 @@
             window.location.reload();
         };
 
+        async function loadCategories() {
+            const res = await fetch(`${BASE_URL}/api/categories`);
+            const categories = await res.json();
+            const categorySelect = document.getElementById('category');
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+                categorySelect.appendChild(option);
+            });
+        }
+
+        document.getElementById('addCategoryBtn').onclick = async () => {
+            const newCategoryInput = document.getElementById('newCategoryName');
+            const name = newCategoryInput.value.trim();
+            if (!name) {
+                alert('Please enter a category name.');
+                return;
+            }
+            const res = await fetch(`${BASE_URL}/api/categories`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ name })
+            });
+            if (res.ok) {
+                newCategoryInput.value = '';
+                await loadCategories();
+                localStorage.setItem('servicesUpdated', Date.now());
+            } else {
+                const err = await res.json();
+                alert(`Error: ${err.error}`);
+            }
+        };
+
         function populatePerformers() {
             const performerSelect = document.getElementById("performer");
             const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"];
@@ -135,48 +171,42 @@
 
         async function loadServices() {
             if (!token) return;
-            const res = await fetch(`${BASE_URL}/services`, {
-                headers: { "Authorization": `Bearer ${token}` }
-            });
+            const res = await fetch(`${BASE_URL}/services`, { headers: { "Authorization": `Bearer ${token}` } });
             const data = await res.json();
             const tbody = document.querySelector("#servicesTable tbody");
             tbody.innerHTML = "";
             data.forEach(s => {
                 const tr = document.createElement("tr");
                 const imageCell = s.imageurl ? `<img src="${s.imageurl}" alt="${s.name}" class="image-preview">` : 'No Image';
-                tr.innerHTML = `
-                    <td>${imageCell}</td>
-                    <td>${s.name}</td>
-                    <td>${s.description || ''}</td>
-                    <td>${s.performer}</td>
-                    <td>${s.duration} min</td>
-                    <td>$${(s.price / 100).toFixed(2)}</td>
-                    <td>
-                        <button class="edit" onclick='editService(${JSON.stringify(s)})'>Edit</button>
-                        <button onclick="deleteService(${s.id})">Delete</button>
-                    </td>
-                `;
+                tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button onclick="deleteService(${s.id})">Delete</button></td>`;
                 tbody.appendChild(tr);
             });
         }
 
-        document.getElementById("serviceForm").onsubmit = async e => {
+        document.getElementById("serviceForm").onsubmit = async (e) => {
             e.preventDefault();
             const form = e.target;
             const id = form.serviceId.value;
-            const formData = new FormData(form);
+            const formData = new FormData();
             
+            ['id', 'existingImageUrl', 'category', 'name', 'duration', 'price', 'description'].forEach(fieldName => {
+                if (form[fieldName]) formData.append(fieldName, form[fieldName].value);
+            });
+
+            const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
+            formData.append('performer', selectedPerformers.join(', '));
+            
+            if (form.image.files[0]) {
+                formData.append('image', form.image.files[0]);
+            }
+
             const url = id ? `${BASE_URL}/services/${id}` : `${BASE_URL}/services`;
             const method = id ? "PUT" : "POST";
 
-            const res = await fetch(url, {
-                method: method,
-                headers: { "Authorization": `Bearer ${token}` },
-                body: formData,
-            });
-
+            const res = await fetch(url, { method, headers: { "Authorization": `Bearer ${token}` }, body: formData });
             if (res.ok) {
                 form.reset();
+                Array.from(document.getElementById('performer').options).forEach(opt => opt.selected = false);
                 document.getElementById('serviceId').value = '';
                 document.getElementById('existingImageUrl').value = '';
                 loadServices();
@@ -188,10 +218,7 @@
 
         window.deleteService = async function(id) {
             if (!confirm("Are you sure?")) return;
-            const res = await fetch(`${BASE_URL}/services/${id}`, {
-                method: "DELETE",
-                headers: { "Authorization": `Bearer ${token}` }
-            });
+            const res = await fetch(`${BASE_URL}/services/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
             if (res.ok) {
                 loadServices();
                 localStorage.setItem('servicesUpdated', Date.now());
@@ -202,12 +229,17 @@
             document.getElementById("serviceId").value = service.id;
             document.getElementById("category").value = service.category;
             document.getElementById("name").value = service.name;
-            document.getElementById("performer").value = service.performer;
             document.getElementById("duration").value = service.duration;
             document.getElementById("price").value = service.price;
-            document.getElementById("existingImageUrl").value = service.imageUrl || '';
+            document.getElementById("existingImageUrl").value = service.imageurl || '';
             document.getElementById("description").value = service.description || '';
-        }
+
+            const performerSelect = document.getElementById("performer");
+            const performers = service.performer.split(',').map(p => p.trim());
+            Array.from(performerSelect.options).forEach(option => {
+                option.selected = performers.includes(option.value);
+            });
+        };
     });
 </script>
 </body>

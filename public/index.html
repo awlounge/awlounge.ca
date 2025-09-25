@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -6,16 +6,11 @@
     <title>Aesthetics & Wellness Lounge</title>
     <meta name="description" content="Aesthetics — curated skincare, advanced treatments and restorative wellness in a boutique lounge." />
     <meta name="theme-color" content="#FBFAF8">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     <script src="https://js.stripe.com/v3/"></script>
-  
     <style>
-        :root {
-            --bg: #FBFAF8; --text: #111114; --muted: #7B7B80; --surface: #FFFFFF; --gold: #d4af37; --gold-2: #B78E46; --blue: #0f6b86; --radius: 14px; --container: 1200px; --ease: cubic-bezier(.2, .9, .3, 1);
-        }
+        :root { --bg: #FBFAF8; --text: #111114; --muted: #7B7B80; --surface: #FFFFFF; --gold: #d4af37; --gold-2: #B78E46; --blue: #0f6b86; --radius: 14px; --container: 1200px; --ease: cubic-bezier(.2, .9, .3, 1); }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         body { margin: 0; font-family: "Inter", system-ui, sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; line-height: 1.6; }
@@ -103,10 +98,7 @@
         <header role="banner">
             <a class="brand" href="#top" aria-label="Aesthetics & Wellness Lounge">
                 <img src="AWL_Logo.jpg" alt="AWL Logo" class="logo" aria-hidden="true" />
-                <div>
-                    <div class="name">Aesthetics & Wellness Lounge</div>
-                    <div class="sub">577 Dundas St, Woodstock, ON</div>
-                </div>
+                <div><div class="name">Aesthetics & Wellness Lounge</div><div class="sub">577 Dundas St, Woodstock, ON</div></div>
             </a>
             <nav role="navigation">
                 <a href="#services" id="navServices">Services</a>
@@ -119,92 +111,15 @@
                 <a class="primary-cta" id="openBookingLink" href="#">Book Now</a>
             </div>
         </header>
-        <section class="hero" aria-label="Hero">
-            <div class="hero-frame">
-                <div class="blob" aria-hidden="true"></div>
-                <div class="hero-photo" id="heroPhoto" aria-hidden="true"></div>
-            </div>
-        </section>
-        <section id="services" style="padding-top: 60px; margin-top: -60px;">
-            <h2 class="section-title">Our Services</h2>
-            <div class="service-buttons"></div>
-            <div id="carousel-container"></div>
-        </section>
-        <section id="visit" style="padding-top: 100px; margin-top: -60px;">
-            <h3 class="section-title">Visit Us</h3>
-            <div style="width:100%; max-width:800px; margin:0 auto; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.08);">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2911.7508081162746!2d-80.75547332317797!3d43.130760771131754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882c1ffd8e139683%3A0x430172e7127d7331!2sAesthetics%20%26%20Wellness%20Lounge!5e0!3m2!1sen!2sus!4v1758563173912!5m2!1sen!2sus" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div>
-        </section>
-        <section id="social" style="padding-top: 100px; margin-top: -60px;">
-            <h3 class="section-title">Connect With Us</h3>
-            <div style="margin-top:20px; display:flex; justify-content:center; gap:28px; font-size:32px;">
-                <a href="https://www.facebook.com/awl.jm2" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:#1877F2;"><i class="fab fa-facebook"></i></a>
-                <a href="https://www.instagram.com/aw.lounge" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:#E4405F;"><i class="fab fa-instagram"></i></a>
-                <a href="mailto:awl.jm2@gmail.com" aria-label="Email" style="color:#333;"><i class="fas fa-envelope"></i></a>
-            </div>
-        </section>
+        <section class="hero" aria-label="Hero"><div class="hero-frame"><div class="blob" aria-hidden="true"></div><div class="hero-photo" id="heroPhoto" aria-hidden="true"></div></div></section>
+        <section id="services" style="padding-top: 60px; margin-top: -60px;"><h2 class="section-title">Our Services</h2><div class="service-buttons"></div><div id="carousel-container"></div></section>
+        <section id="visit" style="padding-top: 100px; margin-top: -60px;"><h3 class="section-title">Visit Us</h3><div style="width:100%; max-width:800px; margin:0 auto; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.08);"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2911.7508081162746!2d-80.75547332317797!3d43.130760771131754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882c1ffd8e139683%3A0x430172e7127d7331!2sAesthetics%20%26%20Wellness%20Lounge!5e0!3m2!1sen!2sus!4v1758563173912!5m2!1sen!2sus" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div></section>
+        <section id="social" style="padding-top: 100px; margin-top: -60px;"><h3 class="section-title">Connect With Us</h3><div style="margin-top:20px; display:flex; justify-content:center; gap:28px; font-size:32px;"><a href="https://www.facebook.com/awl.jm2" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:#1877F2;"><i class="fab fa-facebook"></i></a><a href="https://www.instagram.com/aw.lounge" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:#E4405F;"><i class="fab fa-instagram"></i></a><a href="mailto:awl.jm2@gmail.com" aria-label="Email" style="color:#333;"><i class="fas fa-envelope"></i></a></div></section>
     </div>
-    <div id="bookingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <div class="modal-content">
-            <button class="closeBtn" aria-label="Close booking modal">×</button>
-            <h2 id="modalTitle">Book an Appointment</h2>
-            <label for="serviceCategorySelect">Service Category</label>
-            <select id="serviceCategorySelect"><option value="">-- Select category --</option></select>
-            <label for="serviceSelect">Service</label>
-            <select id="serviceSelect"><option value="">-- Select service --</option></select>
-            <label for="performerSelect">Provider</label>
-            <select id="performerSelect"><option value="">-- Select provider --</option></select>
-            <div class="calendar-header">
-                <button id="prevMonth" class="btn ghost">←</button>
-                <h3 id="monthYear"></h3>
-                <button id="nextMonth" class="btn ghost">→</button>
-            </div>
-            <div id="calendar" role="grid"></div>
-            <h3>Available Time Slots</h3>
-            <div id="timeSlots" aria-live="polite">Select service, provider, and date.</div>
-            <h3>Your Information</h3>
-            <label for="nameInput">Name (required)</label>
-            <input type="text" id="nameInput" placeholder="Full name" required />
-            <label for="phoneInput">Phone (required)</label>
-            <input type="tel" id="phoneInput" placeholder="Phone number" required />
-            <label for="emailInput">Email (required)</label>
-            <input type="email" id="emailInput" placeholder="Email address" required />
-            <div class="modal-cta"><button id="nextBtn" class="btn primary" disabled>Next</button></div>
-        </div>
-    </div>
-    <div id="stripe-modal" class="modal">
-        <div class="modal-content">
-            <button id="close-stripe-modal" class="closeBtn">×</button>
-            <h2>Secure Deposit Payment</h2>
-            <p>Please pay a 25% deposit to confirm your booking.</p>
-            <div id="payment-info" style="margin:15px 0; padding:10px; background:#f9f9f9; border-radius:6px; color:#333;"></div>
-            <div id="card-element"></div>
-            <div id="card-errors" role="alert"></div>
-            <div class="modal-cta">
-                <button id="back-to-booking" class="btn ghost">Back</button>
-                <button id="pay-deposit-btn" class="btn primary">Pay Deposit</button>
-            </div>
-        </div>
-    </div>
-    <div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle">
-        <div class="modal-content">
-            <button class="closeBtn" aria-label="Close about modal">×</button>
-            <h2 id="aboutModalTitle" class="section-title">Meet Our Team</h2>
-            <img src="https://via.placeholder.com/800x400/eeeeee/cccccc?text=Our+Team+Photo" alt="Aesthetics & Wellness Lounge Team" class="team-photo">
-            <div class="team-container">
-                <div class="team-member"><div class="team-member-header"><img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=J" alt="Jessa Cordezar"><div class="team-member-info"><h3>Jessa Cordezar</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Massage/Reflexology~</p></div></div><hr><h5>About me</h5><p class="bio">Born in the Philippines and now living in Woodstock for over 10 years. Proud mom with a lifelong passion for helping others feel their best. Specializes in Indian Head Massage, Hand Reflexology, and Foot Reflexology. Passion for massage started as a child, helping my mom and relatives relieve pain and tension, sparking a deep love for healing touch. Dedicated to providing treatments that leave clients feeling relaxed, renewed, and truly cared for.</p></div>
-                <div class="team-member"><div class="team-member-header"><img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=M" alt="Maricel Tamburri"><div class="team-member-info"><h3>Maricel Tamburri</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Microblading/Brows/Lashes~</p></div></div><hr><h5>About me</h5><p class="bio">I was born and raised in Etobicoke, ON. My family has been in Woodstock since 1996. I am a proud Canadian-Filipina. A wife and mother to 2 great kids. I have been a licensed Registered Practical Nurse since 2012. I’ve had a great sense of accomplishment helping others during my nursing career. Now, I am pursuing my passion to help women from all walks of life. For our clients coming to our 'Beauty Sanctuary', we want them to feel at ease and to be themselves when they come in and when they leave our spa. During your service with me; I take pride in taking my time to assess your skin and facial features, to really understand your needs and preferences. That way you can have the best outcome possible when you leave our lounge.</p></div>
-                <div class="team-member"><div class="team-member-header"><img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=T" alt="Trechan Legria"><div class="team-member-info"><h3>Trechan Legria</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Makeover/Mani-Pedi~</p></div></div><hr><h5>About me</h5><p class="bio">Born in the Philippines, my family and I have been in Woodstock since 2000. Mother of two boys. Experienced aesthetician with 10+ years of client services. Passionate about enhancing one's beauty. As well as bringing confidence and self-love to my clients. Background in healthcare for a well-rounded, and holistic approach to beauty and wellness.</p></div>
-            </div>
-        </div>
-    </div>
-    <footer role="contentinfo">
-        <div>
-            © <strong>Aesthetics And Wellness Lounge</strong> — All rights reserved <br>
-            <strong>awl.jm2@gmail.com</strong> — (226) 796-5138
-        </div>
-    </footer>
+    <div id="bookingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-content"><button class="closeBtn" aria-label="Close booking modal">×</button><h2 id="modalTitle">Book an Appointment</h2><label for="serviceCategorySelect">Service Category</label><select id="serviceCategorySelect"><option value="">-- Select category --</option></select><label for="serviceSelect">Service</label><select id="serviceSelect"><option value="">-- Select service --</option></select><label for="performerSelect">Provider</label><select id="performerSelect"><option value="">-- Select provider --</option></select><div class="calendar-header"><button id="prevMonth" class="btn ghost">←</button><h3 id="monthYear"></h3><button id="nextMonth" class="btn ghost">→</button></div><div id="calendar" role="grid"></div><h3>Available Time Slots</h3><div id="timeSlots" aria-live="polite">Select service, provider, and date.</div><h3>Your Information</h3><label for="nameInput">Name (required)</label><input type="text" id="nameInput" placeholder="Full name" required /><label for="phoneInput">Phone (required)</label><input type="tel" id="phoneInput" placeholder="Phone number" required /><label for="emailInput">Email (required)</label><input type="email" id="emailInput" placeholder="Email address" required /><div class="modal-cta"><button id="nextBtn" class="btn primary" disabled>Next</button></div></div></div>
+    <div id="stripe-modal" class="modal"><div class="modal-content"><button id="close-stripe-modal" class="closeBtn">×</button><h2>Secure Deposit Payment</h2><p>Please pay a 25% deposit to confirm your booking.</p><div id="payment-info" style="margin:15px 0; padding:10px; background:#f9f9f9; border-radius:6px; color:#333;"></div><div id="card-element"></div><div id="card-errors" role="alert"></div><div class="modal-cta"><button id="back-to-booking" class="btn ghost">Back</button><button id="pay-deposit-btn" class="btn primary">Pay Deposit</button></div></div></div>
+    <div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle"><div class="modal-content"><button class="closeBtn" aria-label="Close about modal">×</button><h2 id="aboutModalTitle" class="section-title">Meet Our Team</h2><img src="https://via.placeholder.com/800x400/eeeeee/cccccc?text=Our+Team+Photo" alt="Aesthetics & Wellness Lounge Team" class="team-photo"><div class="team-container"><div class="team-member"><div class="team-member-header"><img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=J" alt="Jessa Cordezar"><div class="team-member-info"><h3>Jessa Cordezar</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Massage/Reflexology~</p></div></div><hr><h5>About me</h5><p class="bio">Born in the Philippines and now living in Woodstock for over 10 years. Proud mom with a lifelong passion for helping others feel their best. Specializes in Indian Head Massage, Hand Reflexology, and Foot Reflexology. Passion for massage started as a child, helping my mom and relatives relieve pain and tension, sparking a deep love for healing touch. Dedicated to providing treatments that leave clients feeling relaxed, renewed, and truly cared for.</p></div><div class="team-member"><div class="team-member-header"><img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=M" alt="Maricel Tamburri"><div class="team-member-info"><h3>Maricel Tamburri</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Microblading/Brows/Lashes~</p></div></div><hr><h5>About me</h5><p class="bio">I was born and raised in Etobicoke, ON. My family has been in Woodstock since 1996. I am a proud Canadian-Filipina. A wife and mother to 2 great kids. I have been a licensed Registered Practical Nurse since 2012. I’ve had a great sense of accomplishment helping others during my nursing career. Now, I am pursuing my passion to help women from all walks of life. For our clients coming to our 'Beauty Sanctuary', we want them to feel at ease and to be themselves when they come in and when they leave our spa. During your service with me; I take pride in taking my time to assess your skin and facial features, to really understand your needs and preferences. That way you can have the best outcome possible when you leave our lounge.</p></div><div class="team-member"><div class="team-member-header"><img src="https://via.placeholder.com/150/B78E46/FFFFFF?text=T" alt="Trechan Legria"><div class="team-member-info"><h3>Trechan Legria</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Makeover/Mani-Pedi~</p></div></div><hr><h5>About me</h5><p class="bio">Born in the Philippines, my family and I have been in Woodstock since 2000. Mother of two boys. Experienced aesthetician with 10+ years of client services. Passionate about enhancing one's beauty. As well as bringing confidence and self-love to my clients. Background in healthcare for a well-rounded, and holistic approach to beauty and wellness.</p></div></div></div></div>
+    <footer role="contentinfo"><div> © <strong>Aesthetics And Wellness Lounge</strong> — All rights reserved <br> <strong>awl.jm2@gmail.com</strong> — (226) 796-5138 </div></footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -240,10 +155,8 @@
                         fetch(`${BASE_URL}/api/categories`, { cache: 'no-store' })
                     ]);
                     if (!servicesRes.ok || !categoriesRes.ok) throw new Error('Could not fetch initial data.');
-                    
                     allServices = await servicesRes.json();
                     const allCategories = await categoriesRes.json();
-                    
                     populateCarouselsAndButtons(allServices, allCategories);
                     populateCategoryDropdown(allCategories);
                     document.querySelectorAll('.service-carousel').forEach(setupCarousel);
@@ -262,7 +175,6 @@
                 carouselContainer.innerHTML = '';
                 buttonsContainer.innerHTML = '';
                 const servicesByCategory = services.reduce((acc, service) => { (acc[service.category] = acc[service.category] || []).push(service); return acc; }, {});
-                
                 categories.forEach((category) => {
                     if (!servicesByCategory[category]) return;
                     const button = document.createElement('button');
@@ -276,17 +188,7 @@
                     servicesByCategory[category].forEach(service => {
                         const imageUrl = service.imageurl ? service.imageurl : `https://via.placeholder.com/320x200/eee/999?text=${encodeURIComponent(service.name)}`;
                         const descriptionText = service.description || '';
-                        slidesHTML += `
-                            <div class="slide" data-service-name="${service.name}" data-service-category="${service.category}">
-                                <img src="${imageUrl}" alt="${service.name}">
-                                <h3>${service.name}</h3>
-                                <p>${descriptionText}</p>
-                                <div class="slide-details">
-                                    <span><i class="fas fa-user"></i> ${service.performer}</span>
-                                    <span><i class="fas fa-clock"></i> ${service.duration} min</span>
-                                    <span><i class="fas fa-dollar-sign"></i> ${(service.price / 100).toFixed(2)}</span>
-                                </div>
-                            </div>`;
+                        slidesHTML += `<div class="slide" data-service-name="${service.name}" data-service-category="${service.category}"><img src="${imageUrl}" alt="${service.name}"><h3>${service.name}</h3><p>${descriptionText}</p><div class="slide-details"><span><i class="fas fa-user"></i> ${service.performer}</span><span><i class="fas fa-clock"></i> ${service.duration} min</span><span><i class="fas fa-dollar-sign"></i> ${(service.price / 100).toFixed(2)}</span></div></div>`;
                     });
                     carouselDiv.innerHTML = `<div class="carousel_wrapper"><div class="carousel">${slidesHTML}</div></div><div class="carousel-nav"><button class="prev">Prev</button><button class="next">Next</button></div>`;
                     carouselContainer.appendChild(carouselDiv);
@@ -305,143 +207,23 @@
                 });
             }
 
-            function showCarousel(sectionId) {
-                document.querySelectorAll('.service-buttons button').forEach(b => b.classList.toggle('active', b.dataset.section === sectionId));
-                document.querySelectorAll('.service-carousel').forEach(c => c.classList.toggle('active', c.id === sectionId + '-carousel'));
-            }
-
-            function setupCarousel(carouselContainer) {
-                const carousel = carouselContainer.querySelector('.carousel');
-                if (!carousel) return;
-                const slides = Array.from(carousel.querySelectorAll('.slide'));
-                const totalSlides = slides.length;
-                if (totalSlides === 0) return;
-                const radius = 350;
-                carouselContainer.rotationY = 0;
-                carouselContainer.dataset.currentSlideIndex = 0;
-                carouselContainer.rotate = function(direction) { this.rotationY += (360 / totalSlides) * direction; carousel.style.transform = `rotateY(${this.rotationY}deg)`; };
-                const stopAndRestartRotation = () => { clearInterval(autoRotateTimer); startAutoRotation(USER_PAUSE_INTERVAL); };
-                slides.forEach((slide, i) => {
-                    const angle = i * (360 / totalSlides);
-                    slide.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
-                    slide.addEventListener('click', (e) => {
-                        if (e.target.tagName === 'BUTTON') return;
-                        clearInterval(autoRotateTimer);
-                        const serviceName = slide.dataset.serviceName;
-                        const serviceCategory = slide.dataset.serviceCategory;
-                        if (serviceName && serviceCategory) {
-                            openBookingForService(serviceName, serviceCategory);
-                        }
-                    });
-                });
-                const prevBtn = carouselContainer.querySelector('.prev');
-                const nextBtn = carouselContainer.querySelector('.next');
-                if (prevBtn) { prevBtn.addEventListener('click', (e) => { e.stopPropagation(); carouselContainer.rotate(-1); stopAndRestartRotation(); }); }
-                if (nextBtn) { nextBtn.addEventListener('click', (e) => { e.stopPropagation(); carouselContainer.rotate(1); stopAndRestartRotation(); }); }
-            }
-          
-            function startAutoRotation(interval = SLIDE_INTERVAL) {
-                if (autoRotateTimer) clearInterval(autoRotateTimer);
-                const sectionsOrder = [...document.querySelectorAll('.service-buttons button')].map(b => b.dataset.section);
-                if (sectionsOrder.length === 0) return;
-                let currentSectionIndex = sectionsOrder.findIndex(s => document.querySelector(`button[data-section="${s}"]`)?.classList.contains('active'));
-                if (currentSectionIndex === -1) currentSectionIndex = 0;
-                const advanceStateAndRotate = () => {
-                    const currentSectionId = sectionsOrder[currentSectionIndex];
-                    const activeCarousel = document.getElementById(currentSectionId + '-carousel');
-                    if (!activeCarousel) return;
-                    let slideIndex = parseInt(activeCarousel.dataset.currentSlideIndex || 0);
-                    const totalSlides = activeCarousel.querySelectorAll('.slide').length;
-                    if (totalSlides > 1 && slideIndex < totalSlides - 1) {
-                        activeCarousel.rotate(1);
-                        activeCarousel.dataset.currentSlideIndex = slideIndex + 1;
-                    } else {
-                        currentSectionIndex = (currentSectionIndex + 1) % sectionsOrder.length;
-                        const nextSectionId = sectionsOrder[currentSectionIndex];
-                        if (activeCarousel.rotate && slideIndex !== 0) {
-                            activeCarousel.rotate(-slideIndex);
-                        }
-                        activeCarousel.dataset.currentSlideIndex = 0;
-                        showCarousel(nextSectionId);
-                    }
-                };
-                autoRotateTimer = setInterval(advanceStateAndRotate, interval);
-            }
-
-            function initializeCarouselInteractions() {
-                document.querySelector('.service-buttons').addEventListener('click', (event) => {
-                    const clickedButton = event.target.closest('button');
-                    if (clickedButton) {
-                        clearInterval(autoRotateTimer);
-                        const clickedSectionId = clickedButton.dataset.section;
-                        document.querySelectorAll('.service-carousel').forEach(c => {
-                            let slideIndex = parseInt(c.dataset.currentSlideIndex || 0);
-                            if(c.rotate && slideIndex !== 0) c.rotate(-slideIndex);
-                            c.dataset.currentSlideIndex = 0;
-                        });
-                        showCarousel(clickedSectionId);
-                        startAutoRotation(USER_PAUSE_INTERVAL);
-                    }
-                });
-            }
-            
+            function showCarousel(sectionId) { document.querySelectorAll('.service-buttons button').forEach(b => b.classList.toggle('active', b.dataset.section === sectionId)); document.querySelectorAll('.service-carousel').forEach(c => c.classList.toggle('active', c.id === sectionId + '-carousel')); }
+            function setupCarousel(carouselContainer) { const carousel = carouselContainer.querySelector('.carousel'); if (!carousel) return; const slides = Array.from(carousel.querySelectorAll('.slide')); const totalSlides = slides.length; if (totalSlides === 0) return; const radius = 350; carouselContainer.rotationY = 0; carouselContainer.dataset.currentSlideIndex = 0; carouselContainer.rotate = function(direction) { this.rotationY += (360 / totalSlides) * direction; carousel.style.transform = `rotateY(${this.rotationY}deg)`; }; const stopAndRestartRotation = () => { clearInterval(autoRotateTimer); startAutoRotation(USER_PAUSE_INTERVAL); }; slides.forEach((slide, i) => { const angle = i * (360 / totalSlides); slide.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`; slide.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') return; clearInterval(autoRotateTimer); const serviceName = slide.dataset.serviceName; const serviceCategory = slide.dataset.serviceCategory; if (serviceName && serviceCategory) { openBookingForService(serviceName, serviceCategory); } }); }); const prevBtn = carouselContainer.querySelector('.prev'); const nextBtn = carouselContainer.querySelector('.next'); if (prevBtn) { prevBtn.addEventListener('click', (e) => { e.stopPropagation(); carouselContainer.rotate(-1); stopAndRestartRotation(); }); } if (nextBtn) { nextBtn.addEventListener('click', (e) => { e.stopPropagation(); carouselContainer.rotate(1); stopAndRestartRotation(); }); } }
+            function startAutoRotation(interval = SLIDE_INTERVAL) { if (autoRotateTimer) clearInterval(autoRotateTimer); const sectionsOrder = [...document.querySelectorAll('.service-buttons button')].map(b => b.dataset.section); if (sectionsOrder.length === 0) return; let currentSectionIndex = sectionsOrder.findIndex(s => document.querySelector(`button[data-section="${s}"]`)?.classList.contains('active')); if (currentSectionIndex === -1) currentSectionIndex = 0; const advanceStateAndRotate = () => { const currentSectionId = sectionsOrder[currentSectionIndex]; const activeCarousel = document.getElementById(currentSectionId + '-carousel'); if (!activeCarousel) return; let slideIndex = parseInt(activeCarousel.dataset.currentSlideIndex || 0); const totalSlides = activeCarousel.querySelectorAll('.slide').length; if (totalSlides > 1 && slideIndex < totalSlides - 1) { activeCarousel.rotate(1); activeCarousel.dataset.currentSlideIndex = slideIndex + 1; } else { currentSectionIndex = (currentSectionIndex + 1) % sectionsOrder.length; const nextSectionId = sectionsOrder[currentSectionIndex]; if (activeCarousel.rotate && slideIndex !== 0) { activeCarousel.rotate(-slideIndex); } activeCarousel.dataset.currentSlideIndex = 0; showCarousel(nextSectionId); } }; autoRotateTimer = setInterval(advanceStateAndRotate, interval); }
+            function initializeCarouselInteractions() { document.querySelector('.service-buttons').addEventListener('click', (event) => { const clickedButton = event.target.closest('button'); if (clickedButton) { clearInterval(autoRotateTimer); const clickedSectionId = clickedButton.dataset.section; document.querySelectorAll('.service-carousel').forEach(c => { let slideIndex = parseInt(c.dataset.currentSlideIndex || 0); if(c.rotate && slideIndex !== 0) c.rotate(-slideIndex); c.dataset.currentSlideIndex = 0; }); showCarousel(clickedSectionId); startAutoRotation(USER_PAUSE_INTERVAL); } }); }
             if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) { const frame = document.querySelector('.hero-frame'); if(frame) { const blob = frame.querySelector('.blob'); const photo = frame.querySelector('#heroPhoto'); if (blob && photo) { frame.addEventListener('pointermove', ev => { const r = frame.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width - 0.5; const y = (ev.clientY - r.top) / r.height - 0.5; blob.style.transform = `translate(${x * 8}%, ${y * -8}%) rotate(8deg)`; photo.style.transform = `scale(1.02) translate(${x * -4}px, ${y * -6}px)`; }); frame.addEventListener('pointerleave', () => { blob.style.transform = 'translate(12%, -12%) rotate(12deg)'; photo.style.transform = ''; }); } } }
             document.getElementById('navServices').addEventListener('click', function(e) { e.preventDefault(); const header = document.querySelector('header'); const target = document.getElementById('services'); const headerHeight = header ? header.offsetHeight + 18 : 70; const targetPosition = target ? target.offsetTop : 0; window.scrollTo({ top: targetPosition - headerHeight, behavior: 'smooth' }); });
             document.querySelectorAll('a[href^="#"]:not(#navServices)').forEach(anchor => { anchor.addEventListener('click', function (e) { if (this.id === 'openBookingLink' || this.id === 'navAbout') return; const href = this.getAttribute('href'); if (href === "#") return; const targetEl = document.querySelector(href); if (targetEl) { e.preventDefault(); targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }); });
-            
             openBookingLink.addEventListener('click', e => { e.preventDefault(); bookingModal.style.display = 'flex'; resetBookingForm(); currentDate = new Date(); currentDate.setDate(1); renderCalendar(currentDate); autoSelectToday(); });
             navAbout.addEventListener('click', e => { e.preventDefault(); aboutModal.style.display = 'flex'; });
-
-            allModals.forEach(modal => {
-                const closeBtn = modal.querySelector('.closeBtn');
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', () => {
-                        modal.style.display = 'none';
-                    });
-                }
-            });
-
-            window.addEventListener('click', e => {
-                if (e.target.classList.contains('modal')) {
-                    e.target.style.display = 'none';
-                }
-            });
-            
-            function openBookingForService(serviceName, serviceCategory) {
-                bookingModal.style.display = 'flex';
-                resetBookingForm();
-                currentDate = new Date(); 
-                renderCalendar(currentDate);
-                autoSelectToday(); 
-                categorySelect.value = serviceCategory;
-                categorySelect.dispatchEvent(new Event('change'));
-                serviceSelect.value = serviceName;
-                serviceSelect.dispatchEvent(new Event('change'));
-                if (performerSelect.options.length === 2) {
-                    performerSelect.selectedIndex = 1;
-                    performerSelect.dispatchEvent(new Event('change'));
-                }
-            }
-            
+            allModals.forEach(modal => { const closeBtn = modal.querySelector('.closeBtn'); if (closeBtn) { closeBtn.addEventListener('click', () => { modal.style.display = 'none'; }); } });
+            window.addEventListener('click', e => { if (e.target.classList.contains('modal')) { e.target.style.display = 'none'; } });
+            function openBookingForService(serviceName, serviceCategory) { bookingModal.style.display = 'flex'; resetBookingForm(); currentDate = new Date(); renderCalendar(currentDate); autoSelectToday(); categorySelect.value = serviceCategory; categorySelect.dispatchEvent(new Event('change')); serviceSelect.value = serviceName; serviceSelect.dispatchEvent(new Event('change')); if (performerSelect.options.length === 2) { performerSelect.selectedIndex = 1; performerSelect.dispatchEvent(new Event('change')); } }
             categorySelect.addEventListener("change", () => { const category = categorySelect.value; serviceSelect.innerHTML = '<option value="">-- Select service --</option>'; performerSelect.innerHTML = '<option value="">-- Select provider --</option>'; resetCalendarAndTime(); if (category) { const servicesInCategory = allServices.filter(s => s.category === category); const uniqueServiceNames = [...new Set(servicesInCategory.map(s => s.name))]; uniqueServiceNames.forEach(serviceName => { const opt = document.createElement("option"); opt.value = serviceName; opt.textContent = serviceName; serviceSelect.appendChild(opt); }); } });
             serviceSelect.addEventListener("change", () => { const serviceName = serviceSelect.value; performerSelect.innerHTML = '<option value="">-- Select provider --</option>'; resetCalendarAndTime(); if (serviceName) { const serviceEntries = allServices.filter(s => s.name === serviceName); const performers = [...new Set(serviceEntries.flatMap(s => s.performer.split(',').map(p => p.trim())))]; performers.forEach(provider => { const opt = document.createElement("option"); opt.value = provider.toLowerCase().replace(/\s+/g, '-'); opt.textContent = provider; performerSelect.appendChild(opt); }); } });
             performerSelect.addEventListener("change", () => { resetCalendarAndTime(); const performerKey = performerSelect.value; const calendarId = performerCalendars[performerKey]; if (selectedDate && calendarId) { loadAvailability(selectedDate, calendarId); } });
             function renderCalendar(date) { calendarEl.innerHTML = ''; monthYearEl.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' }); ['S', 'M', 'T', 'W', 'T', 'F', 'S'].forEach(d => { const h = document.createElement('div'); h.textContent = d; h.className = 'header'; calendarEl.appendChild(h); }); const year = date.getFullYear(), month = date.getMonth(); const firstDay = new Date(year, month, 1).getDay(); for (let i = 0; i < firstDay; i++) calendarEl.appendChild(document.createElement('div')); const lastDate = new Date(year, month + 1, 0).getDate(); for (let day = 1; day <= lastDate; day++) { const cell = document.createElement('div'); cell.textContent = day; const thisDate = new Date(year, month, day); const today = new Date(); today.setHours(0,0,0,0); if (thisDate < today) { cell.classList.add('disabled'); } else { cell.addEventListener('click', () => selectDate(thisDate, cell)); } calendarEl.appendChild(cell); } }
-            
-            function selectDate(date, cell) {
-                calendarEl.querySelectorAll('.selected').forEach(c => c.classList.remove('selected'));
-                cell.classList.add('selected');
-                selectedDate = date;
-                selectedSlot = null;
-                timeSlotsEl.textContent = 'Select a service and provider.';
-                const performerKey = performerSelect.value;
-                const calendarId = performerCalendars[performerKey];
-                if (serviceSelect.value && performerSelect.value && calendarId) {
-                    loadAvailability(date, calendarId);
-                }
-                validateForm();
-            }
-
+            function selectDate(date, cell) { calendarEl.querySelectorAll('.selected').forEach(c => c.classList.remove('selected')); cell.classList.add('selected'); selectedDate = date; selectedSlot = null; timeSlotsEl.textContent = 'Select a service and provider.'; const performerKey = performerSelect.value; const calendarId = performerCalendars[performerKey]; if (serviceSelect.value && performerSelect.value && calendarId) { loadAvailability(date, calendarId); } validateForm(); }
             function autoSelectToday() { const today = new Date(); if (today.getMonth() === currentDate.getMonth() && today.getFullYear() === currentDate.getFullYear()) { calendarEl.querySelectorAll('div:not(.header):not(.disabled)').forEach(cell => { if (parseInt(cell.textContent) === today.getDate()) { cell.click(); } }); } }
             prevMonthBtn.onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(currentDate); autoSelectToday(); };
             nextMonthBtn.onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(currentDate); autoSelectToday(); };
@@ -459,23 +241,6 @@
             backToBookingBtn.onclick = () => { stripeModal.style.display = "none"; bookingModal.style.display = "flex"; };
             payBtn.onclick = async () => { payBtn.disabled = true; payBtn.textContent = "Processing..."; cardErrorsDiv.textContent = ""; const serviceName = serviceSelect.value; const performerName = performerSelect.options[performerSelect.selectedIndex].text; const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName)); if (!service) { alert('Error: Could not find service.'); payBtn.disabled = false; payBtn.textContent = "Pay Deposit"; return; } try { const res = await fetch(`${BASE_URL}/create-payment-intent`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ serviceId: service.id }) }); const { clientSecret, error: backendError } = await res.json(); if (backendError) throw new Error(backendError); const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, { payment_method: { card: cardElement, billing_details: { name: nameInput.value, email: emailInput.value } } }); if (error) { cardErrorsDiv.textContent = error.message; throw new Error(error.message); } if (paymentIntent.status === "succeeded") { const bookingRes = await fetch(`${BASE_URL}/book/${performerCalendars[performerSelect.value]}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: nameInput.value.trim(), phone: phoneInput.value.trim(), email: emailInput.value.trim(), service: serviceSelect.value, performer: performerSelect.options[performerSelect.selectedIndex].text, dateTime: selectedSlot.startDateTime.toISOString() }) }); const result = await bookingRes.json(); if (result.success) { alert("✅ Payment and booking confirmed!"); stripeModal.style.display = "none"; resetBookingForm(); } else { alert("Payment succeeded but booking failed. " + (result.error || '')); } } } catch (err) { console.error(err); alert("Payment or booking failed."); } finally { payBtn.disabled = false; payBtn.textContent = "Pay Deposit"; } };
 
-            async function initializeWebsite() {
-                try {
-                    const response = await fetch(`${BASE_URL}/api/services`, { cache: 'no-store' });
-                    if (!response.ok) throw new Error('Could not fetch services.');
-                    allServices = await response.json();
-                    populateCarouselsAndButtons(allServices);
-                    populateCategoryDropdown(allServices);
-                    document.querySelectorAll('.service-carousel').forEach(setupCarousel);
-                    initializeCarouselInteractions();
-                    startAutoRotation();
-                } catch (error) {
-                    console.error("Initialization failed:", error);
-                    const servicesSection = document.getElementById('services');
-                    if (servicesSection) servicesSection.innerHTML = `<p style="text-align:center; color: red;">Could not load services.</p>`;
-                }
-            }
-            
             window.addEventListener('storage', (event) => {
                 if (event.key === 'servicesUpdated') {
                     console.log('Services updated in another tab. Reloading content...');

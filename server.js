@@ -26,10 +26,8 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'awl_services',
-        format: 'jpg', // Set a consistent format
-        // ** THE CHANGE IS HERE **
-        // Use the original filename (without the extension) as the public ID
-        public_id: (req, file) => path.parse(file.originalname).name,
+        format: 'jpg',
+        public_id: (req, file) => path.parse(file.originalname).name.replace(/\s+/g, '_'),
     },
 });
 
@@ -48,35 +46,41 @@ const pool = new Pool({
 async function initDB() {
     try {
         await pool.query(`
+            CREATE TABLE IF NOT EXISTS categories (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL UNIQUE
+            );
+        `);
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS services (
-                id SERIAL PRIMARY KEY, name TEXT NOT NULL, performer TEXT NOT NULL,
-                duration INTEGER NOT NULL, price INTEGER NOT NULL, category TEXT,
-                imageUrl TEXT, description TEXT
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                performer TEXT NOT NULL,
+                duration INTEGER NOT NULL,
+                price INTEGER NOT NULL,
+                category TEXT,
+                imageUrl TEXT,
+                description TEXT
             );
         `);
         await pool.query(`
             CREATE TABLE IF NOT EXISTS service_logs (
-                id SERIAL PRIMARY KEY, username TEXT, action TEXT, service_id INTEGER,
-                details TEXT, timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                id SERIAL PRIMARY KEY,
+                username TEXT,
+                action TEXT,
+                service_id INTEGER,
+                details TEXT,
+                timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
             );
         `);
 
-        const res = await pool.query("SELECT COUNT(*) FROM services");
-        if (res.rows[0].count === "0") {
-            console.log("No services found, seeding database...");
-            const seedData = [
-                { category: "relaxation", name: "Foot Reflexology", performer: "Jessa", duration: 45, price: 6000, description: "A therapeutic method of relieving pain and tension by stimulating specific points on the feet." },
-                { category: "beauty", name: "Special Event Makeover", performer: "Trechan", duration: 90, price: 10000, description: "Look stunning for any occasion with our professional makeover services." },
-                { category: "aesthetics", name: "Manicure", performer: "Trechan", duration: 60, price: 6000, description: "Pamper your hands with our professional manicure services." },
-                { category: "hairtreatment", name: "Hair Wash & Style", performer: "Maricel", duration: 90, price: 9000, description: "Refresh your hair with a deep cleanse and a smooth, voluminous style." }
-            ];
-            for (const s of seedData) {
-                await pool.query(
-                    "INSERT INTO services (category, name, performer, duration, price, description) VALUES ($1, $2, $3, $4, $5, $6)",
-                    [s.category, s.name, s.performer, s.duration, s.price, s.description]
-                );
+        const catRes = await pool.query("SELECT COUNT(*) FROM categories");
+        if (catRes.rows[0].count === "0") {
+            console.log("No categories found, seeding default categories...");
+            const defaultCategories = ['relaxation', 'beauty', 'aesthetics', 'hairtreatment', 'photography', 'rejuvenate'];
+            for (const cat of defaultCategories) {
+                await pool.query("INSERT INTO categories (name) VALUES ($1)", [cat]);
             }
-            console.log("Database seeded successfully.");
         }
     } catch (err) {
         console.error("Error during database initialization:", err);
@@ -110,14 +114,14 @@ const auth = new google.auth.GoogleAuth({
 const calendar = google.calendar({ version: "v3", auth });
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
 });
 
-// --- Auth Functions ---
+// --- Auth Functions & Routes ---
 function authenticate(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -152,7 +156,6 @@ app.post("/admin/login", (req, res) => {
     }
 });
 
-// --- Helper Functions ---
 async function logChange(username, action, serviceId, details) {
     try {
         await pool.query(
@@ -164,7 +167,32 @@ async function logChange(username, action, serviceId, details) {
     }
 }
 
-// --- API Routes ---
+// --- CATEGORY API ROUTES ---
+app.get("/api/categories", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT name FROM categories ORDER BY name");
+        res.json(result.rows.map(row => row.name));
+    } catch (error) {
+        console.error('API Error fetching categories:', error);
+        res.status(500).json({ error: "Failed to retrieve categories." });
+    }
+});
+
+app.post("/api/categories", authenticate, async (req, res) => {
+    const { name } = req.body;
+    if (!name) {
+        return res.status(400).json({ error: "Category name is required." });
+    }
+    try {
+        await pool.query("INSERT INTO categories (name) VALUES ($1)", [name.toLowerCase().trim()]);
+        res.json({ success: true, message: `Category '${name}' added.`});
+    } catch (error) {
+        console.error('API Error adding category:', error);
+        res.status(500).json({ error: "Failed to add category. It may already exist." });
+    }
+});
+
+// --- SERVICE API ROUTES ---
 app.get("/api/services", async (req, res) => {
     try {
         res.setHeader('Cache-Control', 'no-store');
@@ -249,13 +277,12 @@ app.post("/create-payment-intent", async (req, res) => {
         if (serviceRes.rows.length === 0) {
             return res.status(400).json({ error: "Service not found" });
         }
-        
         const service = serviceRes.rows[0];
         const amount = Math.round(service.price * 0.25);
         const paymentIntent = await stripe.paymentIntents.create({
             amount,
             currency: "cad",
-            description: `25% deposit for ${service.name}`,
+            description: `25% deposit for ${service.name}`
         });
         res.json({ clientSecret: paymentIntent.client_secret });
     } catch (err) {
@@ -283,59 +310,28 @@ app.post("/book/:calendarId", async (req, res) => {
     try {
         const { name, phone, email, service, performer, dateTime } = req.body;
         const startDateTime = new Date(dateTime);
-
         const serviceRes = await pool.query("SELECT duration FROM services WHERE name = $1 AND performer ILIKE $2", [service, `%${performer}%`]);
         const duration = serviceRes.rows[0]?.duration || 60;
         const endDateTime = new Date(startDateTime.getTime() + duration * 60 * 1000);
-
         const event = {
             summary: `Booking: ${name} - ${service}`,
             description: `Client: ${name}\nPhone: ${phone}\nEmail: ${email}\nService: ${service}\nProvider: ${performer}`,
             start: { dateTime: startDateTime.toISOString(), timeZone: "America/Toronto" },
-            end: { dateTime: endDateTime.toISOString(), timeZone: "America/Toronto" },
+            end: { dateTime: endDateTime.toISOString(), timeZone: "America/Toronto" }
         };
         await calendar.events.insert({ calendarId, requestBody: event });
-        
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Your Appointment is Confirmed!",
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; color: #333;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <img src="cid:logo" alt="AWL Logo" style="max-width: 150px; height: auto;">
-                    </div>
-                    <h2 style="text-align: center; color: #2a2a2a;">Appointment Confirmed!</h2>
-                    <p style="text-align: center;">Hi <strong>${name}</strong>,</p>
-                    <p style="text-align: center;">Your appointment for <strong>${service}</strong> with <strong>${performer}</strong> is confirmed.</p>
-                    <div style="background: #f7f7f7; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                        <p style="margin: 5px 0;"><strong>Date & Time:</strong> ${startDateTime.toLocaleString('en-CA', { 
-                            timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', 
-                            day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true 
-                        })}</p>
-                        <p style="margin: 5px 0;"><strong>Provider:</strong> ${performer}</p>
-                        <p style="margin: 5px 0;"><strong>Service:</strong> ${service}</p>
-                    </div>
-                    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                    <div style="text-align: center;">
-                        <img src="cid:banner" alt="AWL Banner" style="max-width: 350px; height: auto;"><br>
-                        <p style="font-size: 14px; color: #777; text-align: center;">
-                            Aesthetics and Wellness Lounge<br>
-                            www.awlounge.ca<br>
-                            577 Dundas St, Woodstock, ON | 226-796-5138 | awl.jm2@gmail.com
-                        </p>
-                    </div>
-                </div>
-            `,
+            html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; color: #333;"><div style="text-align: center; margin-bottom: 30px;"><img src="cid:logo" alt="AWL Logo" style="max-width: 150px; height: auto;"></div><h2 style="text-align: center; color: #2a2a2a;">Appointment Confirmed!</h2><p style="text-align: center;">Hi <strong>${name}</strong>,</p><p style="text-align: center;">Your appointment for <strong>${service}</strong> with <strong>${performer}</strong> is confirmed.</p><div style="background: #f7f7f7; padding: 15px; border-radius: 8px; margin: 20px 0;"><p style="margin: 5px 0;"><strong>Date & Time:</strong> ${startDateTime.toLocaleString('en-CA', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}</p><p style="margin: 5px 0;"><strong>Provider:</strong> ${performer}</p><p style="margin: 5px 0;"><strong>Service:</strong> ${service}</p></div><hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;"><div style="text-align: center;"><img src="cid:banner" alt="AWL Banner" style="max-width: 350px; height: auto;"><br><p style="font-size: 14px; color: #777; text-align: center;">Aesthetics and Wellness Lounge<br>www.awlounge.ca<br>577 Dundas St, Woodstock, ON | 226-796-5138 | awl.jm2@gmail.com</p></div></div>`,
             attachments: [
                 { filename: 'AWL_Logo.jpg', path: path.join(__dirname, 'public', 'AWL_Logo.jpg'), cid: 'logo' },
                 { filename: 'AWL_Banner.jpg', path: path.join(__dirname, 'public', 'AWL_Banner.jpg'), cid: 'banner' }
             ]
         });
-
         console.log(`✅ Booking created and email sent for ${name} on ${startDateTime}`);
         res.json({ success: true, message: "Booking confirmed" });
-
     } catch (err) {
         console.error("Booking Error:", err);
         res.status(500).json({ error: "Failed to create booking" });
