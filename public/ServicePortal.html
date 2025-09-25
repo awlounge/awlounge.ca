@@ -143,6 +143,78 @@
     </div>
 
 <script>
+	document.addEventListener('DOMContentLoaded', () => {
+    // All previous state, config, and selectors...
+
+    // --- NEW ELEMENT SELECTORS ---
+    const categoryModal = document.getElementById('categoryModal');
+    const manageCategoriesBtn = document.getElementById('manageCategoriesBtn');
+    const categoryListDiv = document.getElementById('category-list');
+    
+    // --- NEW MODAL FUNCTIONS ---
+    async function populateCategoryModal() {
+        const res = await fetch(`${BASE_URL}/api/categories`);
+        const categories = await res.json();
+        categoryListDiv.innerHTML = '';
+        if (categories.length === 0) {
+            categoryListDiv.innerHTML = '<p>No categories found.</p>';
+            return;
+        }
+        categories.forEach(cat => {
+            const item = document.createElement('div');
+            item.className = 'category-item';
+            item.innerHTML = `
+                <span>${cat}</span>
+                <button class="delete-category-btn" data-category-name="${cat}" title="Delete Category">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            `;
+            categoryListDiv.appendChild(item);
+        });
+    }
+
+    async function deleteCategory(name) {
+        if (!confirm(`Are you sure you want to delete the category "${name}"? This cannot be undone.`)) {
+            return;
+        }
+        const res = await fetch(`${BASE_URL}/api/categories`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ name })
+        });
+        if (res.ok) {
+            await loadCategories(); // Refresh the dropdown in the main form
+            await populateCategoryModal(); // Refresh the list in the modal
+            localStorage.setItem('servicesUpdated', Date.now());
+        } else {
+            alert('Failed to delete category. It might still be in use by some services.');
+        }
+    }
+
+    // --- UPDATED EVENT LISTENERS ---
+    function setupEventListeners() {
+        // ... (all your previous listeners for login, logout, tabs, forms, team, etc.)
+
+        // New listeners for the category modal
+        manageCategoriesBtn.addEventListener('click', () => {
+            populateCategoryModal();
+            categoryModal.classList.remove('hidden');
+        });
+
+        categoryModal.addEventListener('click', (event) => {
+            // Close modal if the close button or background is clicked
+            if (event.target.classList.contains('close-btn') || event.target.classList.contains('modal')) {
+                categoryModal.classList.add('hidden');
+            }
+            // Handle delete button clicks
+            const deleteBtn = event.target.closest('.delete-category-btn');
+            if (deleteBtn) {
+                const categoryName = deleteBtn.dataset.categoryName;
+                deleteCategory(categoryName);
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         // --- State & Config ---
         const BASE_URL = '';
