@@ -77,7 +77,7 @@ async function initDB() {
         const catRes = await pool.query("SELECT COUNT(*) FROM categories");
         if (catRes.rows[0].count === "0") {
             console.log("No categories found, seeding default categories...");
-            const defaultCategories = ['relaxation', 'beauty', 'aesthetics', 'hairtreatment', 'photography', 'rejuvenate'];
+            const defaultCategories = ['Relaxation', 'Beauty', 'Aesthetics', 'Hair Treatment', 'Photography', 'Rejuvenate'];
             for (const cat of defaultCategories) {
                 await pool.query("INSERT INTO categories (name) VALUES ($1)", [cat]);
             }
@@ -184,11 +184,41 @@ app.post("/api/categories", authenticate, async (req, res) => {
         return res.status(400).json({ error: "Category name is required." });
     }
     try {
-        await pool.query("INSERT INTO categories (name) VALUES ($1)", [name.toLowerCase().trim()]);
-        res.json({ success: true, message: `Category '${name}' added.`});
+        // Automatically capitalize each word
+        const formattedName = name.trim().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+
+        await pool.query("INSERT INTO categories (name) VALUES ($1)", [formattedName]);
+        res.json({ success: true, message: `Category '${formattedName}' added.`});
     } catch (error) {
         console.error('API Error adding category:', error);
         res.status(500).json({ error: "Failed to add category. It may already exist." });
+    }
+});
+
+app.delete("/api/categories", authenticate, async (req, res) => {
+    const { name } = req.body;
+    if (!name) {
+        return res.status(400).json({ error: "Category name is required." });
+    }
+    try {
+        const inUseCheck = await pool.query(
+            "SELECT id FROM services WHERE LOWER(category) = LOWER($1) LIMIT 1",
+            [name.trim()]
+        );
+        if (inUseCheck.rows.length > 0) {
+            return res.status(400).json({ error: 'Failed to delete category. It might still be in use by some services.' });
+        }
+        const deleteResult = await pool.query(
+            "DELETE FROM categories WHERE LOWER(name) = LOWER($1)",
+            [name.trim()]
+        );
+        if (deleteResult.rowCount === 0) {
+             return res.status(404).json({ error: 'Category not found.' });
+        }
+        res.status(200).json({ success: true, message: 'Category deleted successfully.' });
+    } catch (error) {
+        console.error('API Error deleting category:', error);
+        res.status(500).json({ error: "Server error while deleting category." });
     }
 });
 
