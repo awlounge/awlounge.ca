@@ -566,43 +566,50 @@ footer {
         min-width: 100px;
     }
 
-    /* --- START: Your Specific Mobile Header Layout --- */
+    /* --- START: New Mobile Header Layout --- */
+
+    /* Hide the hamburger menu, we are not using it. */
+    .mobile-nav-toggle { 
+        display: none; 
+    }
 
     /* SHOW the navigation links on mobile. */
     nav {
         display: flex;
-        justify-content: center; /* Center the links within their grid cell */
+        justify-content: center;
         align-items: center;
-        gap: 8px; /* Reduce space between links */
-        flex-wrap: wrap; /* Allow wrapping just in case */
+        gap: 8px;
+        flex-wrap: wrap;
     }
     
     /* Style the nav links to fit on mobile */
     nav a {
-        font-size: 13px; /* Smaller font size */
-        padding: 2px 4px; /* Reduced padding */
+        font-size: 13px;
+        padding: 2px 4px;
         font-weight: 500;
     }
 
     /* Use CSS Grid for the precise two-row layout */
     header {
         display: grid;
-        grid-template-columns: auto 1fr auto; /* Col 1: Logo, Col 2: Nav, Col 3: Phone */
+        grid-template-columns: auto 1fr auto; /* Col 1: Logo, Col 2: Middle, Col 3: Phone */
         grid-template-rows: auto auto;    /* Row 1, Row 2 */
         align-items: center;
-        padding: 8px 15px; /* Skinnier padding */
+        padding: 8px 15px;
         row-gap: 10px;
     }
 
     /* --- Row 1 Placement --- */
     .brand { grid-area: 1 / 1 / 2 / 2; }       /* Row 1, Col 1 */
-    nav { grid-area: 1 / 2 / 2 / 3; }          /* Row 1, Col 2 */
+    .primary-cta {                             /* Row 1, Col 2 (NEW) */
+        grid-area: 1 / 2 / 2 / 3; 
+        justify-self: center;
+    }
     .header-ctas { grid-area: 1 / 3 / 2 / 4; }  /* Row 1, Col 3 */
 
     /* --- Row 2 Placement --- */
-    .primary-cta {
-        grid-area: 2 / 1 / 3 / 4; /* Row 2, span all columns */
-        justify-self: center;     /* Center it horizontally */
+    nav {                                      /* Row 2, span all columns (NEW) */
+        grid-area: 2 / 1 / 3 / 4; 
     }
     
     /* --- Styling for a "Thinner" Look --- */
@@ -611,8 +618,8 @@ footer {
         height: 40px; 
     }
 
-    .brand .name { display: none; } /* Hide text name for more space */
-    .brand .sub { display: none; }   /* Hide subtext */
+    .brand .name { display: none; }
+    .brand .sub { display: none; }
 
     /* Style the phone icon */
     .header-cta { 
@@ -625,7 +632,8 @@ footer {
         font-weight: 900;
         font-size: 18px;
     }
-    /* --- END: Your Specific Mobile Header Layout --- */
+    /* --- END: New Mobile Header Layout --- */
+}
 }
     </style>
 </head>
