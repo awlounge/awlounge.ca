@@ -241,8 +241,8 @@ nav a:hover {
             position: absolute;
             top: 20px; /* Adjust top/left to center slides within the stage */
             left: 42px;
-            width: 275px;
-            min-height: 250px;
+            width: 300px;
+            min-height: 300px;
             border-radius: 15px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
             padding: 10px;
@@ -255,7 +255,7 @@ nav a:hover {
             cursor: pointer;
             transform-origin: center center; /* THE CRITICAL FIX */
         }
-        .slide img { width: 50%; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+        .slide img { width: 75%; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
         .slide h3 { font-family: "Playfair Display", serif; font-size: 14px; margin: 4px 0; color: #5a3e36; }
         .slide p { font-family: "Inter", sans-serif; font-size: 10px; margin: 0; color: #333; }
         .slide-details { display: flex; justify-content: space-between; width: 100%; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 10px; color: var(--muted); font-weight: 600; }
@@ -266,7 +266,7 @@ nav a:hover {
     display: flex;
     justify-content: space-between; /* Pushes buttons to the sides */
     width: 300px; /* Controls the distance between buttons */
-    margin-top: 40px; /* The space between the slides and the arrows */
+    margin-top: 50px; /* The space between the slides and the arrows */
     position: static;
 		}
 	.carousel-nav button {
@@ -304,18 +304,18 @@ nav a:hover {
     z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    width: 90%;
+    height: 90%;
     overflow-y: auto;
     background: rgba(0, 0, 0, 0.6);
     align-items: center;
     justify-content: center;
-    padding: 20px 0;
+    padding: 10px 0;
 }
 .modal-content {
     background: #fff;
     margin: auto;
-    padding: 25px;
+    padding: 15px;
     border-radius: 10px;
     max-width: 480px;
     width: 95%;
