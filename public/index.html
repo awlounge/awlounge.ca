@@ -224,7 +224,7 @@ nav a:hover {
             margin: 0 auto; /* Center the 3D scene inside the main container */
             
             /* The entire 3D scene is defined here */
-            perspective: 700px;
+            perspective: 1200px;
             transform: rotateX(20deg);
             transform-origin: center center; /* THE CRITICAL FIX */
         }
@@ -548,6 +548,16 @@ footer {
     .team-member-info {
         text-align: center;
     }
+	.service-carousel.active {
+    /* Keeps the component from getting too wide */
+    width: 100%; 
+    
+    /* This shrinks the entire component to 75% of its size */
+    transform: scale(0.75);
+    
+    /* Reset margin for the new scaled size */
+    margin: 0 auto;
+}
 }
 @media (prefers-reduced-motion: reduce) {
     .blob, .hero-photo, .carousel, .slide {
