@@ -239,7 +239,7 @@ nav a:hover {
             top: 20px; /* Adjust top/left to center slides within the stage */
             left: 30px;
             width: 300px;
-            min-height: 300px;
+            min-height: 275px;
             border-radius: 15px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
             padding: 10px;
@@ -584,7 +584,7 @@ footer {
     
     /* Style the nav links to fit on mobile */
     nav a {
-        font-size: 13px;
+        font-size: 16px;
         padding: 2px 4px;
         font-weight: 500;
     }
@@ -659,8 +659,8 @@ footer {
     <a class="primary-cta" id="openBookingLink" href="#">Book Now</a>
 </header>
         <section class="hero" aria-label="Hero"><div class="hero-frame"><div class="blob" aria-hidden="true"></div><div class="hero-photo" id="heroPhoto" aria-hidden="true"></div></div></section>
-        <section id="services" style="padding-top: 60px; margin-top: -60px;"><h2 class="section-title">Our Services</h2><div class="service-buttons"></div><div id="carousel-container"></div></section>
-        <section id="visit" style="padding-top: 100px; margin-top: -60px;"><h3 class="section-title">Visit Us</h3><div style="width:100%; max-width:800px; margin:0 auto; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.08);"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2911.7508081162746!2d-80.75547332317797!3d43.130760771131754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882c1ffd8e139683%3A0x430172e7127d7331!2sAesthetics%20%26%20Wellness%20Lounge!5e0!3m2!1sen!2sus!4v1758563173912!5m2!1sen!2sus" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div></section>
+        <section id="services" style="padding-top: 60px; margin-top: 0px;"><h2 class="section-title">Our Services</h2><div class="service-buttons"></div><div id="carousel-container"></div></section>
+        <section id="visit" style="padding-top: 100px; margin-top: -30px;"><h3 class="section-title">Visit Us</h3><div style="width:100%; max-width:800px; margin:0 auto; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.08);"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2911.7508081162746!2d-80.75547332317797!3d43.130760771131754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882c1ffd8e139683%3A0x430172e7127d7331!2sAesthetics%20%26%20Wellness%20Lounge!5e0!3m2!1sen!2sus!4v1758563173912!5m2!1sen!2sus" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div></section>
         <section id="social" style="padding-top: 100px; margin-top: -60px;"><h3 class="section-title">Connect With Us</h3><div style="margin-top:20px; display:flex; justify-content:center; gap:28px; font-size:32px;"><a href="https://www.facebook.com/awl.jm2" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:#1877F2;"><i class="fab fa-facebook"></i></a><a href="https://www.instagram.com/aw.lounge" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:#E4405F;"><i class="fab fa-instagram"></i></a><a href="mailto:awl.jm2@gmail.com" aria-label="Email" style="color:#333;"><i class="fas fa-envelope"></i></a></div></section>
     </div>
     <div id="bookingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-content"><button class="closeBtn" aria-label="Close booking modal">×</button><h2 id="modalTitle">Book an Appointment</h2><label for="serviceCategorySelect">Service Category</label><select id="serviceCategorySelect"><option value="">-- Select category --</option></select><label for="serviceSelect">Service</label><select id="serviceSelect"><option value="">-- Select service --</option></select><label for="performerSelect">Provider</label><select id="performerSelect"><option value="">-- Select provider --</option></select><div class="calendar-header"><button id="prevMonth" class="btn ghost">←</button><h3 id="monthYear"></h3><button id="nextMonth" class="btn ghost">→</button></div><div id="calendar" role="grid"></div><h3>Available Time Slots</h3><div id="timeSlots" aria-live="polite">Select service, provider, and date.</div><h3>Your Information</h3><label for="nameInput">Name (required)</label><input type="text" id="nameInput" placeholder="Full name" required /><label for="phoneInput">Phone (required)</label><input type="tel" id="phoneInput" placeholder="Phone number" required /><label for="emailInput">Email (required)</label><input type="email" id="emailInput" placeholder="Email address" required /><div class="modal-cta"><button id="nextBtn" class="btn primary" disabled>Next</button></div></div></div>

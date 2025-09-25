@@ -64,7 +64,7 @@
         <table id="servicesTable">
             <thead>
                 <tr>
-                    <th>Image</th><th>Name</th><th>Description</th><th>Provider(s)</th><th>Duration</th><th>Price</th><th>Actions</th>
+                    <th>Image</th><th>Name</th><th>Category</th><th>Description</th><th>Provider(s)</th><th>Duration</th><th>Price</th><th>Actions</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -178,7 +178,7 @@
             data.forEach(s => {
                 const tr = document.createElement("tr");
                 const imageCell = s.imageurl ? `<img src="${s.imageurl}" alt="${s.name}" class="image-preview">` : 'No Image';
-                tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button onclick="deleteService(${s.id})">Delete</button></td>`;
+                tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.category}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button onclick="deleteService(${s.id})">Delete</button></td>`;
                 tbody.appendChild(tr);
             });
         }
