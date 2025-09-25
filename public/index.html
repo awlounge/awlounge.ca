@@ -203,130 +203,88 @@ nav a:hover {
     box-shadow: 0 12px 12px rgba(183, 142, 70, 0.85);
 }
 
-/* --- START: FINAL Carousel Rewrite (Back to Basics) --- */
-
-.service-carousel {
-    display: none;
-}
-.service-carousel.active {
-    display: block;
-    position: relative;
-    /* This is the container for the whole component (slides + arrows) */
-    width: 480px; /* 360px for the carousel + 60px on each side for arrows */
-    margin: 40px auto; /* Classic, stable centering for the whole component */
-}
-#carousel-container {
-    /* This container no longer needs centering styles */
-    min-height: 450px; /* Ensures it has space */
-}
-.carousel_wrapper {
-    width: 360px;
-    height: 350px;
-    margin: 0 auto; /* Centers the 3D scene within the 480px container */
-    
-    /* The 3D context, now free of any conflicts */
-    perspective: 1200px;
-    transform: rotateX(20deg);
-}
-.carousel {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform-style: preserve-3d;
-    transition: transform 1s;
-}
-.slide {
-    position: absolute;
-    width: 275px;
-    min-height: 250px;
-    border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-    padding: 10px;
-    background: #fff;
-    transition: transform 0.5s, box-shadow 0.5s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    cursor: pointer;
-}
-.slide img {
-    width: 80%;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 8px;
-}
-.slide h3 {
-    font-family: "Playfair Display", serif;
-    font-size: 14px;
-    margin: 4px 0;
-    color: #5a3e36;
-}
-.slide p {
-    font-family: "Inter", sans-serif;
-    font-size: 10px;
-    margin: 0;
-    color: #333;
-}
-.slide-details {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
-    font-size: 10px;
-    color: var(--muted);
-    font-weight: 600;
-}
-.slide-details span {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-.slide-details i {
-    color: var(--gold-2);
-}
-.carousel-nav {
-    position: static;
-}
-.carousel-nav button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    /* Your appearance styles are preserved */
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: transparent;
-    color: var(--gold-2);
-    border: 2px solid var(--gold-2);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.carousel-nav button:hover {
-    background: var(--gold-2);
-    color: #fff;
-}
-.carousel-nav .prev {
-    left: 0; /* Aligns to the far left edge of the 480px container */
-}
-.carousel-nav .next {
-    right: 0; /* Aligns to the far right edge of the 480px container */
-}
-.carousel-nav button svg {
-    width: 22px;
-    height: 22px;
-    stroke-width: 3;
-}
-/* --- END: FINAL Carousel Rewrite --- */
+        /* === START: FINAL, STABLE CAROUSEL === */
+        #carousel-container {
+            /* This container needs space, but no centering styles */
+            min-height: 450px;
+        }
+        .service-carousel {
+            display: none;
+        }
+        .service-carousel.active {
+            display: block;
+            /* The entire component (carousel + arrows) is a single block */
+            width: 500px; /* Wider than the carousel for arrow spacing */
+            margin: 40px auto; /* Rock-solid centering */
+            position: relative;
+        }
+        .carousel_wrapper {
+            width: 360px;
+            height: 350px;
+            margin: 0 auto; /* Center the 3D scene inside the main container */
+            
+            /* The entire 3D scene is defined here */
+            perspective: 1200px;
+            transform: rotateX(20deg);
+            transform-origin: center center; /* THE CRITICAL FIX */
+        }
+        .carousel {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform-origin: center center; /* THE CRITICAL FIX */
+            transition: transform 1s;
+        }
+        .slide {
+            position: absolute;
+            top: 20px; /* Adjust top/left to center slides within the stage */
+            left: 42px;
+            width: 275px;
+            min-height: 250px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            background: #fff;
+            transition: transform 0.5s, box-shadow 0.5s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transform-origin: center center; /* THE CRITICAL FIX */
+        }
+        .slide img { width: 80%; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+        .slide h3 { font-family: "Playfair Display", serif; font-size: 14px; margin: 4px 0; color: #5a3e36; }
+        .slide p { font-family: "Inter", sans-serif; font-size: 10px; margin: 0; color: #333; }
+        .slide-details { display: flex; justify-content: space-between; width: 100%; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 10px; color: var(--muted); font-weight: 600; }
+        .slide-details span { display: flex; align-items: center; gap: 5px; }
+        .slide-details i { color: var(--gold-2); }
+        .carousel-nav {
+            position: static;
+        }
+        .carousel-nav button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            color: var(--gold-2);
+            border: 2px solid var(--gold-2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .carousel-nav button:hover { background: var(--gold-2); color: #fff; }
+        .carousel-nav .prev { left: 0; }
+        .carousel-nav .next { right: 0; }
+        .carousel-nav button svg { width: 22px; height: 22px; stroke-width: 3; }
+        /* === END: FINAL, STABLE CAROUSEL === */
 
 .section-title {
     font-family: 'Playfair Display', serif;
