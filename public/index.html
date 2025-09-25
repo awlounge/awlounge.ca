@@ -95,14 +95,11 @@ header {
     color: var(--muted);
 }
 nav {
-    display: none;
+    display: flex;
+    flex-wrap: wrap; /* Allows links to wrap onto the next line on small screens */
+    justify-content: center; /* Centers the links if they wrap */
     gap: 16px;
     align-items: center;
-}
-@media (min-width: 768px) {
-    nav {
-        display: flex;
-    }
 }
 nav a {
     font-weight: 600;
