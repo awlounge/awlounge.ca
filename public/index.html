@@ -203,13 +203,15 @@ nav a:hover {
     box-shadow: 0 12px 12px rgba(183, 142, 70, 0.85);
 }
 
-/* --- START: Corrected Carousel Section --- */
+/* --- START: Final Carousel Centering & Arrow Fix --- */
+
 .service-carousel {
     display: none; /* Hides inactive carousels */
 }
 .service-carousel.active {
-    display: block; /* Shows the active carousel */
-    position: relative; /* This is the positioning context for the arrows */
+    display: flex; /* Use flex to guarantee centering of the wrapper */
+    justify-content: center;
+    position: relative; /* Positioning context for the arrows */
 }
 #carousel-container {
     display: flex;
@@ -224,7 +226,7 @@ nav a:hover {
     perspective: 1200px;
     transform: rotateX(20deg);
     position: relative;
-    margin: 0 auto; /* Keeps the wrapper centered in its container */
+    flex-shrink: 0; /* Prevents the wrapper from shrinking in the flex container */
 }
 .carousel {
     width: 100%;
@@ -287,18 +289,17 @@ nav a:hover {
     color: var(--gold-2);
 }
 .carousel-nav {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 440px;
-    display: flex;
-    justify-content: space-between;
-    z-index: 10;
-    pointer-events: none;
+    /* This container is now only for holding the buttons in the HTML */
     margin-top: 0;
+    position: static;
 }
 .carousel-nav button {
+    position: absolute; /* Position arrows relative to the active carousel container */
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+
+    /* Appearance styles */
     width: 45px;
     height: 45px;
     border-radius: 50%;
@@ -310,18 +311,27 @@ nav a:hover {
     border: 2px solid var(--gold-2);
     cursor: pointer;
     transition: all 0.3s ease;
-    pointer-events: auto; /* Re-enables clicks on buttons */
 }
 .carousel-nav button:hover {
     background: var(--gold-2);
     color: #fff;
+}
+.carousel-nav .prev {
+    /* Position based on the center, minus half the carousel, minus spacing */
+    /* calc(50% - half_carousel_width - desired_space) */
+    left: calc(50% - 180px - 30px);
+}
+.carousel-nav .next {
+    /* calc(50% - half_carousel_width - desired_space) */
+    right: calc(50% - 180px - 30px);
 }
 .carousel-nav button svg {
     width: 22px;
     height: 22px;
     stroke-width: 3;
 }
-/* --- END: Corrected Carousel Section --- */
+
+/* --- END: Final Carousel Fix --- */
 
 .section-title {
     font-family: 'Playfair Display', serif;
