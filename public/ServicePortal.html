@@ -3,244 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <title>Aesthetics & Wellness Lounge Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6f8; }
-        h1, h2 { color: #333; }
-        .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        form { display: flex; flex-direction: column; gap: 10px; }
-        .form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-        input, select, button, textarea { padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; }
-        select[multiple] { height: 100px; }
-        textarea { width: 100%; min-height: 60px; font-family: Arial, sans-serif; }
-        button { background-color: #007BFF; color: #fff; border: none; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); table-layout: fixed; }
-        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; word-wrap: break-word; }
-        th { background: #007BFF; color: #fff; }
-        td button { background-color: #dc3545; margin-right: 5px; }
-        td button.edit { background-color: #28a745; }
-        .image-preview { max-width: 150px; max-height: 150px; }
-        th:last-child, td:last-child { width: 130px; text-align: center; }
+        :root { 
+            --bg: #f8f9fa; --text: #111114; --muted: #7B7B80; --surface: #FFFFFF; --gold: #d4af37; --gold-2: #B78E46; --blue: #0f6b86; --red: #d9534f; --radius: 12px; --container: 1100px;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Inter", system-ui, sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; line-height: 1.5; padding: 20px; }
+        .portal-container { max-width: var(--container); margin: 0 auto; }
+        .hidden { display: none !important; }
+
+        /* --- Login Styles --- */
+        #loginDiv { max-width: 320px; margin: 100px auto; background: var(--surface); padding: 30px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        #loginDiv h2 { font-family: "Playfair Display", serif; text-align: center; margin-top: 0; }
+        #loginDiv input { display: block; width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 8px; }
+        #loginDiv button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--blue); color: #fff; font-weight: bold; cursor: pointer; }
+
+        /* --- Main Portal Layout --- */
+        .portal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .portal-header p { margin: 0; color: var(--muted); }
+        .portal-nav { display: flex; justify-content: flex-start; background-color: var(--surface); padding: 5px; border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .portal-nav-link { padding: 10px 20px; font-size: 15px; font-weight: 600; color: var(--muted); background: none; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+        .portal-nav-link.active { color: #fff; background: var(--blue); }
+        .portal-view { display: none; }
+        .portal-view.active { display: block; }
+
+        /* --- General UI Components --- */
+        .container { background: var(--surface); padding: 25px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h1, h2 { font-family: "Playfair Display", serif; margin-top: 0; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        form { display: flex; flex-direction: column; gap: 15px; }
+        input, select, button, textarea { padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; font-family: "Inter", sans-serif; }
+        select[multiple] { height: 120px; }
+        textarea { width: 100%; min-height: 80px; }
+        .form-row { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+        .form-row > * { flex: 1; }
+        .form-row > select, .form-row > input[type=number] { flex-basis: 150px; flex-grow: 0; }
+        .btn { text-decoration: none; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; transition: opacity 0.2s; }
+        .btn-main { background-color: var(--blue); color: white; }
+        .btn-danger { background-color: var(--red); color: white; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        
+        /* --- Services Table --- */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; vertical-align: middle; }
+        th { background: var(--blue); color: #fff; }
+        td .btn { padding: 6px 10px; font-size: 12px; margin-right: 5px; }
+        .image-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+
+        /* --- Team Management Styles --- */
+        .team-list-container { display: grid; gap: 15px; }
+        .team-member-row { display: flex; align-items: center; background: var(--surface); padding: 15px 20px; border-radius: var(--radius); box-shadow: 0 4px 15px rgba(0,0,0,0.05); cursor: pointer; }
+        .team-member-row img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 20px; }
+        .team-member-info { flex-grow: 1; }
+        .team-member-info h3 { margin: 0; font-family: "Playfair Display", serif; font-size: 18px; }
+        .team-member-info p { margin: 0; color: var(--muted); font-size: 14px; }
+        .role-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 5px; text-transform: uppercase; }
+        .role-owner { background-color: rgba(183, 142, 70, 0.15); color: var(--gold-2); }
+        .role-employee { background-color: rgba(123, 123, 128, 0.15); color: var(--muted); }
+        .edit-profile-form { display: grid; grid-template-columns: 200px 1fr; gap: 40px; }
+        .form-left-col img { width: 100%; aspect-ratio: 1 / 1; border-radius: 50%; object-fit: cover; border: 4px solid var(--bg); margin-bottom: 15px; }
+        .form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 20px; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
     <div id="loginDiv">
-        <h2>Login</h2>
+        <h2>Portal Login</h2>
         <input type="text" id="loginUser" placeholder="Username" required>
         <input type="password" id="loginPass" placeholder="Password" required>
         <button id="loginBtn">Login</button>
     </div>
 
-    <div id="adminDiv" style="display:none;">
-        <p>Logged in as <span id="loggedInUser"></span> (<span id="userRole"></span>) <button id="logoutBtn" style="background-color: #6c757d;">Logout</button></p>
-        
-        <div class="container">
-            <h2>Manage Categories</h2>
-            <div class="form-row">
-                <input type="text" id="newCategoryName" placeholder="New Category Name" style="flex: 1;">
-                <button id="addCategoryBtn">Add Category</button>
+    <div id="adminDiv" class="hidden">
+        <div class="portal-container">
+            <div class="portal-header">
+                <p>Logged in as <strong id="loggedInUser"></strong> (<span id="userRole"></span>)</p>
+                <button id="logoutBtn" class="btn btn-secondary" style="padding: 8px 15px;">Logout</button>
+            </div>
+
+            <nav class="portal-nav">
+                <button class="portal-nav-link active" data-target="services-view">Manage Services</button>
+                <button class="portal-nav-link" data-target="team-view">Manage Team Profiles</button>
+            </nav>
+
+            <div id="services-view" class="portal-view active">
+                <div class="container">
+                    <h2>Manage Services</h2>
+                    <form id="serviceForm">
+                        <input type="hidden" id="serviceId" name="id">
+                        <div class="form-row">
+                            <div id="category-wrapper" style="flex: 1;">
+                                <select id="category" name="category" required></select>
+                                <input type="text" id="newCategoryInput" placeholder="Enter new category name and save service" class="hidden" style="width: 100%;">
+                            </div>
+                            <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
+                            <select id="performer" name="performer" required multiple></select>
+                            <input type="number" id="duration" name="duration" placeholder="Duration (min)" required>
+                            <input type="number" id="price" name="price" placeholder="Price (cents)" required>
+                        </div>
+                        <textarea id="description" name="description" placeholder="Enter service description here..."></textarea>
+                        <div class="form-row">
+                             <input type="file" id="image" name="image" accept="image/*">
+                             <button type="submit" class="btn btn-main">Save Service</button>
+                        </div>
+                    </form>
+                </div>
+                <table id="servicesTable">
+                    <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Description</th><th>Provider(s)</th><th>Duration</th><th>Price</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="team-view" class="portal-view">
+                <div id="team-list-view">
+                    <div class="page-header">
+                        <h2>Manage Team Profiles</h2>
+                        <a href="#" id="addNewMemberBtn" class="btn btn-main"><i class="fas fa-plus"></i> Add New Team Member</a>
+                    </div>
+                    <div class="team-list-container"></div>
+                </div>
+                <div id="edit-profile-view" class="hidden">
+                    <div class="page-header">
+                        <a href="#" class="back-link"><i class="fas fa-arrow-left"></i> Back to Team List</a>
+                        <h2 id="edit-form-title">Edit Profile</h2>
+                    </div>
+                    <form class="edit-profile-form" onsubmit="return false;">
+                         <div class="form-left-col">
+                            <img src="" alt="Profile Image" id="profileImagePreview">
+                            <label for="profileImage" class="btn btn-main" style="width: 100%; text-align: center;">Change Picture</label>
+                            <input type="file" name="profileImage" id="profileImage" accept="image/*" class="hidden" />
+                        </div>
+                        <div class="form-right-col">
+                            <div class="form-group"><label for="edit-name">Full Name</label><input type="text" id="edit-name"></div>
+                            <div class="form-group"><label for="edit-title">Title</label><input type="text" id="edit-title"></div>
+                            <div class="form-group"><label for="edit-role">Role</label><select id="edit-role"><option value="owner">Owner</option><option value="employee">Employee</option></select></div>
+                            <div class="form-group"><label for="edit-specialty">Specialty</label><input type="text" id="edit-specialty"></div>
+                            <div class="form-group"><label for="edit-bio">Bio</label><textarea id="edit-bio" rows="6"></textarea></div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-danger">Delete Member</button>
+                                <button type="submit" class="btn btn-main">Save Changes</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-
-        <div class="container">
-            <h2>Manage Services</h2>
-            <form id="serviceForm">
-                <input type="hidden" id="serviceId" name="id">
-                <input type="hidden" id="existingImageUrl" name="existingImageUrl">
-                <div class="form-row">
-                    <select id="category" name="category" required></select>
-                    <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
-                    <select id="performer" name="performer" required multiple></select>
-                    <input type="number" id="duration" name="duration" placeholder="Duration (min)" required>
-                    <input type="number" id="price" name="price" placeholder="Price (cents)" required>
-                    <input type="file" id="image" name="image" accept="image/*">
-                </div>
-                <textarea id="description" name="description" placeholder="Enter service description here..."></textarea>
-                <div class="form-row">
-                    <button type="submit">Save Service</button>
-                </div>
-            </form>
-        </div>
-
-        <table id="servicesTable">
-            <thead>
-                <tr>
-                    <th>Image</th><th>Name</th><th>Category</th><th>Description</th><th>Provider(s)</th><th>Duration</th><th>Price</th><th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
     </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const BASE_URL = '';
-        let token = localStorage.getItem('token');
-        let username = localStorage.getItem('username');
-        let role = localStorage.getItem('role');
+document.addEventListener('DOMContentLoaded', () => {
+    // --- State & Config ---
+    const BASE_URL = '';
+    let token = localStorage.getItem('token');
+    let username = localStorage.getItem('username');
+    let role = localStorage.getItem('role');
+    const teamData = { // This will be fetched from your backend later
+        jessa: { id: "jessa", name: "Jessa Cordezar", title: "Co-Owner/Manager", role: "owner", specialty: "~Massage/Reflexology~", bio: "Born in the Philippines...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=J" },
+        maricel: { id: "maricel", name: "Maricel Tamburri", title: "Co-Owner/Manager", role: "owner", specialty: "~Microblading/Brows/Lashes~", bio: "I was born and raised in Etobicoke, ON...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=M" },
+        trechan: { id: "trechan", name: "Trechan Legria", title: "Co-Owner/Manager", role: "owner", specialty: "~Makeover/Mani-Pedi~", bio: "Born in the Philippines, my family and I...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=T" }
+    };
 
-        const loginDiv = document.getElementById('loginDiv');
-        const adminDiv = document.getElementById('adminDiv');
+    // --- Element Selectors ---
+    const loginDiv = document.getElementById('loginDiv');
+    const adminDiv = document.getElementById('adminDiv');
 
-        function showAdminPortal() {
-            document.getElementById("loggedInUser").innerText = username;
-            document.getElementById("userRole").innerText = role;
-            loginDiv.style.display = "none";
-            adminDiv.style.display = "block";
-            populatePerformers();
-            loadCategories();
-            loadServices();
+    // --- View Switching Elements ---
+    const portalNav = document.querySelector('.portal-nav');
+    const portalViews = document.querySelectorAll('.portal-view');
+    const teamListView = document.getElementById('team-list-view');
+    const editProfileView = document.getElementById('edit-profile-view');
+
+    // --- Core Functions ---
+    function showAdminPortal() {
+        document.getElementById("loggedInUser").innerText = username;
+        document.getElementById("userRole").innerText = role;
+        loginDiv.classList.add('hidden');
+        adminDiv.classList.remove('hidden');
+        
+        // Initialize portal features
+        populatePerformers();
+        loadCategories();
+        loadServices();
+        renderTeamList();
+        setupEventListeners();
+    }
+
+    // --- Authentication ---
+    if (token) {
+        showAdminPortal();
+    }
+    
+    // --- Service Management Functions (Your Original Code, Adapted) ---
+    async function loadCategories() {
+        const res = await fetch(`${BASE_URL}/api/categories`);
+        const categories = await res.json();
+        const categorySelect = document.getElementById('category');
+        categorySelect.innerHTML = '<option value="">Select Category</option>';
+        categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+            categorySelect.appendChild(option);
+        });
+        // Add the "Add New" option
+        categorySelect.innerHTML += '<option value="addNewCategory" style="font-weight:bold; color:var(--blue);">+ Add New Category</option>';
+    }
+    
+    function populatePerformers() {
+        const performerSelect = document.getElementById("performer");
+        const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"]; // This should eventually come from the team data
+        performerSelect.innerHTML = "";
+        allPerformers.forEach(p => {
+            const option = document.createElement("option");
+            option.value = p;
+            option.text = p;
+            performerSelect.appendChild(option);
+        });
+    }
+
+    async function loadServices() {
+        if (!token) return;
+        const res = await fetch(`${BASE_URL}/services`, { headers: { "Authorization": `Bearer ${token}` } });
+        const data = await res.json();
+        const tbody = document.querySelector("#servicesTable tbody");
+        tbody.innerHTML = "";
+        data.forEach(s => {
+            const tr = document.createElement("tr");
+            const imageCell = s.imageurl ? `<img src="${s.imageurl}" alt="${s.name}" class="image-preview">` : 'No Image';
+            tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.category}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="btn btn-main edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button class="btn btn-danger" onclick="deleteService(${s.id})">Delete</button></td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- Team Management Functions ---
+    function renderTeamList() {
+        const container = document.querySelector('.team-list-container');
+        container.innerHTML = '';
+        Object.values(teamData).forEach(member => {
+            const memberHtml = `
+                <div class="team-member-row" data-member-id="${member.id}">
+                    <img src="${member.imageUrl}" alt="${member.name}">
+                    <div class="team-member-info">
+                        <h3>${member.name}</h3>
+                        <p>${member.title}</p>
+                        <span class="role-badge role-${member.role}">${member.role}</span>
+                    </div>
+                    <a href="#" class="edit-btn"><i class="fas fa-pen"></i> Edit</a>
+                </div>`;
+            container.innerHTML += memberHtml;
+        });
+    }
+
+    function showListView() {
+        editProfileView.classList.add('hidden');
+        teamListView.classList.remove('hidden');
+    }
+
+    function showEditView(memberId) {
+        const member = teamData[memberId];
+        if (!member) {
+            // This would be for a new member
+            document.getElementById('edit-form-title').textContent = "Add New Team Member";
+            document.querySelector('.edit-profile-form').reset();
+            document.getElementById('profileImagePreview').src = "https://via.placeholder.com/150/ccc/FFFFFF?text=New";
+        } else {
+            // Populate the form for an existing member
+            document.getElementById('edit-form-title').textContent = `Edit Profile: ${member.name}`;
+            document.getElementById('profileImagePreview').src = member.imageUrl;
+            document.getElementById('edit-name').value = member.name;
+            document.getElementById('edit-title').value = member.title;
+            document.getElementById('edit-role').value = member.role;
+            document.getElementById('edit-specialty').value = member.specialty;
+            document.getElementById('edit-bio').value = member.bio;
         }
+        teamListView.classList.add('hidden');
+        editProfileView.classList.remove('hidden');
+    }
 
-        if (token) {
-            showAdminPortal();
-        }
-
+    // --- Event Listeners Setup ---
+    function setupEventListeners() {
+        // Login & Logout
         document.getElementById("loginBtn").onclick = async () => {
             const user = document.getElementById("loginUser").value;
             const pass = document.getElementById("loginPass").value;
-            const res = await fetch(`${BASE_URL}/admin/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username: user, password: pass })
-            });
+            const res = await fetch(`${BASE_URL}/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: user, password: pass }) });
             const data = await res.json();
             if (data.success) {
-                token = data.token;
-                username = data.username;
-                role = data.role;
-                localStorage.setItem("token", token);
-                localStorage.setItem("username", username);
-                localStorage.setItem("role", role);
+                token = data.token; username = data.username; role = data.role;
+                localStorage.setItem("token", token); localStorage.setItem("username", username); localStorage.setItem("role", role);
                 showAdminPortal();
-            } else {
-                alert(data.error);
-            }
+            } else { alert(data.error); }
         };
+        document.getElementById("logoutBtn").onclick = () => { localStorage.clear(); window.location.reload(); };
 
-        document.getElementById("logoutBtn").onclick = () => {
-            localStorage.clear();
-            window.location.reload();
-        };
+        // Portal Tab Switching
+        portalNav.addEventListener('click', (event) => {
+            const navLink = event.target.closest('.portal-nav-link');
+            if (!navLink) return;
+            const targetId = navLink.dataset.target;
+            portalNav.querySelector('.active').classList.remove('active');
+            navLink.classList.add('active');
+            portalViews.forEach(view => view.classList.toggle('active', view.id === targetId));
+        });
 
-        async function loadCategories() {
-            const res = await fetch(`${BASE_URL}/api/categories`);
-            const categories = await res.json();
-            const categorySelect = document.getElementById('category');
-            categorySelect.innerHTML = '<option value="">Select Category</option>';
-            categories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat;
-                option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
-                categorySelect.appendChild(option);
-            });
-        }
-
-        document.getElementById('addCategoryBtn').onclick = async () => {
-            const newCategoryInput = document.getElementById('newCategoryName');
-            const name = newCategoryInput.value.trim();
-            if (!name) {
-                alert('Please enter a category name.');
-                return;
+        // Add New Category (Inline)
+        document.getElementById('category').addEventListener('change', (e) => {
+            const categoryWrapper = document.getElementById('category-wrapper');
+            if (e.target.value === 'addNewCategory') {
+                categoryWrapper.querySelector('select').classList.add('hidden');
+                categoryWrapper.querySelector('input').classList.remove('hidden');
+                categoryWrapper.querySelector('input').focus();
             }
-            const res = await fetch(`${BASE_URL}/api/categories`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ name })
-            });
-            if (res.ok) {
-                newCategoryInput.value = '';
-                await loadCategories();
-                localStorage.setItem('servicesUpdated', Date.now());
-            } else {
-                const err = await res.json();
-                alert(`Error: ${err.error}`);
-            }
-        };
+        });
 
-        function populatePerformers() {
-            const performerSelect = document.getElementById("performer");
-            const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"];
-            performerSelect.innerHTML = "";
-            allPerformers.forEach(p => {
-                const option = document.createElement("option");
-                option.value = p;
-                option.text = p;
-                performerSelect.appendChild(option);
-            });
-        }
-
-        async function loadServices() {
-            if (!token) return;
-            const res = await fetch(`${BASE_URL}/services`, { headers: { "Authorization": `Bearer ${token}` } });
-            const data = await res.json();
-            const tbody = document.querySelector("#servicesTable tbody");
-            tbody.innerHTML = "";
-            data.forEach(s => {
-                const tr = document.createElement("tr");
-                const imageCell = s.imageurl ? `<img src="${s.imageurl}" alt="${s.name}" class="image-preview">` : 'No Image';
-                tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.category}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button onclick="deleteService(${s.id})">Delete</button></td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
+        // Service Form Submission
         document.getElementById("serviceForm").onsubmit = async (e) => {
             e.preventDefault();
             const form = e.target;
             const id = form.serviceId.value;
             const formData = new FormData();
             
-            ['id', 'existingImageUrl', 'category', 'name', 'duration', 'price', 'description'].forEach(fieldName => {
+            // Handle new category input
+            let categoryValue = form.category.value;
+            const newCategoryInput = document.getElementById('newCategoryInput');
+            if (!newCategoryInput.classList.contains('hidden') && newCategoryInput.value.trim()) {
+                // If a new category was typed, we can create it first or send it with the form.
+                // For now, let's just use its value.
+                categoryValue = newCategoryInput.value.trim();
+            }
+            formData.append('category', categoryValue);
+            
+            ['id', 'name', 'duration', 'price', 'description'].forEach(fieldName => {
                 if (form[fieldName]) formData.append(fieldName, form[fieldName].value);
             });
-
             const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
             formData.append('performer', selectedPerformers.join(', '));
-            
-            if (form.image.files[0]) {
-                formData.append('image', form.image.files[0]);
-            }
+            if (form.image.files[0]) { formData.append('image', form.image.files[0]); }
 
             const url = id ? `${BASE_URL}/services/${id}` : `${BASE_URL}/services`;
             const method = id ? "PUT" : "POST";
-
             const res = await fetch(url, { method, headers: { "Authorization": `Bearer ${token}` }, body: formData });
+            
             if (res.ok) {
                 form.reset();
                 Array.from(document.getElementById('performer').options).forEach(opt => opt.selected = false);
                 document.getElementById('serviceId').value = '';
-                document.getElementById('existingImageUrl').value = '';
+                newCategoryInput.classList.add('hidden');
+                document.getElementById('category').classList.remove('hidden');
                 loadServices();
+                loadCategories();
                 localStorage.setItem('servicesUpdated', Date.now());
-            } else {
-                alert('Failed to save service.');
+            } else { alert('Failed to save service.'); }
+        };
+
+        // Team Management Events
+        document.querySelector('.team-list-container').addEventListener('click', (event) => {
+            const editButton = event.target.closest('.edit-btn');
+            if (editButton) {
+                event.preventDefault();
+                const memberRow = event.target.closest('.team-member-row');
+                showEditView(memberRow.dataset.memberId);
             }
-        };
+        });
+        document.getElementById('addNewMemberBtn').addEventListener('click', (e) => { e.preventDefault(); showEditView(null); });
+        document.querySelector('#edit-profile-view .back-link').addEventListener('click', (e) => { e.preventDefault(); showListView(); });
+    }
 
-        window.deleteService = async function(id) {
-            if (!confirm("Are you sure?")) return;
-            const res = await fetch(`${BASE_URL}/services/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
-            if (res.ok) {
-                loadServices();
-                localStorage.setItem('servicesUpdated', Date.now());
-            }
-        };
-
-        window.editService = function(service) {
-            document.getElementById("serviceId").value = service.id;
-            document.getElementById("category").value = service.category;
-            document.getElementById("name").value = service.name;
-            document.getElementById("duration").value = service.duration;
-            document.getElementById("price").value = service.price;
-            document.getElementById("existingImageUrl").value = service.imageurl || '';
-            document.getElementById("description").value = service.description || '';
-
-            const performerSelect = document.getElementById("performer");
-            const performers = service.performer.split(',').map(p => p.trim());
-            Array.from(performerSelect.options).forEach(option => {
-                option.selected = performers.includes(option.value);
-            });
-        };
-    });
+    // --- Global Functions needed for inline HTML onclick ---
+    window.deleteService = async function(id) {
+        if (!confirm("Are you sure?")) return;
+        const res = await fetch(`${BASE_URL}/services/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
+        if (res.ok) { loadServices(); localStorage.setItem('servicesUpdated', Date.now()); }
+    };
+    window.editService = function(service) {
+        document.getElementById("serviceId").value = service.id;
+        document.getElementById("category").value = service.category;
+        document.getElementById("name").value = service.name;
+        document.getElementById("duration").value = service.duration;
+        document.getElementById("price").value = service.price;
+        document.getElementById("description").value = service.description || '';
+        const performerSelect = document.getElementById("performer");
+        const performers = service.performer.split(',').map(p => p.trim());
+        Array.from(performerSelect.options).forEach(option => {
+            option.selected = performers.includes(option.value);
+        });
+        window.scrollTo(0, 0); // Scroll to top to see the form
+    };
+});
 </script>
 </body>
 </html>
