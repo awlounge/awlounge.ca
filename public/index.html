@@ -41,7 +41,7 @@
         .service-carousel.active { display: block; }
         .carousel_wrapper { width: 360px; height: 350px; perspective: 1200px; margin: 75px auto; transform: rotateX(20deg); position: relative; justify-content: center;}
         .carousel { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 1s; justify-content: center; }
-        .slide { position: absolute; width: 275px; min-height: 250px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); padding: 0px; background: #fff; transition: transform 0.5s, box-shadow 0.5s; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; }
+        .slide { position: absolute; width: 275px; min-height: 250px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); padding: 10px; background: #fff; transition: transform 0.5s, box-shadow 0.5s; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; }
         .slide img { width: 100%; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
         .slide h3 { font-family: "Playfair Display", serif; font-size: 14px; margin: 4px 0; color: #5a3e36; }
         .slide p { font-family: "Inter", sans-serif; font-size: 10px; margin: 0; color: #333; }
@@ -89,7 +89,7 @@
         .team-member h5 { font-family: "Playfair Display", serif; margin-bottom: 8px; color: var(--text); font-size: 16px; text-align: center; }
         .team-member .bio { font-size: 14px; text-align: left; line-height: 1.5; color: var(--muted); }
         footer { margin-top: 36px; padding: 28px 0; border-top: 1px solid rgba(16, 18, 20, 0.03); color: var(--muted); text-align: center; }
-        @media (max-width: 768px) { .wrap { padding: 18px; } header { flex-wrap: wrap; justify-content: center; } .hero-photo { height: 180px; } .team-member-header { flex-direction: column; } .team-member-info { text-align: center; } }
+        @media (max-width: 768px) { .wrap { padding: 18px; } header { flex-wrap: wrap; justify-content: center; } .hero-photo { height: 160px; } .hero-frame { height: 160; } .team-member-header { flex-direction: column; } .team-member-info { text-align: center; } }
         @media (prefers-reduced-motion: reduce) { .blob, .hero-photo, .carousel, .slide { transition: none !important; animation: none !important; } }
     </style>
 </head>
