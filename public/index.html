@@ -55,10 +55,13 @@
         .service-carousel.active { display: block; }
         .carousel_wrapper { width: 360px; height: 350px; perspective: 1200px; margin: 75px auto; transform: rotateX(20deg); position: relative; }
         .carousel { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 1s; }
-        .slide { position: absolute; width: 320px; height: 320px; border-radius: 15px; overflow: hidden; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); padding: 10px; background: #fff; transition: transform 0.5s, box-shadow 0.5s; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; }
-        .slide img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
-        .slide h2, .slide h3 { font-family: "Playfair Display", serif; font-size: 18px; margin: 4px 0; color: #5a3e36; }
+        .slide { position: absolute; width: 300px; height: 300px; border-radius: 15px; overflow: hidden; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); padding: 10px; background: #fff; transition: transform 0.5s, box-shadow 0.5s; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; }
+        .slide img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+        .slide h2, .slide h3 { font-family: "Playfair Display", serif; font-size: 14px; margin: 4px 0; color: #5a3e36; }
         .slide p { font-family: "Inter", sans-serif; font-size: 13px; margin: 0; color: #333; }
+		.slide-details { display: flex; justify-content: space-between; width: 100%; margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee; font-size: 12px; color: var(--muted); font-weight: 600; }
+        .slide-details span { display: flex; align-items: center; gap: 5px; }
+        .slide-details i { color: var(--gold-2); }
         .carousel-nav { display: flex; justify-content: center; gap: 20px; margin-top: 15px; z-index: 10; }
         .carousel-nav button { padding: 10px 20px; font-size: 16px; border: 2px solid #5a3e36; background: #fff; color: #5a3e36; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s; }
         .carousel-nav button:hover { background: #5a3e36; color: #fff; }
@@ -261,12 +264,7 @@
             const BASE_URL = '';
             let allServices = [];
             let autoRotateTimer = null;
-            const performerCalendars = { 
-                jessa: "mark.adam.grabowski@gmail.com", 
-                maricel: "maricelcalendar@gmail.com", 
-                trechan: "trechancalendar@gmail.com", 
-                "mary-ann": "maryanncalendar@gmail.com" 
-            };
+            const performerCalendars = { jessa: "mark.adam.grabowski@gmail.com", maricel: "maricelcalendar@gmail.com", trechan: "trechancalendar@gmail.com", "mary-ann": "maryanncalendar@gmail.com" };
             const SLIDE_INTERVAL = 4000;
             const USER_PAUSE_INTERVAL = 15000;
             const bookingModal = document.getElementById('bookingModal');
@@ -288,15 +286,37 @@
             const nextBtn = document.getElementById('nextBtn');
             let selectedDate = null, selectedSlot = null, currentDate = new Date();
 
-            function populateCarouselsAndButtons(services) {
+            async function initializeWebsite() {
+                try {
+                    const [servicesRes, categoriesRes] = await Promise.all([
+                        fetch(`${BASE_URL}/api/services`, { cache: 'no-store' }),
+                        fetch(`${BASE_URL}/api/categories`, { cache: 'no-store' })
+                    ]);
+                    if (!servicesRes.ok || !categoriesRes.ok) throw new Error('Could not fetch initial data.');
+                    
+                    allServices = await servicesRes.json();
+                    const allCategories = await categoriesRes.json();
+                    
+                    populateCarouselsAndButtons(allServices, allCategories);
+                    populateCategoryDropdown(allCategories);
+                    document.querySelectorAll('.service-carousel').forEach(setupCarousel);
+                    initializeCarouselInteractions();
+                    startAutoRotation();
+                } catch (error) {
+                    console.error("Initialization failed:", error);
+                    const servicesSection = document.getElementById('services');
+                    if (servicesSection) servicesSection.innerHTML = `<p style="text-align:center; color: red;">Could not load services.</p>`;
+                }
+            }
+
+            function populateCarouselsAndButtons(services, categories) {
                 const carouselContainer = document.getElementById('carousel-container');
                 const buttonsContainer = document.querySelector('.service-buttons');
                 carouselContainer.innerHTML = '';
                 buttonsContainer.innerHTML = '';
-                const categoryOrder = ["relaxation", "beauty", "aesthetics", "hairtreatment", "photography", "rejuvenate"];
                 const servicesByCategory = services.reduce((acc, service) => { (acc[service.category] = acc[service.category] || []).push(service); return acc; }, {});
                 
-                categoryOrder.forEach((category) => {
+                categories.forEach((category) => {
                     if (!servicesByCategory[category]) return;
                     const button = document.createElement('button');
                     button.dataset.section = category;
@@ -308,8 +328,18 @@
                     let slidesHTML = '';
                     servicesByCategory[category].forEach(service => {
                         const imageUrl = service.imageurl ? service.imageurl : `https://via.placeholder.com/320x200/eee/999?text=${encodeURIComponent(service.name)}`;
-                        const descriptionText = service.description || `Provided by ${service.performer}`;
-                        slidesHTML += `<div class="slide" data-service-name="${service.name}" data-service-category="${service.category}"><img src="${imageUrl}" alt="${service.name}"><h3>${service.name}</h3><p>${descriptionText}</p></div>`;
+                        const descriptionText = service.description || '';
+                        slidesHTML += `
+                            <div class="slide" data-service-name="${service.name}" data-service-category="${service.category}">
+                                <img src="${imageUrl}" alt="${service.name}">
+                                <h3>${service.name}</h3>
+                                <p>${descriptionText}</p>
+                                <div class="slide-details">
+                                    <span><i class="fas fa-user"></i> ${service.performer}</span>
+                                    <span><i class="fas fa-clock"></i> ${service.duration} min</span>
+                                    <span><i class="fas fa-dollar-sign"></i> ${(service.price / 100).toFixed(2)}</span>
+                                </div>
+                            </div>`;
                     });
                     carouselDiv.innerHTML = `<div class="carousel_wrapper"><div class="carousel">${slidesHTML}</div></div><div class="carousel-nav"><button class="prev">Prev</button><button class="next">Next</button></div>`;
                     carouselContainer.appendChild(carouselDiv);
