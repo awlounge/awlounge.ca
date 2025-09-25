@@ -537,7 +537,20 @@ footer {
     .wrap {
         padding: 18px;
     }
-    
+	
+    .carousel-nav {
+    /* This container now positions the buttons underneath the carousel */
+    display: flex;
+    justify-content: space-between; /* Pushes buttons to the sides */
+    width: 300px; /* Controls the distance between buttons */
+    margin-top: 80px; /* The space between the slides and the arrows */
+    position: static;
+		}
+		
+		.slide img { width: 75%; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+        .slide h3 { font-family: "Playfair Display", serif; font-size: 16px; margin: 4px 0; color: #5a3e36; }
+        .slide p { font-family: "Inter", sans-serif; font-size: 12px; margin: 0; color: #333; }
+	
     .hero-photo {
         height: 160px;
     }
@@ -669,6 +682,35 @@ footer {
     <footer role="contentinfo"><div> © <strong>Aesthetics And Wellness Lounge</strong> — All rights reserved <br> <strong>awl.jm2@gmail.com</strong> — (226) 796-5138 </div></footer>
 
     <script>
+	
+	// --- START: Inconspicuous Admin Portal Link ---
+const secretButton = document.querySelector('footer');
+let clickCount = 0;
+let clickTimer = null;
+
+secretButton.addEventListener('click', () => {
+    clickCount++;
+
+    // If the user clicks 7 times, go to the portal
+    if (clickCount === 7) {
+        console.log("Accessing service portal...");
+        window.location.href = 'ServicePortal.html'; // <-- REPLACE WITH YOUR URL
+        
+        // Reset after success
+        clearTimeout(clickTimer);
+        clickCount = 0;
+        return;
+    }
+
+    // Reset the counter if the user pauses for more than 1.5 seconds
+    clearTimeout(clickTimer);
+    clickTimer = setTimeout(() => {
+        clickCount = 0;
+    }, 1500); // 1.5 seconds
+});
+// --- END: Inconspicuous Admin Portal Link ---
+	
+	
         document.addEventListener('DOMContentLoaded', () => {
             const BASE_URL = '';
             let allServices = [];
