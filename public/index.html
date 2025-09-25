@@ -533,114 +533,122 @@ footer {
     text-align: center;
 }
 @media (max-width: 768px) {
+    /* --- General Mobile Styles --- */
     .wrap {
         padding: 18px;
     }
-     header {
-        flex-wrap: nowrap; /* Prevent items from wrapping to a new line */
-        justify-content: space-between; /* Space items out to the edges */
-        padding: 6px 10px; /* Reduce top/bottom and side padding */
-        gap: 8px;
-    }
-
-    .logo {
-        width: 40px; /* Make the logo smaller */
-        height: 40px;
-        font-size: 16px;
-    }
-
-    .brand .name {
-        font-size: 14px; /* Make the brand name text smaller */
-    }
-
-    .brand .sub {
-        display: none; /* Hide the address on mobile to save space */
-    }
-
-    /* 2. Replace the phone number text with an icon */
-    .header-cta {
-        font-size: 0; /* This makes the text "(226) 796-5138" invisible */
-        padding: 8px 12px; /* Adjust padding for a square icon button */
-    }
-
-    .header-cta::before {
-        content: '\f095'; /* This is the Font Awesome unicode for a phone icon */
-        font-family: "Font Awesome 6 Free";
-        font-weight: 900;
-        font-size: 16px; /* This sets the size of the new icon */
-    }
     
-    /* Ensure the "Book Now" button doesn't also get an icon */
-    .primary-cta::before {
-        content: none;
-    }
-    
-    .primary-cta {
-        font-size: 14px; /* Keep the font size for the "Book Now" button */
-        padding: 8px 12px;
-    }
-}
     .hero-photo {
         height: 160px;
     }
+
     .hero-frame {
-        height: 160;
+        height: 160px; /* Corrected typo, was missing 'px' */
     }
+
     .team-member-header {
         flex-direction: column;
     }
+
     .team-member-info {
         text-align: center;
     }
-	.service-carousel.active {
-    /* Keeps the component from getting too wide */
-    width: 100%; 
-    
-    /* This shrinks the entire component to 75% of its size */
-    transform: scale(0.75);
-    
-    /* Reset margin for the new scaled size */
-    margin: 0 auto;
-	}
-	.service-buttons button {
-    padding: 10px 10px;
-    font-size: 15px;
-    background: transparent;
-    color: var(--text);
-    border: 2px solid rgba(16, 18, 20, 0.06);
-    border-radius: 9px;
-    cursor: pointer;
-    font-weight: 700;
-    min-width: 100px;
-    transition: all 0.24s ease;
-}
-}
-@media (prefers-reduced-motion: reduce) {
-    .blob, .hero-photo, .carousel, .slide {
-        transition: none !important;
-        animation: none !important;
+
+    .service-carousel.active {
+        width: 100%;
+        transform: scale(0.75);
+        margin: 0 auto;
     }
+
+    .service-buttons button {
+        padding: 10px 10px;
+        font-size: 15px;
+        min-width: 100px;
+    }
+
+    /* --- START: New Mobile Header Layout --- */
+    
+    /* Hide the full nav menu and show the hamburger button */
+    nav { 
+        display: none; 
+    }
+    
+    .mobile-nav-toggle { 
+        display: block; 
+    }
+
+    /* Use CSS Grid for the new two-row header layout */
+    header {
+        display: grid;
+        grid-template-columns: auto 1fr auto; /* Col 1: Logo, Col 2: Spacer, Col 3: Phone/Menu */
+        grid-template-rows: auto auto;    /* Row 1, Row 2 */
+        align-items: center;
+        padding: 8px 15px; /* Skinnier padding */
+        gap: 10px;
+    }
+
+    /* --- Row 1 Placement --- */
+    .brand { grid-area: 1 / 1 / 2 / 2; } /* Row 1, Col 1 */
+    .header-ctas { grid-area: 1 / 3 / 2 / 4; } /* Row 1, Col 3 */
+    .mobile-nav-toggle { grid-area: 1 / 3 / 2 / 4; justify-self: end; padding-left: 10px;} /* Puts hamburger on the right */
+
+    /* --- Row 2 Placement --- */
+    .primary-cta {
+        grid-area: 2 / 1 / 3 / 4; /* Row 2, span all columns */
+        justify-self: center;     /* Center it horizontally */
+        margin-top: 8px;
+    }
+    
+    /* --- Styling for a "Thinner" Look --- */
+    .logo { 
+        width: 40px; 
+        height: 40px; 
+    }
+
+    .brand .name { display: none; } /* Hide text name for more space */
+    .brand .sub { display: none; }   /* Hide subtext */
+
+    /* Style the phone icon */
+    .header-cta { 
+        font-size: 0; 
+        padding: 8px 10px; 
+    }
+    .header-cta::before {
+        content: '\f095';
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: 18px;
+    }
+    /* --- END: New Mobile Header Layout --- */
 }
     </style>
 </head>
 <body>
     <div class="wrap" id="top">
         <header role="banner">
-            <a class="brand" href="#top" aria-label="Aesthetics & Wellness Lounge">
-                <img src="AWL_Logo.jpg" alt="AWL Logo" class="logo" aria-hidden="true" />
-                <div><div class="name">Aesthetics & Wellness Lounge</div><div class="sub">577 Dundas St, Woodstock, ON</div></div>
-            </a>
-            <nav role="navigation">
-                <a href="#services" id="navServices">Services</a>
-                <a href="#visit">Visit</a>
-                <a href="#social">Social</a>
-                <a href="#about" id="navAbout">About Us</a>
-            </nav>
-            <div class="header-ctas">
-                <a class="header-cta" href="tel:+12267965138" aria-label="Call us">(226) 796-5138</a>
-                <a class="primary-cta" id="openBookingLink" href="#">Book Now</a>
-            </div>
-        </header>
+    <a class="brand" href="#top" aria-label="Aesthetics & Wellness Lounge">
+        <img src="AWL_Logo.jpg" alt="AWL Logo" class="logo" aria-hidden="true" />
+        <div><div class="name">Aesthetics & Wellness Lounge</div><div class="sub">577 Dundas St, Woodstock, ON</div></div>
+    </a>
+    
+    <button class="mobile-nav-toggle" aria-controls="primary-navigation" aria-expanded="false">
+        <span class="sr-only">Menu</span>
+        <i class="fas fa-bars" aria-hidden="true"></i>
+    </button>
+    
+    <nav role="navigation">
+        <a href="#services" id="navServices">Services</a>
+        <a href="#visit">Visit</a>
+        <a href="#social">Social</a>
+        <a href="#about" id="navAbout">About Us</a>
+    </nav>
+    
+    <div class="header-ctas">
+        <a class="header-cta" href="tel:+12267965138" aria-label="Call us">(226) 796-5138</a>
+    </div>
+
+    <a class="primary-cta" id="openBookingLink" href="#">Book Now</a>
+</header>
         <section class="hero" aria-label="Hero"><div class="hero-frame"><div class="blob" aria-hidden="true"></div><div class="hero-photo" id="heroPhoto" aria-hidden="true"></div></div></section>
         <section id="services" style="padding-top: 60px; margin-top: -60px;"><h2 class="section-title">Our Services</h2><div class="service-buttons"></div><div id="carousel-container"></div></section>
         <section id="visit" style="padding-top: 100px; margin-top: -60px;"><h3 class="section-title">Visit Us</h3><div style="width:100%; max-width:800px; margin:0 auto; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.08);"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2911.7508081162746!2d-80.75547332317797!3d43.130760771131754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882c1ffd8e139683%3A0x430172e7127d7331!2sAesthetics%20%26%20Wellness%20Lounge!5e0!3m2!1sen!2sus!4v1758563173912!5m2!1sen!2sus" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div></section>
