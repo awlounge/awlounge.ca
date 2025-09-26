@@ -68,6 +68,8 @@
         #category-list .category-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
         #category-list .category-item:last-child { border-bottom: none; }
         .delete-category-btn { background: none; border: none; color: var(--red); cursor: pointer; font-size: 16px; }
+        .modal-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        .modal-footer input { flex-grow: 1; }
     </style>
 </head>
 <body>
@@ -161,6 +163,10 @@
                 <button class="close-btn">&times;</button>
             </div>
             <div id="category-list"></div>
+            <div class="modal-footer">
+                <input type="text" id="newCategoryName" placeholder="New category name...">
+                <button id="addCategoryBtn" class="btn btn-main">Add Category</button>
+            </div>
         </div>
     </div>
 
@@ -329,6 +335,20 @@
                     }
                 });
             }
+
+            const addCategoryBtn = document.getElementById('addCategoryBtn');
+            if (addCategoryBtn) {
+                addCategoryBtn.onclick = () => {
+                    const input = document.getElementById('newCategoryName');
+                    const newName = input.value.trim();
+                    if (newName) {
+                        addCategory(newName);
+                        input.value = '';
+                    } else {
+                        alert('Please enter a category name.');
+                    }
+                };
+            }
         }
         
         function renderTeamList() {
@@ -381,6 +401,22 @@
                 categorySelect.appendChild(option);
             });
             categorySelect.innerHTML += '<option value="addNewCategory" style="font-weight:bold; color:var(--blue);">+ Add New Category</option>';
+        }
+
+        async function addCategory(name) {
+            const res = await fetch(`${BASE_URL}/api/categories`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ name })
+            });
+            if (res.ok) {
+                await loadCategories();
+                await populateCategoryModal();
+                localStorage.setItem('servicesUpdated', Date.now());
+            } else {
+                const errData = await res.json();
+                alert(`Error: ${errData.error || 'Failed to add category.'}`);
+            }
         }
 
         function populatePerformers() {
@@ -437,7 +473,8 @@
                 await populateCategoryModal();
                 localStorage.setItem('servicesUpdated', Date.now());
             } else {
-                alert('Failed to delete category. It might still be in use by some services.');
+                const errData = await res.json();
+                alert(errData.error || 'Failed to delete category.');
             }
         }
 
