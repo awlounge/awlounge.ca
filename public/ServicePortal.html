@@ -97,11 +97,9 @@
                     <form id="serviceForm">
                         <input type="hidden" id="serviceId" name="id">
                         <div class="form-row">
-						<button type="button" id="manageCategoriesBtn" class="btn-secondary btn-small">Manage Categories</button>
+                            <button type="button" id="manageCategoriesBtn" class="btn-secondary btn-small">Manage Categories</button>
                             <div id="category-wrapper">
                                 <select id="category" name="category" required></select>
-                               
-                                
                             </div>
                             <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
                             <select id="performer" name="performer" required multiple></select>
@@ -248,19 +246,7 @@
                 });
             }
 
-            const categorySelect = document.getElementById('category');
-            if(categorySelect) {
-                categorySelect.addEventListener('change', (e) => {
-                    const categoryWrapper = document.getElementById('category-wrapper');
-                    const selectInput = categoryWrapper.querySelector('select');
-                    const textInput = categoryWrapper.querySelector('input');
-                    if (e.target.value === 'addNewCategory') {
-                        selectInput.classList.add('hidden');
-                        textInput.classList.remove('hidden');
-                        textInput.focus();
-                    }
-                });
-            }
+            // REMOVED BROKEN EVENT LISTENER FOR CATEGORY SELECT
             
             const serviceForm = document.getElementById("serviceForm");
             if(serviceForm) {
@@ -269,12 +255,12 @@
                     const form = e.target;
                     const id = form.serviceId.value;
                     const formData = new FormData();
-                    let categoryValue = form.category.value;
-                    const newCategoryInput = document.getElementById('newCategoryInput');
-                    if (!newCategoryInput.classList.contains('hidden') && newCategoryInput.value.trim()) {
-                        categoryValue = newCategoryInput.value.trim();
-                    }
-                    formData.append('category', categoryValue);
+                    
+                    // --- THIS IS THE FIX ---
+                    // The old code was trying to find an input field that no longer exists.
+                    // Now, we simply get the selected category from the dropdown.
+                    formData.append('category', form.category.value);
+                    
                     ['id', 'name', 'duration', 'price', 'description'].forEach(fieldName => { if (form[fieldName]) formData.append(fieldName, form[fieldName].value); });
                     const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
                     formData.append('performer', selectedPerformers.join(', '));
@@ -285,8 +271,6 @@
                     if (res.ok) {
                         form.reset();
                         document.getElementById('serviceId').value = '';
-                        newCategoryInput.classList.add('hidden');
-                        document.getElementById('category').classList.remove('hidden');
                         loadServices();
                         loadCategories();
                         localStorage.setItem('servicesUpdated', Date.now());
@@ -398,10 +382,9 @@
             categories.forEach(cat => {
                 const option = document.createElement('option');
                 option.value = cat;
-                option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+                option.textContent = cat; // Display formatted name from DB
                 categorySelect.appendChild(option);
             });
-
         }
 
         async function addCategory(name) {
