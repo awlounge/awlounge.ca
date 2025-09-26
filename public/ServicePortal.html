@@ -183,15 +183,20 @@
             maricel: { id: "maricel", name: "Maricel Tamburri", title: "Co-Owner/Manager", role: "owner", specialty: "~Microblading/Brows/Lashes~", bio: "I was born and raised in Etobicoke, ON...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=M" },
             trechan: { id: "trechan", name: "Trechan Legria", title: "Co-Owner/Manager", role: "owner", specialty: "~Makeover/Mani-Pedi~", bio: "Born in the Philippines, my family and I...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=T" }
         };
+
+        // --- Element Selectors ---
         const loginDiv = document.getElementById('loginDiv');
         const adminDiv = document.getElementById('adminDiv');
 
+        // --- All Function Definitions ---
+        
         function showAdminPortal() {
             document.getElementById("loggedInUser").innerText = username;
             document.getElementById("userRole").innerText = role;
             loginDiv.classList.add('hidden');
             adminDiv.classList.remove('hidden');
             adminDiv.classList.add(`role-${role}`);
+            
             const addNewMemberBtn = document.getElementById('addNewMemberBtn');
             if (addNewMemberBtn) {
                 if (role !== 'admin') { addNewMemberBtn.classList.add('hidden'); } 
@@ -207,7 +212,7 @@
             renderTeamList();
         }
 
-        function setupAllEventListeners() {
+        function setupAdminPanelEventListeners() {
             const portalNav = document.querySelector('.portal-nav');
             const serviceForm = document.getElementById("serviceForm");
             const teamListContainer = document.querySelector('.team-list-container');
@@ -221,6 +226,7 @@
                 localStorage.clear();
                 window.location.reload();
             };
+            
             if(portalNav) {
                 portalNav.addEventListener('click', (event) => {
                     const navLink = event.target.closest('.portal-nav-link');
@@ -233,12 +239,31 @@
                     });
                 });
             }
+            
             if(serviceForm) {
                 serviceForm.onsubmit = async (e) => {
                     e.preventDefault();
-                    // Full form submission logic...
+                    const form = e.target;
+                    const id = form.serviceId.value;
+                    const formData = new FormData();
+                    formData.append('category', form.category.value);
+                    ['id', 'name', 'duration', 'price', 'description'].forEach(fieldName => { if (form[fieldName]) formData.append(fieldName, form[fieldName].value); });
+                    const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
+                    formData.append('performer', selectedPerformers.join(', '));
+                    if (form.image.files[0]) { formData.append('image', form.image.files[0]); }
+                    const url = id ? `${BASE_URL}/services/${id}` : `${BASE_URL}/services`;
+                    const method = id ? "PUT" : "POST";
+                    const res = await fetch(url, { method, headers: { "Authorization": `Bearer ${token}` }, body: formData });
+                    if (res.ok) {
+                        form.reset();
+                        document.getElementById('serviceId').value = '';
+                        loadServices();
+                        loadCategories();
+                        localStorage.setItem('servicesUpdated', Date.now());
+                    } else { alert('Failed to save service.'); }
                 };
             }
+
             if(teamListContainer) {
                 teamListContainer.addEventListener('click', (event) => {
                     const editButton = event.target.closest('.edit-btn');
@@ -249,14 +274,17 @@
                     }
                 });
             }
+            
             if(addNewMemberBtn) { addNewMemberBtn.addEventListener('click', (e) => { e.preventDefault(); showEditView(null); }); }
             if(backLink) { backLink.addEventListener('click', (e) => { e.preventDefault(); showListView(); }); }
+
             if(manageCategoriesBtn) {
                 manageCategoriesBtn.addEventListener('click', () => {
                     populateCategoryModal();
                     categoryModal.classList.remove('hidden');
                 });
             }
+
             if(categoryModal) {
                 categoryModal.addEventListener('click', (event) => {
                     if (event.target.classList.contains('close-btn') || event.target.classList.contains('modal')) {
@@ -269,32 +297,162 @@
                     }
                 });
             }
+            
             if(addCategoryForm) {
                 addCategoryForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    // Full add category logic...
+                    const input = document.getElementById('addCategoryNameInput');
+                    const name = input.value.trim();
+                    if (!name) return;
+                    const res = await fetch(`${BASE_URL}/api/categories`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ name })
+                    });
+                    if (res.ok) {
+                        input.value = '';
+                        await loadCategories();
+                        await populateCategoryModal();
+                        localStorage.setItem('servicesUpdated', Date.now());
+                    } else {
+                        alert('Failed to add category.');
+                    }
                 });
             }
         }
         
-        // --- Data Loading & Rendering Functions (Full versions) ---
-        function renderTeamList() { /* Full function */ }
-        function showListView() { /* Full function */ }
-        function showEditView(memberId) { /* Full function */ }
-        async function loadCategories() { /* Full function */ }
-        function populatePerformers() { /* Full function */ }
-        async function loadServices() { /* Full function */ }
-        async function populateCategoryModal() { /* Full function */ }
-        async function deleteCategory(name) { /* Full function */ }
-        window.deleteService = async function(id) { /* Full function */ };
-        window.editService = function(service) { /* Full function */ };
+        function renderTeamList() {
+             const container = document.querySelector('.team-list-container');
+             if(!container) return;
+             container.innerHTML = '';
+             Object.values(teamData).forEach(member => {
+                 const canEdit = (role === 'admin' || username === member.id);
+                 const editButtonHTML = canEdit ? `<a href="#" class="btn edit-btn"><i class="fas fa-pen"></i> Edit</a>` : '';
+                 const memberHtml = `<div class="team-member-row" data-member-id="${member.id}"><img src="${member.imageUrl}" alt="${member.name}"><div class="team-member-info"><h3>${member.name}</h3><p>${member.title}</p><span class="role-badge role-${member.role}">${member.role}</span></div>${editButtonHTML}</div>`;
+                 container.innerHTML += memberHtml;
+             });
+        }
 
-        // ===============================================
-        // =========== SCRIPT INITIALIZATION ===========
-        // ===============================================
+        function showListView() {
+            document.getElementById('edit-profile-view').classList.add('hidden');
+            document.getElementById('team-list-view').classList.remove('hidden');
+        }
 
-        // THIS IS THE FIX: The login button listener is isolated and attached immediately.
-        // It is not dependent on any other part of the script.
+        function showEditView(memberId) {
+             const deleteButton = document.querySelector('#edit-profile-view .btn-danger');
+             if (role !== 'admin') { deleteButton.classList.add('hidden'); } else { deleteButton.classList.remove('hidden'); }
+             const member = teamData[memberId];
+             if (!memberId) {
+                 document.getElementById('edit-form-title').textContent = "Add New Team Member";
+                 document.querySelector('.edit-profile-form').reset();
+                 document.getElementById('profileImagePreview').src = "https://via.placeholder.com/150/ccc/FFFFFF?text=New";
+             } else {
+                 document.getElementById('edit-form-title').textContent = `Edit Profile: ${member.name}`;
+                 document.getElementById('profileImagePreview').src = member.imageUrl;
+                 document.getElementById('edit-name').value = member.name;
+                 document.getElementById('edit-title').value = member.title;
+                 document.getElementById('edit-role').value = member.role;
+                 document.getElementById('edit-specialty').value = member.specialty;
+                 document.getElementById('edit-bio').value = member.bio;
+             }
+             document.getElementById('team-list-view').classList.add('hidden');
+             document.getElementById('edit-profile-view').classList.remove('hidden');
+        }
+        
+        async function loadCategories() {
+            const res = await fetch(`${BASE_URL}/api/categories`);
+            const categories = await res.json();
+            const categorySelect = document.getElementById('category');
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        function populatePerformers() {
+            const performerSelect = document.getElementById("performer");
+            const allPerformers = ["Jessa", "Trechan", "Maricel", "Mary-Ann"];
+            performerSelect.innerHTML = "";
+            allPerformers.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p;
+                option.text = p;
+                performerSelect.appendChild(option);
+            });
+        }
+
+        async function loadServices() {
+            if (!token) return;
+            const res = await fetch(`${BASE_URL}/services`, { headers: { "Authorization": `Bearer ${token}` } });
+            const data = await res.json();
+            const tbody = document.querySelector("#servicesTable tbody");
+            tbody.innerHTML = "";
+            data.forEach(s => {
+                const tr = document.createElement("tr");
+                const imageCell = s.imageurl ? `<img src="${s.imageurl}" alt="${s.name}" class="image-preview">` : 'No Image';
+                tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.category}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="btn btn-main edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button class="btn btn-danger" onclick="deleteService(${s.id})">Delete</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function populateCategoryModal() {
+            const res = await fetch(`${BASE_URL}/api/categories`);
+            const categories = await res.json();
+            const categoryListDiv = document.getElementById('category-list');
+            categoryListDiv.innerHTML = '';
+            if (categories.length === 0) {
+                categoryListDiv.innerHTML = '<p>No categories found.</p>';
+            }
+            categories.forEach(cat => {
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                item.innerHTML = `<span>${cat}</span><button class="delete-category-btn" data-category-name="${cat}" title="Delete Category"><i class="fas fa-trash-alt"></i></button>`;
+                categoryListDiv.appendChild(item);
+            });
+        }
+
+        async function deleteCategory(name) {
+            if (!confirm(`Are you sure you want to delete the category "${name}"? This cannot be undone.`)) return;
+            const res = await fetch(`${BASE_URL}/api/categories`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ name })
+            });
+            if (res.ok) {
+                await loadCategories();
+                await populateCategoryModal();
+                localStorage.setItem('servicesUpdated', Date.now());
+            } else {
+                alert('Failed to delete category. It might still be in use by some services.');
+            }
+        }
+
+        window.deleteService = async function(id) {
+            if (!confirm("Are you sure?")) return;
+            const res = await fetch(`${BASE_URL}/services/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } });
+            if (res.ok) { loadServices(); localStorage.setItem('servicesUpdated', Date.now()); }
+        };
+
+        window.editService = function(service) {
+            document.getElementById("serviceId").value = service.id;
+            document.getElementById("category").value = service.category;
+            document.getElementById("name").value = service.name;
+            document.getElementById("duration").value = service.duration;
+            document.getElementById("price").value = service.price;
+            document.getElementById("description").value = service.description || '';
+            const performerSelect = document.getElementById("performer");
+            const performers = service.performer.split(',').map(p => p.trim());
+            Array.from(performerSelect.options).forEach(option => {
+                option.selected = performers.includes(option.value);
+            });
+            document.querySelector('.portal-nav-link[data-target="services-view"]').click();
+            window.scrollTo(0, 0);
+        };
+        
+        // --- SCRIPT INITIALIZATION ---
         const loginButton = document.getElementById('loginBtn');
         if (loginButton) {
             loginButton.onclick = async () => {
@@ -308,7 +466,7 @@
                         localStorage.setItem("token", token); 
                         localStorage.setItem("username", username); 
                         localStorage.setItem("role", role);
-                        setupAllEventListeners(); // Setup the rest of the listeners ONLY after a successful login
+                        setupEventListeners();
                         showAdminPortal();
                     } else { 
                         alert(data.error || 'Login failed'); 
@@ -317,13 +475,10 @@
                     alert('Could not connect to the server.');
                 }
             };
-        } else {
-            console.error("CRITICAL ERROR: Login button could not be found.");
         }
-
-        // Check if user is ALREADY logged in from a previous session
+        
         if (token) {
-            setupAllEventListeners(); // If already logged in, set up all listeners
+            setupEventListeners();
             showAdminPortal();
         }
     });
