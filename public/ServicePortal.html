@@ -97,10 +97,11 @@
                     <form id="serviceForm">
                         <input type="hidden" id="serviceId" name="id">
                         <div class="form-row">
+						<button type="button" id="manageCategoriesBtn" class="btn-secondary btn-small">Manage Categories</button>
                             <div id="category-wrapper">
                                 <select id="category" name="category" required></select>
-                                <input type="text" id="newCategoryInput" placeholder="Enter new category name" class="hidden">
-                                <button type="button" id="manageCategoriesBtn" class="btn-secondary btn-small">Manage</button>
+                               
+                                
                             </div>
                             <input type="text" id="name" name="name" placeholder="Service Name" required style="flex: 2;">
                             <select id="performer" name="performer" required multiple></select>
@@ -400,7 +401,7 @@
                 option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
                 categorySelect.appendChild(option);
             });
-            categorySelect.innerHTML += '<option value="addNewCategory" style="font-weight:bold; color:var(--blue);">+ Add New Category</option>';
+
         }
 
         async function addCategory(name) {
