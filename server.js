@@ -15,18 +15,80 @@ import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
 dotenv.config();
 
-// --- Cloudinary, Multer, and PostgreSQL Setup (Unchanged) ---
-cloudinary.config({ cloud_name: process.env.CLOUDINARY_CLOUD_NAME, api_key: process.env.CLOUDINARY_API_KEY, api_secret: process.env.CLOUDINARY_API_SECRET });
-const storage = new CloudinaryStorage({ cloudinary: cloudinary, params: { folder: 'awl_services', format: 'jpg', public_id: (req, file) => path.parse(file.originalname).name.replace(/\s+/g, '_') } });
-const upload = multer({ storage: storage });
-const { Pool } = pg;
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+// --- Cloudinary Configuration ---
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-// --- Database Initialization (Unchanged) ---
-async function initDB() { /* ... Unchanged ... */ }
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'awl_services',
+        format: 'jpg',
+        public_id: (req, file) => path.parse(file.originalname).name.replace(/\s+/g, '_'),
+    },
+});
+
+const upload = multer({ storage: storage });
+
+// --- PostgreSQL Database Setup ---
+const { Pool } = pg;
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
+
+// --- Function to Create Tables and Seed Data ---
+async function initDB() {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS categories (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL UNIQUE
+            );
+        `);
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS services (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                performer TEXT NOT NULL,
+                duration INTEGER NOT NULL,
+                price INTEGER NOT NULL,
+                category TEXT,
+                imageUrl TEXT,
+                description TEXT
+            );
+        `);
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS service_logs (
+                id SERIAL PRIMARY KEY,
+                username TEXT,
+                action TEXT,
+                service_id INTEGER,
+                details TEXT,
+                timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        const catRes = await pool.query("SELECT COUNT(*) FROM categories");
+        if (catRes.rows[0].count === "0") {
+            console.log("No categories found, seeding default categories...");
+            const defaultCategories = ['Relaxation', 'Beauty', 'Aesthetics', 'Hair Treatment', 'Photography', 'Rejuvenate'];
+            for (const cat of defaultCategories) {
+                await pool.query("INSERT INTO categories (name) VALUES ($1)", [cat]);
+            }
+        }
+    } catch (err) {
+        console.error("Error during database initialization:", err);
+    }
+}
 initDB();
 
-// --- Middleware and Setup (Unchanged) ---
+// --- Middleware and Setup ---
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -34,44 +96,84 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
-const auth = new google.auth.GoogleAuth({ /* ... Unchanged ... */ });
-const calendar = google.calendar({ version: "v3", auth });
-const transporter = nodemailer.createTransport({ /* ... Unchanged ... */ });
 
-// --- HELPER FUNCTION TO FORMAT AND ADD CATEGORIES ---
-async function ensureCategoryExists(categoryName) {
-    if (!categoryName || typeof categoryName !== 'string' || categoryName.trim() === '') {
-        return null; // Return null if category is invalid or empty
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+
+const auth = new google.auth.GoogleAuth({
+    credentials: {
+        type: "service_account",
+        project_id: process.env.GOOGLE_PROJECT_ID,
+        private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        universe_domain: "googleapis.com",
+    },
+    scopes: ["https://www.googleapis.com/auth/calendar"],
+});
+const calendar = google.calendar({ version: "v3", auth });
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
+
+// --- Auth Functions & Routes ---
+function authenticate(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ error: "Unauthorized" });
     }
-    // Standardize the format: trim whitespace and capitalize each word
-    const formattedName = categoryName.trim().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-    
+    const token = authHeader.split(" ")[1];
     try {
-        // Use INSERT ... ON CONFLICT to add the category only if it doesn't already exist
-        await pool.query(
-            "INSERT INTO categories (name) VALUES ($1) ON CONFLICT (name) DO NOTHING",
-            [formattedName]
-        );
-        return formattedName; // Return the correctly formatted name
-    } catch (error) {
-        console.error("Error ensuring category exists:", error);
-        return categoryName; // Fallback to original name on error
+        req.user = jwt.verify(token, JWT_SECRET);
+        next();
+    } catch (err) {
+        res.status(401).json({ error: "Invalid token" });
     }
 }
 
+app.post("/admin/login", (req, res) => {
+    const { username, password } = req.body;
+    const allowedUsers = [];
+    for (let i = 1; i <= 10; i++) {
+        const user = process.env[`AWLOUNGE_USER_${i}`];
+        const pass = process.env[`AWLOUNGE_PASS_${i}`];
+        const role = process.env[`AWLOUNGE_ROLE_${i}`] || "user";
+        if (user && pass) {
+            allowedUsers.push({ user, pass, role });
+        }
+    }
+    const validUser = allowedUsers.find(u => u.user === username && u.pass === password);
+    if (validUser) {
+        const token = jwt.sign({ username: validUser.user, role: validUser.role }, JWT_SECRET, { expiresIn: "4h" });
+        res.json({ success: true, token, username: validUser.user, role: validUser.role });
+    } else {
+        res.status(401).json({ success: false, error: "Invalid credentials" });
+    }
+});
 
-// --- Auth Functions & Routes (Unchanged) ---
-function authenticate(req, res, next) { /* ... Unchanged ... */ }
-app.post("/admin/login", (req, res) => { /* ... Unchanged ... */ });
-async function logChange(username, action, serviceId, details) { /* ... Unchanged ... */ }
+async function logChange(username, action, serviceId, details) {
+    try {
+        await pool.query(
+            "INSERT INTO service_logs (username, action, service_id, details) VALUES ($1, $2, $3, $4)",
+            [username, action, serviceId, JSON.stringify(details)]
+        );
+    } catch (err) {
+        console.error("Failed to log change:", err);
+    }
+}
 
-// --- CATEGORY API ROUTES (Updated) ---
+// --- CATEGORY API ROUTES ---
 app.get("/api/categories", async (req, res) => {
     try {
         const result = await pool.query("SELECT name FROM categories ORDER BY name");
         res.json(result.rows.map(row => row.name));
     } catch (error) {
+        console.error('API Error fetching categories:', error);
         res.status(500).json({ error: "Failed to retrieve categories." });
     }
 });
@@ -82,10 +184,13 @@ app.post("/api/categories", authenticate, async (req, res) => {
         return res.status(400).json({ error: "Category name is required." });
     }
     try {
-        // Use the helper function to format and add the category
-        const formattedName = await ensureCategoryExists(name);
+        // Automatically capitalize each word
+        const formattedName = name.trim().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+
+        await pool.query("INSERT INTO categories (name) VALUES ($1)", [formattedName]);
         res.json({ success: true, message: `Category '${formattedName}' added.`});
     } catch (error) {
+        console.error('API Error adding category:', error);
         res.status(500).json({ error: "Failed to add category. It may already exist." });
     }
 });
@@ -96,34 +201,61 @@ app.delete("/api/categories", authenticate, async (req, res) => {
         return res.status(400).json({ error: "Category name is required." });
     }
     try {
-        const inUseCheck = await pool.query("SELECT id FROM services WHERE LOWER(category) = LOWER($1) LIMIT 1", [name.trim()]);
+        const inUseCheck = await pool.query(
+            "SELECT id FROM services WHERE LOWER(category) = LOWER($1) LIMIT 1",
+            [name.trim()]
+        );
         if (inUseCheck.rows.length > 0) {
             return res.status(400).json({ error: 'Failed to delete category. It might still be in use by some services.' });
         }
-        const deleteResult = await pool.query("DELETE FROM categories WHERE LOWER(name) = LOWER($1)", [name.trim()]);
+        const deleteResult = await pool.query(
+            "DELETE FROM categories WHERE LOWER(name) = LOWER($1)",
+            [name.trim()]
+        );
         if (deleteResult.rowCount === 0) {
              return res.status(404).json({ error: 'Category not found.' });
         }
         res.status(200).json({ success: true, message: 'Category deleted successfully.' });
     } catch (error) {
+        console.error('API Error deleting category:', error);
         res.status(500).json({ error: "Server error while deleting category." });
     }
 });
 
-// --- SERVICE API ROUTES (Updated) ---
-app.get("/api/services", async (req, res) => { /* ... Unchanged ... */ });
-app.get("/services", authenticate, async (req, res) => { /* ... Unchanged ... */ });
+// --- SERVICE API ROUTES ---
+app.get("/api/services", async (req, res) => {
+    try {
+        res.setHeader('Cache-Control', 'no-store');
+        const result = await pool.query("SELECT * FROM services ORDER BY category, name");
+        res.json(result.rows);
+    } catch (error) {
+        console.error('API Error fetching services:', error);
+        res.status(500).json({ error: "Failed to retrieve services." });
+    }
+});
+
+app.get("/services", authenticate, async (req, res) => {
+    try {
+        let result;
+        if (req.user && req.user.role && req.user.role.toLowerCase() === "admin") {
+            result = await pool.query("SELECT * FROM services ORDER BY category, name");
+        } else {
+            result = await pool.query("SELECT * FROM services WHERE performer ILIKE $1 ORDER BY category, name", [`%${req.user.username}%`]);
+        }
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Portal service fetch error:', err);
+        res.status(500).json({ error: "Failed to fetch services for portal." });
+    }
+});
 
 app.post("/services", authenticate, upload.single('image'), async (req, res) => {
-    let { name, performer, duration, price, category, description } = req.body;
+    const { name, performer, duration, price, category, description } = req.body;
     const imageUrl = req.file ? req.file.path : null;
     try {
-        // THIS IS THE FIX: Ensure the category exists and is formatted before saving the service
-        const finalCategory = await ensureCategoryExists(category);
-
         const result = await pool.query(
             "INSERT INTO services (name, performer, duration, price, category, imageUrl, description) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
-            [name, performer, duration, price, finalCategory, imageUrl, description]
+            [name, performer, duration, price, category, imageUrl, description]
         );
         const newId = result.rows[0].id;
         await logChange(req.user.username, "ADD", newId, req.body);
@@ -136,15 +268,12 @@ app.post("/services", authenticate, upload.single('image'), async (req, res) => 
 
 app.put("/services/:id", authenticate, upload.single('image'), async (req, res) => {
     const { id } = req.params;
-    let { name, performer, duration, price, category, description, existingImageUrl } = req.body;
+    const { name, performer, duration, price, category, description, existingImageUrl } = req.body;
     let imageUrl = req.file ? req.file.path : existingImageUrl;
     try {
-        // THIS IS THE FIX: Ensure the category exists and is formatted before updating the service
-        const finalCategory = await ensureCategoryExists(category);
-
         await pool.query(
             "UPDATE services SET name = $1, performer = $2, duration = $3, price = $4, category = $5, imageUrl = $6, description = $7 WHERE id = $8",
-            [name, performer, duration, price, finalCategory, imageUrl, description, id]
+            [name, performer, duration, price, category, imageUrl, description, id]
         );
         await logChange(req.user.username, "EDIT", id, req.body);
         res.json({ success: true });
