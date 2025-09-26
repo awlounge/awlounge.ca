@@ -173,6 +173,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // --- State & Config ---
         const BASE_URL = '';
         let token = localStorage.getItem('token');
         let username = localStorage.getItem('username');
@@ -182,11 +183,14 @@
             maricel: { id: "maricel", name: "Maricel Tamburri", title: "Co-Owner/Manager", role: "owner", specialty: "~Microblading/Brows/Lashes~", bio: "I was born and raised in Etobicoke, ON...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=M" },
             trechan: { id: "trechan", name: "Trechan Legria", title: "Co-Owner/Manager", role: "owner", specialty: "~Makeover/Mani-Pedi~", bio: "Born in the Philippines, my family and I...", imageUrl: "https://via.placeholder.com/150/B78E46/FFFFFF?text=T" }
         };
+
+        // --- Element Selectors ---
         const loginDiv = document.getElementById('loginDiv');
         const adminDiv = document.getElementById('adminDiv');
         const categoryModal = document.getElementById('categoryModal');
         const categoryListDiv = document.getElementById('category-list');
-
+        
+        // --- Core Functions ---
         function showAdminPortal() {
             document.getElementById("loggedInUser").innerText = username;
             document.getElementById("userRole").innerText = role;
@@ -208,6 +212,7 @@
             renderTeamList();
         }
 
+        // --- Event Listener Setup ---
         function setupEventListeners() {
             document.getElementById("loginBtn").onclick = async () => {
                 const user = document.getElementById("loginUser").value;
@@ -333,7 +338,6 @@
                         await loadCategories();
                         await populateCategoryModal();
                         localStorage.setItem('servicesUpdated', Date.now());
-
                     } else {
                         alert('Failed to add category.');
                     }
@@ -341,6 +345,7 @@
             }
         }
         
+        // --- Data Loading & Rendering Functions ---
         function renderTeamList() {
              const container = document.querySelector('.team-list-container');
              if(!container) return;
@@ -470,8 +475,12 @@
             document.querySelector('.portal-nav-link[data-target="services-view"]').click();
             window.scrollTo(0, 0);
         };
-
+        
+        // --- THIS IS THE FIX ---
+        // This block ensures all event listeners are attached as soon as the page is ready.
         setupEventListeners();
+
+        // --- This block checks if the user is ALREADY logged in when they visit the page ---
         if (token) {
             showAdminPortal();
         }
