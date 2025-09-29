@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aesthetics & Wellness Lounge</title>
+    <meta name="description" content="Aesthetics — curated skincare, advanced treatments and restorative wellness in a boutique lounge." />
+    <meta name="theme-color" content="#FBFAF8">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+:root {
+    --bg: #FBFAF8;
+    --text: #111114;
+    --muted: #7B7B80;
+    --surface: #FFFFFF;
+    --gold: #d4af37;
+    --gold-2: #B78E46;
+    --blue: #0f6b86;
+    --radius: 14px;
+    --container: 1200px;
+    --ease: cubic-bezier(.2, .9, .3, 1);
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+html {
+    scroll-behavior: smooth;
+}
+body {
+    margin: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+}
+a {
+    color: inherit;
+    text-decoration: none;
+}
+img {
+    display: block;
+    max-width: 100%;
+}
+.wrap {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 36px 28px;
+}
+header {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 12px;
+    position: sticky;
+    top: 18px;
+    z-index: 100;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.85));
+    backdrop-filter: blur(6px) saturate(120%);
+    border: 1px solid rgba(16, 18, 20, 0.04);
+    box-shadow: 0 6px 20px rgba(16, 20, 28, 0.04);
+    margin-bottom: 18px;
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--gold-2), var(--gold));
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Playfair Display", serif;
+    font-weight: 600;
+    font-size: 18px;
+    box-shadow: 0 8px 26px rgba(183, 142, 70, 0.16);
+}
+.brand .name {
+    font-family: "Playfair Display", serif;
+    font-size: 18px;
+}
+.brand .sub {
+    font-size: 14px;
+    color: var(--muted);
+}
+nav {
+    display: flex;
+    flex-wrap: wrap; /* Allows links to wrap onto the next line on small screens */
+    justify-content: center; /* Centers the links if they wrap */
+    gap: 16px;
+    align-items: center;
+}
+nav a {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 10px;
+}
+nav a:hover {
+    color: var(--text);
+    background: rgba(16, 18, 20, 0.02);
+}
+.header-ctas {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.header-cta {
+    background: transparent;
+    border: 1px solid rgba(16, 18, 20, 0.06);
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    color: var(--text);
+}
+.primary-cta {
+    background: linear-gradient(90deg, var(--gold), var(--gold-2));
+    color: #fff;
+    padding: 9px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 0 12px 30px rgba(183, 142, 70, 0.12);
+}
+.hero {
+    display: grid;
+    gap: 20px;
+    align-items: center;
+    margin-top: 6px;
+}
+.hero-frame {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    min-height: 180px;
+    box-shadow: 0 36px 90px rgba(20, 24, 30, 0.06);
+    border: 1px solid rgba(16, 18, 20, 0.04);
+}
+.blob {
+    position: absolute;
+    inset: auto -8% auto auto;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    transform: translate(12%, -12%) rotate(12deg);
+    background: radial-gradient(circle at 30% 30%, rgba(183, 142, 70, 0.14), rgba(201, 179, 141, 0.08) 30%, transparent 60%);
+    filter: blur(46px);
+    pointer-events: none;
+    will-change: transform;
+    transition: transform 1.2s var(--ease);
+}
+.hero-photo {
+    width: 100%;
+    height: 375px;
+    background-image: url('AWL_Banner.jpg');
+    background-size: cover;
+    background-position: center;
+    display: block;
+    transform-origin: center;
+    transition: transform 0.9s var(--ease);
+}
+.service-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 30px 0 20px;
+}
+.service-buttons button {
+    padding: 10px 14px;
+    font-size: 15px;
+    background: transparent;
+    color: var(--text);
+    border: 2px solid rgba(16, 18, 20, 0.06);
+    border-radius: 9px;
+    cursor: pointer;
+    font-weight: 700;
+    min-width: 140px;
+    transition: all 0.24s ease;
+}
+.service-buttons button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(183, 142, 70, 0.85);
+}
+.service-buttons button.active {
+    background: linear-gradient(90deg, var(--gold), rgba(183, 142, 70, 0.85));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 12px 12px rgba(183, 142, 70, 0.85);
+}
+
+        /* === START: FINAL, STABLE CAROUSEL === */
+        #carousel-container {
+            /* This container needs space, but no centering styles */
+            min-height: 550px;
+        }
+        .service-carousel {
+            display: none;
+        }
+        .service-carousel.active {
+			/* This now stacks the carousel and its navigation vertically */
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin: 40px auto;
+			position: relative;
+}
+        .carousel_wrapper {
+            width: 360px;
+            height: 350px;
+            margin: 0 auto; /* Center the 3D scene inside the main container */
+            
+            /* The entire 3D scene is defined here */
+            perspective: 1200px;
+            transform: rotateX(20deg);
+            transform-origin: center center; /* THE CRITICAL FIX */
+        }
+        .carousel {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform-origin: center center; /* THE CRITICAL FIX */
+            transition: transform 1s;
+        }
+        .slide {
+            position: absolute;
+            top: 20px; /* Adjust top/left to center slides within the stage */
+            left: 30px;
+            width: 300px;
+            min-height: 275px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            background: #fff;
+            transition: transform 0.5s, box-shadow 0.5s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transform-origin: center center; /* THE CRITICAL FIX */
+        }
+        .slide img { width: 75%; height: 150px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+        .slide h3 { font-family: "Playfair Display", serif; font-size: 14px; margin: 4px 0; color: #5a3e36; }
+        .slide p { font-family: "Inter", sans-serif; font-size: 10px; margin: 0; color: #333; }
+        .slide-details { display: flex; justify-content: space-between; width: 100%; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; font-size: 10px; color: var(--muted); font-weight: 600; }
+        .slide-details span { display: flex; align-items: center; gap: 5px; }
+        .slide-details i { color: var(--gold-2); }
+        .carousel-nav {
+    /* This container now positions the buttons underneath the carousel */
+    display: flex;
+    justify-content: space-between; /* Pushes buttons to the sides */
+    width: 300px; /* Controls the distance between buttons */
+    margin-top: 50px; /* The space between the slides and the arrows */
+    position: static;
+		}
+	.carousel-nav button {
+    /* REMOVED absolute positioning to put buttons in the normal flow */
+    position: static;
+    transform: none; /* Reset transform */
+    
+    /* All your appearance styles are preserved */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    color: var(--gold-2);
+    border: 2px solid var(--gold-2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+	}
+        .carousel-nav button:hover { background: var(--gold-2); color: #fff; }
+        .carousel-nav .prev { left: 0; }
+        .carousel-nav .next { right: 0; }
+        .carousel-nav button svg { width: 22px; height: 22px; stroke-width: 3; }
+        /* === END: FINAL, STABLE CAROUSEL === */
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 16px;
+    text-align: center;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+}
+.modal-content {
+    background: #fff;
+    margin: auto;
+    padding: 15px;
+    border-radius: 10px;
+    max-width: 475px;
+    width: 95%;
+    box-sizing: border-box;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+.closeBtn {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: #333;
+}
+.modal label {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+    font-size: 14px;
+}
+.modal select, .modal input {
+    margin-top: 6px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+.modal-cta {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+.btn {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+}
+.btn.primary {
+    background: var(--blue);
+    color: #fff;
+}
+.btn.ghost {
+    background: #f2f2f2;
+}
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+#monthYear {
+    text-align: center;
+    flex: 1;
+    margin: 0;
+}
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin: 8px 0 14px;
+}
+#calendar div {
+    padding: 10px 5px;
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid #eee;
+}
+#calendar div.header {
+    background: transparent;
+    font-weight: 600;
+    cursor: default;
+    border: none;
+}
+#calendar div:not(.header):not(.disabled):hover {
+    background: #f0c040;
+    color: #fff;
+}
+#calendar div.selected {
+    background: var(--blue);
+    color: #fff;
+}
+#calendar div.disabled {
+    color: #ccc;
+    pointer-events: none;
+}
+#timeSlots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    min-height: 40px;
+}
+.time-slot {
+    padding: 6px 12px;
+    background: #f2f2f2;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+}
+.time-slot.selected, .time-slot:hover {
+    background: var(--blue);
+    color: #fff;
+}
+#stripe-modal .modal-content {
+    max-width: 420px;
+}
+#card-element {
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 15px 0;
+}
+#card-errors {
+    color: #b00020;
+    margin-top: 8px;
+    min-height: 18px;
+    font-size: 14px;
+}
+#aboutModal .modal-content {
+    max-width: 80%;
+}
+.team-photo {
+    width: 100%;
+    max-width: 500px;
+    display: block;
+    margin: 20px auto;
+    border-radius: var(--radius);
+    box-shadow: 0 8px 26px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.04);
+}
+.team-container {
+    display: flex;
+    gap: 25px;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+.team-member {
+    background: var(--bg);
+    border: 1px solid rgba(0,0,0,0.04);
+    border-radius: var(--radius);
+    padding: 25px;
+    flex: 1;
+    min-width: 300px;
+    max-width: 500px;
+    box-shadow: 0 8px 26px rgba(0,0,0,0.05);
+}
+.team-member-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+.team-member-info {
+    text-align: left;
+}
+.team-member img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--gold);
+    flex-shrink: 0;
+}
+.team-member h3 {
+    font-family: "Playfair Display", serif;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+.team-member h4 {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.team-member .specialty {
+    color: var(--gold-2);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 15px;
+    margin: 5px 0;
+}
+.team-member hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 15px 0;
+}
+.team-member h5 {
+    font-family: "Playfair Display", serif;
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: 16px;
+    text-align: center;
+}
+.team-member .bio {
+    font-size: 14px;
+    text-align: left;
+    line-height: 1.5;
+    color: var(--muted);
+}
+footer {
+    margin-top: 36px;
+    padding: 28px 0;
+    border-top: 1px solid rgba(16, 18, 20, 0.03);
+    color: var(--muted);
+    text-align: center;
+}
+@media (max-width: 768px) {
+    /* --- General Mobile Styles --- */
+    .wrap {
+        padding: 18px;
+    }
+	
+    .carousel-nav {
+    /* This container now positions the buttons underneath the carousel */
+    display: flex;
+    justify-content: space-between; /* Pushes buttons to the sides */
+    width: 300px; /* Controls the distance between buttons */
+    margin-top: 80px; /* The space between the slides and the arrows */
+    position: static;
+		}
+		
+		.slide img { width: 75%; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 8px; }
+        .slide h3 { font-family: "Playfair Display", serif; font-size: 16px; margin: 4px 0; color: #5a3e36; }
+        .slide p { font-family: "Inter", sans-serif; font-size: 12px; margin: 0; color: #333; }
+	
+    .hero-photo {
+        height: 160px;
+    }
+
+    .hero-frame {
+        height: 160px;
+    }
+
+    .team-member-header {
+        flex-direction: column;
+    }
+
+    .team-member-info {
+        text-align: center;
+    }
+
+    .service-carousel.active {
+        width: 100%;
+        transform: scale(0.75);
+        margin: 0 auto;
+    }
+
+    .service-buttons button {
+        padding: 10px 10px;
+        font-size: 15px;
+        min-width: 100px;
+    }
+
+    /* --- START: New Mobile Header Layout --- */
+
+    /* Hide the hamburger menu, we are not using it. */
+    .mobile-nav-toggle { 
+        display: none; 
+    }
+
+    /* SHOW the navigation links on mobile. */
+    nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    /* Style the nav links to fit on mobile */
+    nav a {
+        font-size: 16px;
+        padding: 2px 4px;
+        font-weight: 500;
+    }
+
+    /* Use CSS Grid for the precise two-row layout */
+    header {
+        display: grid;
+        grid-template-columns: auto 1fr auto; /* Col 1: Logo, Col 2: Middle, Col 3: Phone */
+        grid-template-rows: auto auto;    /* Row 1, Row 2 */
+        align-items: center;
+        padding: 8px 15px;
+        row-gap: 10px;
+    }
+
+    /* --- Row 1 Placement --- */
+    .brand { grid-area: 1 / 1 / 2 / 2; }       /* Row 1, Col 1 */
+    .primary-cta {                             /* Row 1, Col 2 (NEW) */
+        grid-area: 1 / 2 / 2 / 3; 
+        justify-self: center;
+    }
+    .header-ctas { grid-area: 1 / 3 / 2 / 4; }  /* Row 1, Col 3 */
+
+    /* --- Row 2 Placement --- */
+    nav {                                      /* Row 2, span all columns (NEW) */
+        grid-area: 2 / 1 / 3 / 4; 
+    }
+    
+    /* --- Styling for a "Thinner" Look --- */
+    .logo { 
+        width: 40px; 
+        height: 40px; 
+    }
+
+    .brand .name { display: none; }
+    .brand .sub { display: none; }
+
+    /* Style the phone icon */
+    .header-cta { 
+        font-size: 0; 
+        padding: 8px 10px; 
+    }
+    .header-cta::before {
+        content: '\f095';
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        font-size: 18px;
+    }
+    /* --- END: New Mobile Header Layout --- */
+}
+}
+    </style>
+</head>
+<body>
+    <div class="wrap" id="top">
+        <header role="banner">
+    <a class="brand" href="#top" aria-label="Aesthetics & Wellness Lounge">
+        <img src="AWL_Logo.jpg" alt="AWL Logo" class="logo" aria-hidden="true" />
+        <div><div class="name">Aesthetics & Wellness Lounge</div><div class="sub">577 Dundas St, Woodstock, ON</div></div>
+    </a>
+    
+    <nav role="navigation">
+        <a href="#services" id="navServices">Services</a>
+        <a href="#visit">Visit</a>
+        <a href="#social">Social</a>
+        <a href="#about" id="navAbout">About Us</a>
+    </nav>
+    
+    <div class="header-ctas">
+        <a class="header-cta" href="tel:+12267965138" aria-label="Call us">(226) 796-5138</a>
+    </div>
+
+    <a class="primary-cta" id="openBookingLink" href="#">Book Now</a>
+</header>
+        <section class="hero" aria-label="Hero"><div class="hero-frame"><div class="blob" aria-hidden="true"></div><div class="hero-photo" id="heroPhoto" aria-hidden="true"></div></div></section>
+        <section id="services" style="padding-top: 10px; margin-top: 0px;"><h2 class="section-title">Our Services</h2><div class="service-buttons"></div><div id="carousel-container"></div></section>
+        <section id="visit" style="padding-top: 10px; margin-top: 0px;"><h3 class="section-title">Visit Us</h3><br><div><div class="name">Aesthetics & Wellness Lounge</div><div class="sub">577 Dundas St, Woodstock, ON</div></div><div style="width:100%; max-width:800px; margin:0 auto; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.08);"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2911.7508081162746!2d-80.75547332317797!3d43.130760771131754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882c1ffd8e139683%3A0x430172e7127d7331!2sAesthetics%20%26%20Wellness%20Lounge!5e0!3m2!1sen!2sus!4v1758563173912!5m2!1sen!2sus" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div></section>
+        <section id="social" style="padding-top: 10px; margin-top: 0px;"><h3 class="section-title">Connect With Us</h3><div style="margin-top:20px; display:flex; justify-content:center; gap:28px; font-size:32px;"><a href="https://www.facebook.com/awl.jm2" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:#1877F2;"><i class="fab fa-facebook"></i></a><a href="https://www.instagram.com/aw.lounge" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:#E4405F;"><i class="fab fa-instagram"></i></a><a href="mailto:awl.jm2@gmail.com" aria-label="Email" style="color:#333;"><i class="fas fa-envelope"></i></a></div></section>
+    </div>
+    <div id="bookingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-content"><button class="closeBtn" aria-label="Close booking modal">×</button><h2 id="modalTitle">Book an Appointment</h2><label for="serviceCategorySelect">Service Category</label><select id="serviceCategorySelect"><option value="">-- Select category --</option></select><label for="serviceSelect">Service</label><select id="serviceSelect"><option value="">-- Select service --</option></select><label for="performerSelect">Provider</label><select id="performerSelect"><option value="">-- Select provider --</option></select><div class="calendar-header"><button id="prevMonth" class="btn ghost">←</button><h3 id="monthYear"></h3><button id="nextMonth" class="btn ghost">→</button></div><div id="calendar" role="grid"></div><h3>Available Time Slots</h3><div id="timeSlots" aria-live="polite">Select service, provider, and date.</div><h3>Your Information</h3><label for="nameInput">Name (required)</label><input type="text" id="nameInput" placeholder="Full name" required /><label for="phoneInput">Phone (required)</label><input type="tel" id="phoneInput" placeholder="Phone number" required /><label for="emailInput">Email (required)</label><input type="email" id="emailInput" placeholder="Email address" required /><div class="modal-cta"><button id="nextBtn" class="btn primary" disabled>Next</button></div></div></div>
+    <div id="stripe-modal" class="modal"><div class="modal-content"><button id="close-stripe-modal" class="closeBtn">×</button><h2>Secure Deposit Payment</h2><p>Please pay a 25% deposit to confirm your booking.</p><div id="payment-info" style="margin:15px 0; padding:10px; background:#f9f9f9; border-radius:6px; color:#333;"></div><div id="card-element"></div><div id="card-errors" role="alert"></div><div class="modal-cta"><button id="back-to-booking" class="btn ghost">Back</button><button id="pay-deposit-btn" class="btn primary">Pay Deposit</button></div></div></div>
+    <div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle"><div class="modal-content"><button class="closeBtn" aria-label="Close about modal">×</button><h2 id="aboutModalTitle" class="section-title">Meet Our Team</h2><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_team_epruej.webp" alt="Aesthetics & Wellness Lounge Team" class="team-photo"><div class="team-container"><div class="team-member"><div class="team-member-header"><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_jessa_pdhtmm.webp" alt="Jessa Cordezar"><div class="team-member-info"><h3>Jessa Cordezar</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Massage/Reflexology~</p></div></div><hr><h5>About me</h5><p class="bio">Born in the Philippines and now living in Woodstock for over 10 years. Proud mom with a lifelong passion for helping others feel their best. Specializes in Indian Head Massage, Hand Reflexology, and Foot Reflexology. Passion for massage started as a child, helping my mom and relatives relieve pain and tension, sparking a deep love for healing touch. Dedicated to providing treatments that leave clients feeling relaxed, renewed, and truly cared for.</p></div><div class="team-member"><div class="team-member-header"><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_maricel_rcca8u.webp" alt="Maricel Tamburri"><div class="team-member-info"><h3>Maricel Tamburri</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Microblading/Brows/Lashes~</p></div></div><hr><h5>About me</h5><p class="bio">I was born and raised in Etobicoke, ON. My family has been in Woodstock since 1996. I am a proud Canadian-Filipina. A wife and mother to 2 great kids. I have been a licensed Registered Practical Nurse since 2012. I’ve had a great sense of accomplishment helping others during my nursing career. Now, I am pursuing my passion to help women from all walks of life. For our clients coming to our 'Beauty Sanctuary', we want them to feel at ease and to be themselves when they come in and when they leave our spa. During your service with me; I take pride in taking my time to assess your skin and facial features, to really understand your needs and preferences. That way you can have the best outcome possible when you leave our lounge.</p></div><div class="team-member"><div class="team-member-header"><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_trechan_rf82dn.webp" alt="Trechan Legria"><div class="team-member-info"><h3>Trechan Legria</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Makeover/Mani-Pedi~</p></div></div><hr><h5>About me</h5><p class="bio">Born in the Philippines, my family and I have been in Woodstock since 2000. Mother of two boys. Experienced aesthetician with 10+ years of client services. Passionate about enhancing one's beauty. As well as bringing confidence and self-love to my clients. Background in healthcare for a well-rounded, and holistic approach to beauty and wellness.</p></div></div></div></div>
+    <footer role="contentinfo"><div> © <strong>Aesthetics And Wellness Lounge</strong> — All rights reserved <br> <strong>awl.jm2@gmail.com</strong> — (226) 796-5138 </div></footer>
+
+    <script>
+	
+	// --- START: Inconspicuous Admin Portal Link ---
+const secretButton = document.querySelector('footer');
+let clickCount = 0;
+let clickTimer = null;
+
+secretButton.addEventListener('click', () => {
+    clickCount++;
+
+    // If the user clicks 7 times, go to the portal
+    if (clickCount === 7) {
+        console.log("Accessing service portal...");
+        window.location.href = 'ServicePortal.html'; // <-- REPLACE WITH YOUR URL
+        
+        // Reset after success
+        clearTimeout(clickTimer);
+        clickCount = 0;
+        return;
+    }
+
+    // Reset the counter if the user pauses for more than 1.5 seconds
+    clearTimeout(clickTimer);
+    clickTimer = setTimeout(() => {
+        clickCount = 0;
+    }, 1500); // 1.5 seconds
+});
+// --- END: Inconspicuous Admin Portal Link ---
+	
+	
+        document.addEventListener('DOMContentLoaded', () => {
+            const BASE_URL = '';
+            let allServices = [];
+            let autoRotateTimer = null;
+            const performerCalendars = { jessa: "mark.adam.grabowski@gmail.com", maricel: "maricelcalendar@gmail.com", trechan: "trechancalendar@gmail.com", "mary-ann": "maryanncalendar@gmail.com" };
+            const SLIDE_INTERVAL = 7500;
+            const USER_PAUSE_INTERVAL = 15000;
+            const bookingModal = document.getElementById('bookingModal');
+            const aboutModal = document.getElementById('aboutModal');
+            const allModals = document.querySelectorAll('.modal');
+            const openBookingLink = document.getElementById('openBookingLink');
+            const navAbout = document.getElementById('navAbout');
+            const categorySelect = document.getElementById('serviceCategorySelect');
+            const serviceSelect = document.getElementById('serviceSelect');
+            const performerSelect = document.getElementById('performerSelect');
+            const nameInput = document.getElementById('nameInput');
+            const phoneInput = document.getElementById('phoneInput');
+            const emailInput = document.getElementById('emailInput');
+            const calendarEl = document.getElementById('calendar');
+            const monthYearEl = document.getElementById('monthYear');
+            const prevMonthBtn = document.getElementById('prevMonth');
+            const nextMonthBtn = document.getElementById('nextMonth');
+            const timeSlotsEl = document.getElementById('timeSlots');
+            const nextBtn = document.getElementById('nextBtn');
+            let selectedDate = null, selectedSlot = null, currentDate = new Date();
+
+            async function initializeWebsite() {
+                try {
+                    const [servicesRes, categoriesRes] = await Promise.all([
+                        fetch(`${BASE_URL}/api/services`, { cache: 'no-store' }),
+                        fetch(`${BASE_URL}/api/categories`, { cache: 'no-store' })
+                    ]);
+                    if (!servicesRes.ok || !categoriesRes.ok) throw new Error('Could not fetch initial data.');
+                    allServices = await servicesRes.json();
+                    const allCategories = await categoriesRes.json();
+                    populateCarouselsAndButtons(allServices, allCategories);
+                    populateCategoryDropdown(allCategories);
+                    document.querySelectorAll('.service-carousel').forEach(setupCarousel);
+                    initializeCarouselInteractions();
+                    startAutoRotation();
+                } catch (error) {
+                    console.error("Initialization failed:", error);
+                    const servicesSection = document.getElementById('services');
+                    if (servicesSection) servicesSection.innerHTML = `<p style="text-align:center; color: red;">Could not load services.</p>`;
+                }
+            }
+
+            function populateCarouselsAndButtons(services, categories) {
+                const carouselContainer = document.getElementById('carousel-container');
+                const buttonsContainer = document.querySelector('.service-buttons');
+                carouselContainer.innerHTML = '';
+                buttonsContainer.innerHTML = '';
+                const servicesByCategory = services.reduce((acc, service) => { (acc[service.category] = acc[service.category] || []).push(service); return acc; }, {});
+                categories.forEach((category) => {
+                    if (!servicesByCategory[category]) return;
+                    const button = document.createElement('button');
+                    button.dataset.section = category;
+                    button.textContent = category.charAt(0).toUpperCase() + category.slice(1).replace('treatment', ' Treatment');
+                    buttonsContainer.appendChild(button);
+                    const carouselDiv = document.createElement('div');
+                    carouselDiv.id = `${category}-carousel`;
+                    carouselDiv.className = 'service-carousel';
+                    let slidesHTML = '';
+                    servicesByCategory[category].forEach(service => {
+                        const imageUrl = service.imageurl ? service.imageurl : `https://via.placeholder.com/320x200/eee/999?text=${encodeURIComponent(service.name)}`;
+                        const descriptionText = service.description || '';
+                        slidesHTML += `<div class="slide" data-service-name="${service.name}" data-service-category="${service.category}"><img src="${imageUrl}" alt="${service.name}"><h3>${service.name}</h3><p>${descriptionText}</p><div class="slide-details"><span><i class="fas fa-user"></i> ${service.performer}</span><span><i class="fas fa-clock"></i> ${service.duration} min</span><span><i class="fas fa-dollar-sign"></i> ${(service.price / 100).toFixed(2)}</span></div></div>`;
+                    });
+                    carouselDiv.innerHTML = `
+  <div class="carousel_wrapper">
+    <div class="carousel">${slidesHTML}</div>
+  </div>
+  <div class="carousel-nav">
+    <button class="prev" aria-label="Previous slide">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <button class="next" aria-label="Next slide">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+  </div>`;
+                    carouselContainer.appendChild(carouselDiv);
+                });
+                if (buttonsContainer.firstChild) buttonsContainer.firstChild.classList.add('active');
+                if (carouselContainer.firstChild) carouselContainer.firstChild.classList.add('active');
+            }
+
+            function populateCategoryDropdown(categories) {
+                while (categorySelect.options.length > 1) { categorySelect.remove(1); }
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    categorySelect.appendChild(option);
+                });
+            }
+
+            function showCarousel(sectionId) { document.querySelectorAll('.service-buttons button').forEach(b => b.classList.toggle('active', b.dataset.section === sectionId)); document.querySelectorAll('.service-carousel').forEach(c => c.classList.toggle('active', c.id === sectionId + '-carousel')); }
+            function setupCarousel(carouselContainer) { const carousel = carouselContainer.querySelector('.carousel'); if (!carousel) return; const slides = Array.from(carousel.querySelectorAll('.slide')); const totalSlides = slides.length; if (totalSlides === 0) return; const radius = 350; carouselContainer.rotationY = 0; carouselContainer.dataset.currentSlideIndex = 0; carouselContainer.rotate = function(direction) { this.rotationY += (360 / totalSlides) * direction; carousel.style.transform = `rotateY(${this.rotationY}deg)`; }; const stopAndRestartRotation = () => { clearInterval(autoRotateTimer); startAutoRotation(USER_PAUSE_INTERVAL); }; slides.forEach((slide, i) => { const angle = i * (360 / totalSlides); slide.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`; slide.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') return; clearInterval(autoRotateTimer); const serviceName = slide.dataset.serviceName; const serviceCategory = slide.dataset.serviceCategory; if (serviceName && serviceCategory) { openBookingForService(serviceName, serviceCategory); } }); }); const prevBtn = carouselContainer.querySelector('.prev'); const nextBtn = carouselContainer.querySelector('.next'); if (prevBtn) { prevBtn.addEventListener('click', (e) => { e.stopPropagation(); carouselContainer.rotate(-1); stopAndRestartRotation(); }); } if (nextBtn) { nextBtn.addEventListener('click', (e) => { e.stopPropagation(); carouselContainer.rotate(1); stopAndRestartRotation(); }); } }
+            function startAutoRotation(interval = SLIDE_INTERVAL) { if (autoRotateTimer) clearInterval(autoRotateTimer); const sectionsOrder = [...document.querySelectorAll('.service-buttons button')].map(b => b.dataset.section); if (sectionsOrder.length === 0) return; let currentSectionIndex = sectionsOrder.findIndex(s => document.querySelector(`button[data-section="${s}"]`)?.classList.contains('active')); if (currentSectionIndex === -1) currentSectionIndex = 0; const advanceStateAndRotate = () => { const currentSectionId = sectionsOrder[currentSectionIndex]; const activeCarousel = document.getElementById(currentSectionId + '-carousel'); if (!activeCarousel) return; let slideIndex = parseInt(activeCarousel.dataset.currentSlideIndex || 0); const totalSlides = activeCarousel.querySelectorAll('.slide').length; if (totalSlides > 1 && slideIndex < totalSlides - 1) { activeCarousel.rotate(1); activeCarousel.dataset.currentSlideIndex = slideIndex + 1; } else { currentSectionIndex = (currentSectionIndex + 1) % sectionsOrder.length; const nextSectionId = sectionsOrder[currentSectionIndex]; if (activeCarousel.rotate && slideIndex !== 0) { activeCarousel.rotate(-slideIndex); } activeCarousel.dataset.currentSlideIndex = 0; showCarousel(nextSectionId); } }; autoRotateTimer = setInterval(advanceStateAndRotate, interval); }
+            function initializeCarouselInteractions() { document.querySelector('.service-buttons').addEventListener('click', (event) => { const clickedButton = event.target.closest('button'); if (clickedButton) { clearInterval(autoRotateTimer); const clickedSectionId = clickedButton.dataset.section; document.querySelectorAll('.service-carousel').forEach(c => { let slideIndex = parseInt(c.dataset.currentSlideIndex || 0); if(c.rotate && slideIndex !== 0) c.rotate(-slideIndex); c.dataset.currentSlideIndex = 0; }); showCarousel(clickedSectionId); startAutoRotation(USER_PAUSE_INTERVAL); } }); }
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) { const frame = document.querySelector('.hero-frame'); if(frame) { const blob = frame.querySelector('.blob'); const photo = frame.querySelector('#heroPhoto'); if (blob && photo) { frame.addEventListener('pointermove', ev => { const r = frame.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width - 0.5; const y = (ev.clientY - r.top) / r.height - 0.5; blob.style.transform = `translate(${x * 8}%, ${y * -8}%) rotate(8deg)`; photo.style.transform = `scale(1.02) translate(${x * -4}px, ${y * -6}px)`; }); frame.addEventListener('pointerleave', () => { blob.style.transform = 'translate(12%, -12%) rotate(12deg)'; photo.style.transform = ''; }); } } }
+            document.getElementById('navServices').addEventListener('click', function(e) { e.preventDefault(); const header = document.querySelector('header'); const target = document.getElementById('services'); const headerHeight = header ? header.offsetHeight + 18 : 70; const targetPosition = target ? target.offsetTop : 0; window.scrollTo({ top: targetPosition - headerHeight, behavior: 'smooth' }); });
+            document.querySelectorAll('a[href^="#"]:not(#navServices)').forEach(anchor => { anchor.addEventListener('click', function (e) { if (this.id === 'openBookingLink' || this.id === 'navAbout') return; const href = this.getAttribute('href'); if (href === "#") return; const targetEl = document.querySelector(href); if (targetEl) { e.preventDefault(); targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }); });
+            openBookingLink.addEventListener('click', e => { e.preventDefault(); bookingModal.style.display = 'flex'; resetBookingForm(); currentDate = new Date(); currentDate.setDate(1); renderCalendar(currentDate); autoSelectToday(); });
+            navAbout.addEventListener('click', e => { e.preventDefault(); aboutModal.style.display = 'flex'; });
+            allModals.forEach(modal => { const closeBtn = modal.querySelector('.closeBtn'); if (closeBtn) { closeBtn.addEventListener('click', () => { modal.style.display = 'none'; }); } });
+            window.addEventListener('click', e => { if (e.target.classList.contains('modal')) { e.target.style.display = 'none'; } });
+            function openBookingForService(serviceName, serviceCategory) { bookingModal.style.display = 'flex'; resetBookingForm(); currentDate = new Date(); renderCalendar(currentDate); autoSelectToday(); categorySelect.value = serviceCategory; categorySelect.dispatchEvent(new Event('change')); serviceSelect.value = serviceName; serviceSelect.dispatchEvent(new Event('change')); if (performerSelect.options.length === 2) { performerSelect.selectedIndex = 1; performerSelect.dispatchEvent(new Event('change')); } }
+            categorySelect.addEventListener("change", () => { const category = categorySelect.value; serviceSelect.innerHTML = '<option value="">-- Select service --</option>'; performerSelect.innerHTML = '<option value="">-- Select provider --</option>'; resetCalendarAndTime(); if (category) { const servicesInCategory = allServices.filter(s => s.category === category); const uniqueServiceNames = [...new Set(servicesInCategory.map(s => s.name))]; uniqueServiceNames.forEach(serviceName => { const opt = document.createElement("option"); opt.value = serviceName; opt.textContent = serviceName; serviceSelect.appendChild(opt); }); } });
+            serviceSelect.addEventListener("change", () => { const serviceName = serviceSelect.value; performerSelect.innerHTML = '<option value="">-- Select provider --</option>'; resetCalendarAndTime(); if (serviceName) { const serviceEntries = allServices.filter(s => s.name === serviceName); const performers = [...new Set(serviceEntries.flatMap(s => s.performer.split(',').map(p => p.trim())))]; performers.forEach(provider => { const opt = document.createElement("option"); opt.value = provider.toLowerCase().replace(/\s+/g, '-'); opt.textContent = provider; performerSelect.appendChild(opt); }); } });
+            performerSelect.addEventListener("change", () => { resetCalendarAndTime(); const performerKey = performerSelect.value; const calendarId = performerCalendars[performerKey]; if (selectedDate && calendarId) { loadAvailability(selectedDate, calendarId); } });
+            function renderCalendar(date) { calendarEl.innerHTML = ''; monthYearEl.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' }); ['S', 'M', 'T', 'W', 'T', 'F', 'S'].forEach(d => { const h = document.createElement('div'); h.textContent = d; h.className = 'header'; calendarEl.appendChild(h); }); const year = date.getFullYear(), month = date.getMonth(); const firstDay = new Date(year, month, 1).getDay(); for (let i = 0; i < firstDay; i++) calendarEl.appendChild(document.createElement('div')); const lastDate = new Date(year, month + 1, 0).getDate(); for (let day = 1; day <= lastDate; day++) { const cell = document.createElement('div'); cell.textContent = day; const thisDate = new Date(year, month, day); const today = new Date(); today.setHours(0,0,0,0); if (thisDate < today) { cell.classList.add('disabled'); } else { cell.addEventListener('click', () => selectDate(thisDate, cell)); } calendarEl.appendChild(cell); } }
+            function selectDate(date, cell) { calendarEl.querySelectorAll('.selected').forEach(c => c.classList.remove('selected')); cell.classList.add('selected'); selectedDate = date; selectedSlot = null; timeSlotsEl.textContent = 'Select a service and provider.'; const performerKey = performerSelect.value; const calendarId = performerCalendars[performerKey]; if (serviceSelect.value && performerSelect.value && calendarId) { loadAvailability(date, calendarId); } validateForm(); }
+            function autoSelectToday() { const today = new Date(); if (today.getMonth() === currentDate.getMonth() && today.getFullYear() === currentDate.getFullYear()) { calendarEl.querySelectorAll('div:not(.header):not(.disabled)').forEach(cell => { if (parseInt(cell.textContent) === today.getDate()) { cell.click(); } }); } }
+            prevMonthBtn.onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(currentDate); autoSelectToday(); };
+            nextMonthBtn.onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(currentDate); autoSelectToday(); };
+            async function loadAvailability(date, calId) { if (!calId) { timeSlotsEl.textContent = 'Provider calendar not configured.'; return; } timeSlotsEl.textContent = 'Loading...'; const timeMin = new Date(date); timeMin.setHours(0,0,0,0); const timeMax = new Date(date); timeMax.setHours(23,59,59,999); try { const res = await fetch(`${BASE_URL}/freebusy/${encodeURIComponent(calId)}?timeMin=${timeMin.toISOString()}&timeMax=${timeMax.toISOString()}`); if (!res.ok) throw new Error('Failed to load from server'); const data = await res.json(); const busyTimes = data.calendars[Object.keys(data.calendars)[0]]?.busy || []; const slots = generateTimeSlots(date, busyTimes); if (slots.length === 0) { timeSlotsEl.textContent = 'No available slots.'; } else { timeSlotsEl.innerHTML = ''; slots.forEach(slot => { const el = document.createElement('span'); el.textContent = slot.startTime; el.classList.add('time-slot'); el.addEventListener('click', () => selectSlot(slot, el)); timeSlotsEl.appendChild(el); }); } } catch (err) { timeSlotsEl.textContent = 'Failed to load availability.'; console.error(err); } }
+            function generateTimeSlots(date, busyTimes) { const slots = []; const start = 9, end = 17; for (let h = start; h < end; h++) { const times = [`${h.toString().padStart(2, '0')}:00`, `${h.toString().padStart(2, '0')}:30`]; times.forEach(t => { const busy = busyTimes.some(b => { const bStart = new Date(b.start); const bEnd = new Date(b.end); const slotDate = new Date(date); const [hour, min] = t.split(':').map(Number); slotDate.setHours(hour, min, 0, 0); return slotDate >= bStart && slotDate < bEnd; }); if (!busy) slots.push({ startTime: t }); }); } return slots; }
+            function selectSlot(slot, el) { timeSlotsEl.querySelectorAll('.selected').forEach(s => s.classList.remove('selected')); el.classList.add('selected'); const [hours, minutes] = slot.startTime.split(':'); const startDateTime = new Date(selectedDate); startDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0); selectedSlot = { ...slot, startDateTime }; validateForm(); }
+            function validateForm() { const isValid = selectedDate && selectedSlot && nameInput.value.trim() && phoneInput.value.trim() && emailInput.value.trim(); nextBtn.disabled = !isValid; return isValid; }
+            [nameInput, phoneInput, emailInput].forEach(i => i.addEventListener('input', validateForm));
+            function resetBookingForm() { categorySelect.value = ""; serviceSelect.innerHTML = '<option value="">-- Select service --</option>'; performerSelect.innerHTML = '<option value="">-- Select provider --</option>'; nameInput.value = ''; phoneInput.value = ''; emailInput.value = ''; selectedDate = null; selectedSlot = null; validateForm(); resetCalendarAndTime(); }
+            function resetCalendarAndTime() { timeSlotsEl.textContent = 'Select service, provider, and date.'; selectedSlot = null; validateForm(); }
+            const stripe = Stripe("pk_live_51Qg6aWC5NlBSaGb82hFsSiw6V7Ubh1Sffz1LwZwofupdkR2aRmrm3LYobssPE0zizn8oxlvQCDbQLTbZX6rcz8zC00wkHNHt5w");
+            const elements = stripe.elements(); const cardElement = elements.create("card"); cardElement.mount("#card-element"); const stripeModal = document.getElementById("stripe-modal"); const closeStripeModalBtn = document.getElementById("close-stripe-modal"); const backToBookingBtn = document.getElementById("back-to-booking"); const payBtn = document.getElementById("pay-deposit-btn"); const paymentInfoDiv = document.getElementById("payment-info"); const cardErrorsDiv = document.getElementById("card-errors");
+            nextBtn.onclick = () => { if (!validateForm()) return; const serviceName = serviceSelect.value; const performerName = performerSelect.options[performerSelect.selectedIndex].text; const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName)); if (!service) { alert('Could not find service details.'); return; } const price = service.price / 100; const deposit = (price * 0.25).toFixed(2); paymentInfoDiv.innerHTML = `<strong>Service:</strong> ${serviceName}<br><strong>Total Price:</strong> $${price.toFixed(2)}<br><strong>Deposit Due:</strong> $${deposit}`; bookingModal.style.display = "none"; stripeModal.style.display = "flex"; };
+            closeStripeModalBtn.onclick = () => stripeModal.style.display = "none";
+            backToBookingBtn.onclick = () => { stripeModal.style.display = "none"; bookingModal.style.display = "flex"; };
+            payBtn.onclick = async () => { payBtn.disabled = true; payBtn.textContent = "Processing..."; cardErrorsDiv.textContent = ""; const serviceName = serviceSelect.value; const performerName = performerSelect.options[performerSelect.selectedIndex].text; const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName)); if (!service) { alert('Error: Could not find service.'); payBtn.disabled = false; payBtn.textContent = "Pay Deposit"; return; } try { const res = await fetch(`${BASE_URL}/create-payment-intent`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ serviceId: service.id }) }); const { clientSecret, error: backendError } = await res.json(); if (backendError) throw new Error(backendError); const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, { payment_method: { card: cardElement, billing_details: { name: nameInput.value, email: emailInput.value } } }); if (error) { cardErrorsDiv.textContent = error.message; throw new Error(error.message); } if (paymentIntent.status === "succeeded") { const bookingRes = await fetch(`${BASE_URL}/book/${performerCalendars[performerSelect.value]}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: nameInput.value.trim(), phone: phoneInput.value.trim(), email: emailInput.value.trim(), service: serviceSelect.value, performer: performerSelect.options[performerSelect.selectedIndex].text, dateTime: selectedSlot.startDateTime.toISOString() }) }); const result = await bookingRes.json(); if (result.success) { alert("✅ Payment and booking confirmed!"); stripeModal.style.display = "none"; resetBookingForm(); } else { alert("Payment succeeded but booking failed. " + (result.error || '')); } } } catch (err) { console.error(err); alert("Payment or booking failed."); } finally { payBtn.disabled = false; payBtn.textContent = "Pay Deposit"; } };
+
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'servicesUpdated') {
+                    console.log('Services updated in another tab. Reloading content...');
+                    initializeWebsite();
+                }
+            });
+
+            initializeWebsite();
+        });
+    </script>
+</body>
+</html>
