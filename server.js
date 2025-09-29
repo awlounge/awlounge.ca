@@ -12,6 +12,8 @@ import multer from "multer";
 import pg from "pg";
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { v4 as uuidv4 } from 'uuid';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 dotenv.config();
 
@@ -73,6 +75,36 @@ async function initDB() {
                 timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
             );
         `);
+		
+		await pool.query(`
+            CREATE TABLE IF NOT EXISTS consent_form_questions (
+                id SERIAL PRIMARY KEY,
+                question_number INTEGER NOT NULL UNIQUE,
+                question_text TEXT
+            );
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS consent_form_submissions (
+                id SERIAL PRIMARY KEY,
+                token TEXT NOT NULL UNIQUE,
+                customer_name TEXT,
+                customer_email TEXT,
+                answers JSONB,
+                submission_date TIMESTAMPTZ
+            );
+        `);
+		
+		const questionRes = await pool.query("SELECT COUNT(*) FROM consent_form_questions");
+        if (questionRes.rows[0].count === "0") {
+            console.log("Seeding default consent form questions...");
+            for (let i = 1; i <= 10; i++) {
+                await pool.query(
+                    "INSERT INTO consent_form_questions (question_number, question_text) VALUES ($1, $2)",
+                    [i, `This is default question #${i}. Please edit me.`]
+                );
+            }
+        }
 
         const catRes = await pool.query("SELECT COUNT(*) FROM categories");
         if (catRes.rows[0].count === "0") {
@@ -349,6 +381,40 @@ app.get("/my-appointments", authenticate, async (req, res) => {
     }
 });
 
+// --- CONSENT FORM ADMIN API ---
+app.get("/api/consent-questions", authenticate, async (req, res) => {
+    try {
+        const result = await pool.query("SELECT question_number, question_text FROM consent_form_questions ORDER BY question_number");
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Error fetching consent questions:', err);
+        res.status(500).json({ error: "Failed to fetch questions." });
+    }
+});
+
+app.put("/api/consent-questions", authenticate, async (req, res) => {
+    const { questions } = req.body; // Expects an array of question objects
+    if (!questions || !Array.isArray(questions)) {
+        return res.status(400).json({ error: "Invalid data format." });
+    }
+    try {
+        const client = await pool.connect();
+        await client.query('BEGIN');
+        for (const q of questions) {
+            await client.query(
+                "UPDATE consent_form_questions SET question_text = $1 WHERE question_number = $2",
+                [q.question_text, q.question_number]
+            );
+        }
+        await client.query('COMMIT');
+        client.release();
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error updating consent questions:', err);
+        res.status(500).json({ error: "Failed to update questions." });
+    }
+});
+
 // --- Booking and Payment Routes ---
 app.post("/create-payment-intent", async (req, res) => {
     try {
@@ -414,28 +480,139 @@ app.post("/book/:calendarId", async (req, res) => {
         const serviceRes = await pool.query("SELECT duration FROM services WHERE name = $1 AND performer ILIKE $2", [service, `%${performer}%`]);
         const duration = serviceRes.rows[0]?.duration || 60;
         const endDateTime = new Date(startDateTime.getTime() + duration * 60 * 1000);
+
+        // --- NEW: Generate a unique token and link for the consent form ---
+        const consentToken = uuidv4();
+        const consentFormLink = `${req.protocol}://${req.get('host')}/consent-form.html?token=${consentToken}`;
+
+        // --- NEW: Create the initial submission record in the database ---
+        await pool.query(
+            "INSERT INTO consent_form_submissions (token, customer_name, customer_email) VALUES ($1, $2, $3)",
+            [consentToken, name, email]
+        );
+
+        // --- MODIFIED: The Google Calendar event now includes the consent form link for your records ---
         const event = {
-            summary: `AWL Appointment: ${name} - ${service}`,
-            description: `Client: ${name}\nPhone: ${phone}\nEmail: ${email}\nService: ${service}\nProvider: ${performer}`,
+            summary: `Booking: ${name} - ${service}`,
+            description: `Client: ${name}\nPhone: ${phone}\nEmail: ${email}\nService: ${service}\nProvider: ${performer}\n\nConsent Form Link: ${consentFormLink}`,
             start: { dateTime: startDateTime.toISOString(), timeZone: "America/Toronto" },
             end: { dateTime: endDateTime.toISOString(), timeZone: "America/Toronto" }
         };
         await calendar.events.insert({ calendarId, requestBody: event });
+
+        // --- MODIFIED: Your full email template now includes the consent form section ---
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Your Appointment is Confirmed!",
-            html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; color: #333;"><div style="text-align: center; margin-bottom: 30px;"><img src="cid:logo" alt="AWL Logo" style="max-width: 150px; height: auto;"></div><h2 style="text-align: center; color: #2a2a2a;">Appointment Confirmed!</h2><p style="text-align: center;">Hi <strong>${name}</strong>,</p><p style="text-align: center;">Your appointment for <strong>${service}</strong> with <strong>${performer}</strong> is confirmed.</p><div style="background: #f7f7f7; padding: 15px; border-radius: 8px; margin: 20px 0;"><p style="margin: 5px 0;"><strong>Date & Time:</strong> ${startDateTime.toLocaleString('en-CA', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}</p><p style="margin: 5px 0;"><strong>Provider:</strong> ${performer}</p><p style="margin: 5px 0;"><strong>Service:</strong> ${service}</p></div><hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;"><div style="text-align: center;"><img src="cid:banner" alt="AWL Banner" style="max-width: 350px; height: auto;"><br><p style="font-size: 14px; color: #777; text-align: center;">Aesthetics and Wellness Lounge<br>www.awlounge.ca<br>577 Dundas St, Woodstock, ON | 226-796-5138 | awl.jm2@gmail.com</p></div></div>`,
+            html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; color: #333;">
+                <div style="text-align: center; margin-bottom: 30px;"><img src="cid:logo" alt="AWL Logo" style="max-width: 150px; height: auto;"></div>
+                <h2 style="text-align: center; color: #2a2a2a;">Appointment Confirmed!</h2>
+                <p style="text-align: center;">Hi <strong>${name}</strong>,</p>
+                <p style="text-align: center;">Your appointment for <strong>${service}</strong> with <strong>${performer}</strong> is confirmed.</p>
+                <div style="background: #f7f7f7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 5px 0;"><strong>Date & Time:</strong> ${startDateTime.toLocaleString('en-CA', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })}</p>
+                    <p style="margin: 5px 0;"><strong>Provider:</strong> ${performer}</p>
+                    <p style="margin: 5px 0;"><strong>Service:</strong> ${service}</p>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background-color: #eaf6ff; border: 1px solid #bce8f1; border-radius: 8px; text-align: center;">
+                    <h3 style="margin-top:0; color: #31708f;">Action Required: Consent Form</h3>
+                    <p style="color: #31708f; margin-bottom: 15px;">To ensure the best experience, please complete our secure consent form prior to your appointment.</p>
+                    <a href="${consentFormLink}" target="_blank" style="display: inline-block; padding: 12px 25px; background-color: #0f6b86; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold;">Complete Consent Form</a>
+                </div>
+                
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                <div style="text-align: center;">
+                    <img src="cid:banner" alt="AWL Banner" style="max-width: 350px; height: auto;"><br>
+                    <p style="font-size: 14px; color: #777; text-align: center;">Aesthetics and Wellness Lounge<br>www.awlounge.ca<br>577 Dundas St, Woodstock, ON | 226-796-5138 | awl.jm2@gmail.com</p>
+                </div>
+            </div>`,
             attachments: [
                 { filename: 'AWL_Logo.jpg', path: path.join(__dirname, 'public', 'AWL_Logo.jpg'), cid: 'logo' },
                 { filename: 'AWL_Banner.jpg', path: path.join(__dirname, 'public', 'AWL_Banner.jpg'), cid: 'banner' }
             ]
         });
+
         console.log(`✅ Booking created and email sent for ${name} on ${startDateTime}`);
         res.json({ success: true, message: "Booking confirmed" });
     } catch (err) {
         console.error("Booking Error:", err);
         res.status(500).json({ error: "Failed to create booking" });
+    }
+});
+
+// --- CONSENT FORM CUSTOMER API ---
+app.get("/api/consent-form/:token", async (req, res) => {
+    try {
+        const { token } = req.params;
+        const subRes = await pool.query("SELECT customer_name, customer_email FROM consent_form_submissions WHERE token = $1", [token]);
+        if (subRes.rows.length === 0) {
+            return res.status(404).json({ error: "Form not found." });
+        }
+        const questionsRes = await pool.query("SELECT question_number, question_text FROM consent_form_questions ORDER BY question_number");
+        res.json({
+            customer: subRes.rows[0],
+            questions: questionsRes.rows
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Could not load form data." });
+    }
+});
+
+app.post("/api/consent-form/:token", async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { answers } = req.body; // Expects answers as an object {1: "answer1", 2: "answer2", ...}
+
+        // 1. Update submission in DB
+        const result = await pool.query(
+            "UPDATE consent_form_submissions SET answers = $1, submission_date = NOW() WHERE token = $2 RETURNING customer_name",
+            [answers, token]
+        );
+        const customerName = result.rows[0].customer_name;
+        const submissionDate = new Date().toLocaleDateString('en-CA');
+
+        // 2. Generate PDF
+        const questionsRes = await pool.query("SELECT question_number, question_text FROM consent_form_questions ORDER BY question_number");
+        const pdfDoc = await PDFDocument.create();
+        const page = pdfDoc.addPage();
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        let y = 750;
+
+        page.drawText('Aesthetics & Wellness Lounge - Consent Form', { x: 50, y, size: 18, font });
+        y -= 30;
+        page.drawText(`Client: ${customerName}`, { x: 50, y, size: 12, font });
+        y -= 20;
+        page.drawText(`Date: ${submissionDate}`, { x: 50, y, size: 12, font });
+        y -= 40;
+
+        questionsRes.rows.forEach(q => {
+            page.drawText(`${q.question_number}. ${q.question_text}`, { x: 60, y, size: 11, font, color: rgb(0, 0, 0) });
+            y -= 20;
+            page.drawText(`Answer: ${answers[q.question_number] || 'N/A'}`, { x: 70, y, size: 11, font, color: rgb(0.2, 0.2, 0.2) });
+            y -= 30;
+        });
+
+        const pdfBytes = await pdfDoc.save();
+
+        // 3. Email PDF
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: 'awl.jm2@gmail.com',
+            subject: `New Consent Form Submission from ${customerName}`,
+            text: `A new consent form was submitted by ${customerName} on ${submissionDate}. The completed form is attached as a PDF.`,
+            attachments: [{
+                filename: `Consent_Form_${customerName}_${submissionDate}.pdf`,
+                content: Buffer.from(pdfBytes),
+                contentType: 'application/pdf'
+            }]
+        });
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Consent form submission error:', err);
+        res.status(500).json({ error: "Failed to submit form." });
     }
 });
 

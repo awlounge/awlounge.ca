@@ -214,11 +214,23 @@
                 <p>Logged in as <strong id="loggedInUser"></strong> (<span id="userRole"></span>)</p>
                 <button id="logoutBtn" class="btn btn-secondary" style="padding: 8px 15px;">Logout</button>
             </div>
-            <nav class="portal-nav">
-    <button class="portal-nav-link active" data-target="appointments-view">My Appointments</button>
-    <button class="portal-nav-link" data-target="services-view">Manage Services</button>
-    <button class="portal-nav-link" data-target="team-view">Manage Team Profiles</button>
-</nav>
+		<nav class="portal-nav">
+			<button class="portal-nav-link active" data-target="appointments-view">My Appointments</button>
+			<button class="portal-nav-link" data-target="services-view">Manage Services</button>
+			<button class="portal-nav-link" data-target="team-view">Manage Team Profiles</button>
+			<button class="portal-nav-link" data-target="consent-form-view">Consent Form</button> 
+		</nav>
+
+<div id="consent-form-view" class="portal-view">
+    <div class="container">
+        <div class="page-header">
+            <h2>Edit Consent Form Questions</h2>
+            <button id="saveConsentQuestionsBtn" class="btn btn-main">Save All Questions</button>
+        </div>
+        <form id="consentFormEditor">
+            </form>
+    </div>
+</div>
 
 <div id="appointments-view" class="portal-view active">
     <div class="container">
@@ -370,6 +382,45 @@ async function loadAppointments(token) {
         container.innerHTML = '<p style="color: red;">Could not load appointments.</p>';
     }
 }
+
+
+
+async function loadConsentQuestions() {
+    const res = await fetch(`${BASE_URL}/api/consent-questions`, { headers: { "Authorization": `Bearer ${token}` } });
+    const questions = await res.json();
+    const form = document.getElementById('consentFormEditor');
+    form.innerHTML = '';
+    questions.forEach(q => {
+        form.innerHTML += `
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="font-weight: bold;">Question ${q.question_number}</label>
+                <textarea class="form-control" data-q-number="${q.question_number}" rows="2" style="width: 100%;">${q.question_text}</textarea>
+            </div>
+        `;
+    });
+}
+
+async function saveConsentQuestions() {
+    const questions = [];
+    document.querySelectorAll('#consentFormEditor textarea').forEach(textarea => {
+        questions.push({
+            question_number: parseInt(textarea.dataset.qNumber),
+            question_text: textarea.value
+        });
+    });
+
+    const res = await fetch(`${BASE_URL}/api/consent-questions`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ questions })
+    });
+
+    if (res.ok) {
+        alert('Consent form questions saved!');
+    } else {
+        alert('Failed to save questions.');
+    }
+}
 		
 		
 		
@@ -445,8 +496,14 @@ if (portalNav) {
         if (navLink.dataset.target === 'appointments-view') {
             loadAppointments(token);
         }
+		
+		if (navLink.dataset.target === 'consent-form-view') {
+    loadConsentQuestions();
+}
     });
 }
+
+
 
 
 
@@ -550,8 +607,11 @@ if (serviceForm) {
                         alert('Please enter a category name.');
                     }
                 };
-            }
+			}
+            // ADD THE NEW LINE HERE
+            document.getElementById('saveConsentQuestionsBtn').onclick = saveConsentQuestions;
         }
+        
         
         function renderTeamList() {
              const container = document.querySelector('.team-list-container');
