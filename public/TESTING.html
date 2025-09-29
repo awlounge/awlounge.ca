@@ -428,8 +428,43 @@ nav a:hover {
     background: var(--blue);
     color: #fff;
 }
+
 #stripe-modal .modal-content {
     max-width: 420px;
+}
+.stripe-label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: block;
+}
+.stripe-element {
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    background: white;
+}
+.card-details-row {
+    display: flex;
+    gap: 15px;
+}
+.card-detail-field {
+    flex: 1;
+}
+#card-errors {
+    color: #b00020;
+    margin-top: 8px;
+    min-height: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    background-color: rgba(176, 0, 32, 0.1);
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: none; /* Hidden by default */
+}
+#card-errors.visible {
+    display: block; /* Shown by JS when there's an error */
 }
 #card-element {
     border: 1px solid #ddd;
@@ -437,12 +472,7 @@ nav a:hover {
     border-radius: 6px;
     margin: 15px 0;
 }
-#card-errors {
-    color: #b00020;
-    margin-top: 8px;
-    min-height: 18px;
-    font-size: 14px;
-}
+
 #aboutModal .modal-content {
     max-width: 80%;
 }
@@ -677,10 +707,46 @@ footer {
         <section id="social" style="padding-top: 10px; margin-top: 0px;"><h3 class="section-title">Connect With Us</h3><div style="margin-top:20px; display:flex; justify-content:center; gap:28px; font-size:32px;"><a href="https://www.facebook.com/awl.jm2" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color:#1877F2;"><i class="fab fa-facebook"></i></a><a href="https://www.instagram.com/aw.lounge" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color:#E4405F;"><i class="fab fa-instagram"></i></a><a href="mailto:awl.jm2@gmail.com" aria-label="Email" style="color:#333;"><i class="fas fa-envelope"></i></a></div></section>
     </div>
     <div id="bookingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-content"><button class="closeBtn" aria-label="Close booking modal">×</button><h2 id="modalTitle">Book an Appointment</h2><label for="serviceCategorySelect">Service Category</label><select id="serviceCategorySelect"><option value="">-- Select category --</option></select><label for="serviceSelect">Service</label><select id="serviceSelect"><option value="">-- Select service --</option></select><label for="performerSelect">Provider</label><select id="performerSelect"><option value="">-- Select provider --</option></select><div class="calendar-header"><button id="prevMonth" class="btn ghost">←</button><h3 id="monthYear"></h3><button id="nextMonth" class="btn ghost">→</button></div><div id="calendar" role="grid"></div><h3>Available Time Slots</h3><div id="timeSlots" aria-live="polite">Select service, provider, and date.</div><h3>Your Information</h3><label for="nameInput">Name (required)</label><input type="text" id="nameInput" placeholder="Full name" required /><label for="phoneInput">Phone (required)</label><input type="tel" id="phoneInput" placeholder="Phone number" required /><label for="emailInput">Email (required)</label><input type="email" id="emailInput" placeholder="Email address" required /><div class="modal-cta"><button id="nextBtn" class="btn primary" disabled>Next</button></div></div></div>
-    <div id="stripe-modal" class="modal"><div class="modal-content"><button id="close-stripe-modal" class="closeBtn">×</button><h2>Secure Deposit Payment</h2><p>Please pay a 25% deposit to confirm your booking.</p><div id="payment-info" style="margin:15px 0; padding:10px; background:#f9f9f9; border-radius:6px; color:#333;"></div><div id="card-element"></div><div id="card-errors" role="alert"></div><div class="modal-cta"><button id="back-to-booking" class="btn ghost">Back</button><button id="pay-deposit-btn" class="btn primary">Pay Deposit</button></div></div></div>
-    <div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle"><div class="modal-content"><button class="closeBtn" aria-label="Close about modal">×</button><h2 id="aboutModalTitle" class="section-title">Meet Our Team</h2><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_team_epruej.webp" alt="Aesthetics & Wellness Lounge Team" class="team-photo"><div class="team-container"><div class="team-member"><div class="team-member-header"><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_jessa_pdhtmm.webp" alt="Jessa Cordezar"><div class="team-member-info"><h3>Jessa Cordezar</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Massage/Reflexology~</p></div></div><hr><h5>About me</h5><p class="bio">Born in the Philippines and now living in Woodstock for over 10 years. Proud mom with a lifelong passion for helping others feel their best. Specializes in Indian Head Massage, Hand Reflexology, and Foot Reflexology. Passion for massage started as a child, helping my mom and relatives relieve pain and tension, sparking a deep love for healing touch. Dedicated to providing treatments that leave clients feeling relaxed, renewed, and truly cared for.</p></div><div class="team-member"><div class="team-member-header"><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_maricel_rcca8u.webp" alt="Maricel Tamburri"><div class="team-member-info"><h3>Maricel Tamburri</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Microblading/Brows/Lashes~</p></div></div><hr><h5>About me</h5><p class="bio">I was born and raised in Etobicoke, ON. My family has been in Woodstock since 1996. I am a proud Canadian-Filipina. A wife and mother to 2 great kids. I have been a licensed Registered Practical Nurse since 2012. I’ve had a great sense of accomplishment helping others during my nursing career. Now, I am pursuing my passion to help women from all walks of life. For our clients coming to our 'Beauty Sanctuary', we want them to feel at ease and to be themselves when they come in and when they leave our spa. During your service with me; I take pride in taking my time to assess your skin and facial features, to really understand your needs and preferences. That way you can have the best outcome possible when you leave our lounge.</p></div><div class="team-member"><div class="team-member-header"><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_trechan_rf82dn.webp" alt="Trechan Legria"><div class="team-member-info"><h3>Trechan Legria</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Makeover/Mani-Pedi~</p></div></div><hr><h5>About me</h5><p class="bio">Born in the Philippines, my family and I have been in Woodstock since 2000. Mother of two boys. Experienced aesthetician with 10+ years of client services. Passionate about enhancing one's beauty. As well as bringing confidence and self-love to my clients. Background in healthcare for a well-rounded, and holistic approach to beauty and wellness.</p></div></div></div></div>
+    
+	
+	
+	<div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle"><div class="modal-content"><button class="closeBtn" aria-label="Close about modal">×</button><h2 id="aboutModalTitle" class="section-title">Meet Our Team</h2><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_team_epruej.webp" alt="Aesthetics & Wellness Lounge Team" class="team-photo"><div class="team-container"><div class="team-member"><div class="team-member-header"><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_jessa_pdhtmm.webp" alt="Jessa Cordezar"><div class="team-member-info"><h3>Jessa Cordezar</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Massage/Reflexology~</p></div></div><hr><h5>About me</h5><p class="bio">Born in the Philippines and now living in Woodstock for over 10 years. Proud mom with a lifelong passion for helping others feel their best. Specializes in Indian Head Massage, Hand Reflexology, and Foot Reflexology. Passion for massage started as a child, helping my mom and relatives relieve pain and tension, sparking a deep love for healing touch. Dedicated to providing treatments that leave clients feeling relaxed, renewed, and truly cared for.</p></div><div class="team-member"><div class="team-member-header"><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_maricel_rcca8u.webp" alt="Maricel Tamburri"><div class="team-member-info"><h3>Maricel Tamburri</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Microblading/Brows/Lashes~</p></div></div><hr><h5>About me</h5><p class="bio">I was born and raised in Etobicoke, ON. My family has been in Woodstock since 1996. I am a proud Canadian-Filipina. A wife and mother to 2 great kids. I have been a licensed Registered Practical Nurse since 2012. I’ve had a great sense of accomplishment helping others during my nursing career. Now, I am pursuing my passion to help women from all walks of life. For our clients coming to our 'Beauty Sanctuary', we want them to feel at ease and to be themselves when they come in and when they leave our spa. During your service with me; I take pride in taking my time to assess your skin and facial features, to really understand your needs and preferences. That way you can have the best outcome possible when you leave our lounge.</p></div><div class="team-member"><div class="team-member-header"><img src="https://res.cloudinary.com/dk3nchuxx/image/upload/v1758825701/awl_trechan_rf82dn.webp" alt="Trechan Legria"><div class="team-member-info"><h3>Trechan Legria</h3><h4>Co-Owner/Manager</h4><p class="specialty">~Makeover/Mani-Pedi~</p></div></div><hr><h5>About me</h5><p class="bio">Born in the Philippines, my family and I have been in Woodstock since 2000. Mother of two boys. Experienced aesthetician with 10+ years of client services. Passionate about enhancing one's beauty. As well as bringing confidence and self-love to my clients. Background in healthcare for a well-rounded, and holistic approach to beauty and wellness.</p></div></div></div></div>
     <footer role="contentinfo"><div> © <strong>Aesthetics And Wellness Lounge</strong> — All rights reserved <br> <strong>awl.jm2@gmail.com</strong> — (226) 796-5138 </div></footer>
+<div id="stripe-modal" class="modal">
+    <div class="modal-content">
+        <button id="close-stripe-modal" class="closeBtn">×</button>
+        <h2>Secure Deposit Payment</h2>
+        <p>Please pay a 25% deposit to confirm your booking.</p>
+        <div id="payment-info" style="margin:15px 0; padding:10px; background:#f9f9f9; border-radius:6px; color:#333;"></div>
+        
+        <div id="payment-form">
+            <label for="card-number-element" class="stripe-label">Card Number</label>
+            <div id="card-number-element" class="stripe-element"></div>
 
+            <div class="card-details-row">
+              <div class="card-detail-field">
+                <label for="card-expiry-element" class="stripe-label">Expiration</label>
+                <div id="card-expiry-element" class="stripe-element"></div>
+              </div>
+              <div class="card-detail-field">
+                <label for="card-cvc-element" class="stripe-label">CVC</label>
+                <div id="card-cvc-element" class="stripe-element"></div>
+              </div>
+              <div class="card-detail-field">
+                <label for="postal-code-element" class="stripe-label">Postal Code</label>
+                <div id="postal-code-element" class="stripe-element"></div>
+              </div>
+            </div>
+
+            <div id="card-errors" role="alert"></div>
+        </div>
+        
+        <div class="modal-cta">
+            <button id="back-to-booking" class="btn ghost">Back</button>
+            <button id="pay-deposit-btn" class="btn primary">Pay Deposit</button>
+        </div>
+    </div>
+</div>
     <script>
 	
 	// --- START: Inconspicuous Admin Portal Link ---
@@ -834,9 +900,136 @@ secretButton.addEventListener('click', () => {
             [nameInput, phoneInput, emailInput].forEach(i => i.addEventListener('input', validateForm));
             function resetBookingForm() { categorySelect.value = ""; serviceSelect.innerHTML = '<option value="">-- Select service --</option>'; performerSelect.innerHTML = '<option value="">-- Select provider --</option>'; nameInput.value = ''; phoneInput.value = ''; emailInput.value = ''; selectedDate = null; selectedSlot = null; validateForm(); resetCalendarAndTime(); }
             function resetCalendarAndTime() { timeSlotsEl.textContent = 'Select service, provider, and date.'; selectedSlot = null; validateForm(); }
-            const stripe = Stripe("pk_live_51Qg6aWC5NlBSaGb82hFsSiw6V7Ubh1Sffz1LwZwofupdkR2aRmrm3LYobssPE0zizn8oxlvQCDbQLTbZX6rcz8zC00wkHNHt5w");
-            const elements = stripe.elements(); const cardElement = elements.create("card"); cardElement.mount("#card-element"); const stripeModal = document.getElementById("stripe-modal"); const closeStripeModalBtn = document.getElementById("close-stripe-modal"); const backToBookingBtn = document.getElementById("back-to-booking"); const payBtn = document.getElementById("pay-deposit-btn"); const paymentInfoDiv = document.getElementById("payment-info"); const cardErrorsDiv = document.getElementById("card-errors");
-            nextBtn.onclick = () => { if (!validateForm()) return; const serviceName = serviceSelect.value; const performerName = performerSelect.options[performerSelect.selectedIndex].text; const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName)); if (!service) { alert('Could not find service details.'); return; } const price = service.price / 100; const deposit = (price * 0.25).toFixed(2); paymentInfoDiv.innerHTML = `<strong>Service:</strong> ${serviceName}<br><strong>Total Price:</strong> $${price.toFixed(2)}<br><strong>Deposit Due:</strong> $${deposit}`; bookingModal.style.display = "none"; stripeModal.style.display = "flex"; };
+            
+
+
+const stripe = Stripe("pk_live_51Qg6aWC5NlBSaGb82hFsSiw6V7Ubh1Sffz1LwZwofupdkR2aRmrm3LYobssPE0zizn8oxlvQCDbQLTbZX6rcz8zC00wkHNHt5w");
+const elements = stripe.elements();
+
+const style = {
+    base: {
+        fontSize: '16px',
+        color: '#32325d',
+        fontFamily: '"Inter", system-ui, sans-serif',
+    },
+};
+
+// Create and mount the separate card elements
+const cardNumber = elements.create('cardNumber', { style: style });
+const cardExpiry = elements.create('cardExpiry', { style: style });
+const cardCvc = elements.create('cardCvc', { style: style });
+const postalCode = elements.create('postalCode', { style: style });
+
+cardNumber.mount('#card-number-element');
+cardExpiry.mount('#card-expiry-element');
+cardCvc.mount('#card-cvc-element');
+postalCode.mount('#postal-code-element');
+
+// Get references to modal elements
+const stripeModal = document.getElementById("stripe-modal");
+const closeStripeModalBtn = document.getElementById("close-stripe-modal");
+const backToBookingBtn = document.getElementById("back-to-booking");
+const payBtn = document.getElementById("pay-deposit-btn");
+const paymentInfoDiv = document.getElementById("payment-info");
+const cardErrorsDiv = document.getElementById("card-errors");
+
+// This function shows the Stripe modal (it should be unchanged)
+nextBtn.onclick = () => {
+    if (!validateForm()) return; 
+    const serviceName = serviceSelect.value;
+    const performerName = performerSelect.options[performerSelect.selectedIndex].text;
+    const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName));
+    if (!service) { alert('Could not find service details.'); return; }
+    const price = service.price / 100;
+    const deposit = (price * 0.25).toFixed(2);
+    paymentInfoDiv.innerHTML = `<strong>Service:</strong> ${serviceName}<br><strong>Total Price:</strong> $${price.toFixed(2)}<br><strong>Deposit Due:</strong> $${deposit}`;
+    bookingModal.style.display = "none";
+    stripeModal.style.display = "flex";
+};
+
+// Functions to close or go back
+closeStripeModalBtn.onclick = () => stripeModal.style.display = "none";
+backToBookingBtn.onclick = () => {
+    stripeModal.style.display = "none";
+    bookingModal.style.display = "flex";
+};
+
+// The main payment processing function
+payBtn.onclick = async () => {
+    payBtn.disabled = true;
+    payBtn.textContent = "Processing...";
+    cardErrorsDiv.textContent = "";
+    cardErrorsDiv.classList.remove('visible'); // Hide previous errors
+
+    const serviceName = serviceSelect.value;
+    const performerName = performerSelect.options[performerSelect.selectedIndex].text;
+    const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName));
+
+    if (!service) {
+        alert('Error: Could not find service details for the selected provider.');
+        payBtn.disabled = false;
+        payBtn.textContent = "Pay Deposit";
+        return;
+    }
+
+    try {
+        const res = await fetch(`${BASE_URL}/create-payment-intent`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ serviceId: service.id, performerName: performerName })
+        });
+
+        const { clientSecret, error: backendError } = await res.json();
+        if (backendError) throw new Error(backendError);
+
+        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: cardNumber, // Use the main cardNumber element here
+                billing_details: { name: nameInput.value, email: emailInput.value }
+            }
+        });
+
+        if (error) {
+            cardErrorsDiv.textContent = error.message;
+            cardErrorsDiv.classList.add('visible'); // Make the error div visible
+            throw new Error(error.message);
+        }
+
+        if (paymentIntent.status === "succeeded") {
+            const bookingRes = await fetch(`${BASE_URL}/book/${performerCalendars[performerSelect.value]}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: nameInput.value.trim(),
+                    phone: phoneInput.value.trim(),
+                    email: emailInput.value.trim(),
+                    service: serviceSelect.value,
+                    performer: performerSelect.options[performerSelect.selectedIndex].text,
+                    dateTime: selectedSlot.startDateTime.toISOString()
+                })
+            });
+            const result = await bookingRes.json();
+            if (result.success) {
+                alert("✅ Payment and booking confirmed!");
+                stripeModal.style.display = "none";
+                resetBookingForm();
+            } else {
+                alert("Payment succeeded but booking failed. " + (result.error || ''));
+            }
+        }
+    } catch (err) {
+        console.error(err);
+    } finally {
+        payBtn.disabled = false;
+        payBtn.textContent = "Pay Deposit";
+    }
+};
+
+
+
+
+			
+			nextBtn.onclick = () => { if (!validateForm()) return; const serviceName = serviceSelect.value; const performerName = performerSelect.options[performerSelect.selectedIndex].text; const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName)); if (!service) { alert('Could not find service details.'); return; } const price = service.price / 100; const deposit = (price * 0.25).toFixed(2); paymentInfoDiv.innerHTML = `<strong>Service:</strong> ${serviceName}<br><strong>Total Price:</strong> $${price.toFixed(2)}<br><strong>Deposit Due:</strong> $${deposit}`; bookingModal.style.display = "none"; stripeModal.style.display = "flex"; };
             closeStripeModalBtn.onclick = () => stripeModal.style.display = "none";
             backToBookingBtn.onclick = () => { stripeModal.style.display = "none"; bookingModal.style.display = "flex"; };
             
