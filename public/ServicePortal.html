@@ -311,7 +311,7 @@
 <script>
 
 
-async function loadAppointments() {
+async function loadAppointments(token) {
     if (!token) return;
     const container = document.getElementById('appointment-list-container');
     container.innerHTML = '<p>Loading appointments...</p>';
@@ -388,7 +388,7 @@ async function loadAppointments() {
                 else { addNewMemberBtn.classList.remove('hidden'); }
             }
             loadPortalContent();
-			loadAppointments();
+			loadAppointments(token);
         }
 
         function loadPortalContent() {
@@ -439,7 +439,7 @@ if (portalNav) {
 
         // If the appointments tab is clicked, load the data
         if (navLink.dataset.target === 'appointments-view') {
-            loadAppointments();
+            loadAppointments(token);
         }
     });
 }
