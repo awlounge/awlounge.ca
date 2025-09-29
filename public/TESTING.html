@@ -715,7 +715,7 @@ secretButton.addEventListener('click', () => {
             const BASE_URL = '';
             let allServices = [];
             let autoRotateTimer = null;
-            const performerCalendars = { jessa: "mark.adam.grabowski@gmail.com", maricel: "maricelcalendar@gmail.com", trechan: "trechancalendar@gmail.com", "mary-ann": "maryanncalendar@gmail.com" };
+            const performerCalendars = { jessa: "aaliyahjes@gmail.com", maricel: "maricelcalendar@gmail.com", trechan: "trechancalendar@gmail.com", mary-ann: "maryanncalendar@gmail.com", admin: "mark.adam.grabowski@gmail.com" };
             const SLIDE_INTERVAL = 7500;
             const USER_PAUSE_INTERVAL = 15000;
             const bookingModal = document.getElementById('bookingModal');
@@ -839,7 +839,78 @@ secretButton.addEventListener('click', () => {
             nextBtn.onclick = () => { if (!validateForm()) return; const serviceName = serviceSelect.value; const performerName = performerSelect.options[performerSelect.selectedIndex].text; const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName)); if (!service) { alert('Could not find service details.'); return; } const price = service.price / 100; const deposit = (price * 0.25).toFixed(2); paymentInfoDiv.innerHTML = `<strong>Service:</strong> ${serviceName}<br><strong>Total Price:</strong> $${price.toFixed(2)}<br><strong>Deposit Due:</strong> $${deposit}`; bookingModal.style.display = "none"; stripeModal.style.display = "flex"; };
             closeStripeModalBtn.onclick = () => stripeModal.style.display = "none";
             backToBookingBtn.onclick = () => { stripeModal.style.display = "none"; bookingModal.style.display = "flex"; };
-            payBtn.onclick = async () => { payBtn.disabled = true; payBtn.textContent = "Processing..."; cardErrorsDiv.textContent = ""; const serviceName = serviceSelect.value; const performerName = performerSelect.options[performerSelect.selectedIndex].text; const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName)); if (!service) { alert('Error: Could not find service.'); payBtn.disabled = false; payBtn.textContent = "Pay Deposit"; return; } try { const res = await fetch(`${BASE_URL}/create-payment-intent`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ serviceId: service.id }) }); const { clientSecret, error: backendError } = await res.json(); if (backendError) throw new Error(backendError); const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, { payment_method: { card: cardElement, billing_details: { name: nameInput.value, email: emailInput.value } } }); if (error) { cardErrorsDiv.textContent = error.message; throw new Error(error.message); } if (paymentIntent.status === "succeeded") { const bookingRes = await fetch(`${BASE_URL}/book/${performerCalendars[performerSelect.value]}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: nameInput.value.trim(), phone: phoneInput.value.trim(), email: emailInput.value.trim(), service: serviceSelect.value, performer: performerSelect.options[performerSelect.selectedIndex].text, dateTime: selectedSlot.startDateTime.toISOString() }) }); const result = await bookingRes.json(); if (result.success) { alert("✅ Payment and booking confirmed!"); stripeModal.style.display = "none"; resetBookingForm(); } else { alert("Payment succeeded but booking failed. " + (result.error || '')); } } } catch (err) { console.error(err); alert("Payment or booking failed."); } finally { payBtn.disabled = false; payBtn.textContent = "Pay Deposit"; } };
+            
+			payBtn.onclick = async () => {
+    payBtn.disabled = true;
+    payBtn.textContent = "Processing...";
+    cardErrorsDiv.textContent = "";
+
+    const serviceName = serviceSelect.value;
+    // --- NEW: Get the selected provider's name (e.g., "Jessa") ---
+    const performerName = performerSelect.options[performerSelect.selectedIndex].text;
+    
+    const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName));
+
+    if (!service) {
+        alert('Error: Could not find service details for the selected provider.');
+        payBtn.disabled = false;
+        payBtn.textContent = "Pay Deposit";
+        return;
+    }
+    
+    try {
+        const res = await fetch(`${BASE_URL}/create-payment-intent`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            // --- MODIFIED: Send both the serviceId AND the performerName ---
+            body: JSON.stringify({ serviceId: service.id, performerName: performerName })
+        });
+        
+        const { clientSecret, error: backendError } = await res.json();
+        if (backendError) throw new Error(backendError);
+
+        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: cardElement,
+                billing_details: { name: nameInput.value, email: emailInput.value }
+            }
+        });
+
+        if (error) {
+            cardErrorsDiv.textContent = error.message;
+            throw new Error(error.message);
+        }
+
+        if (paymentIntent.status === "succeeded") {
+            const bookingRes = await fetch(`${BASE_URL}/book/${performerCalendars[performerSelect.value]}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: nameInput.value.trim(),
+                    phone: phoneInput.value.trim(),
+                    email: emailInput.value.trim(),
+                    service: serviceSelect.value,
+                    performer: performerSelect.options[performerSelect.selectedIndex].text,
+                    dateTime: selectedSlot.startDateTime.toISOString()
+                })
+            });
+            const result = await bookingRes.json();
+            if (result.success) {
+                alert("✅ Payment and booking confirmed!");
+                stripeModal.style.display = "none";
+                resetBookingForm();
+            } else {
+                alert("Payment succeeded but booking failed. " + (result.error || ''));
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Payment or booking failed.");
+    } finally {
+        payBtn.disabled = false;
+        payBtn.textContent = "Pay Deposit";
+    }
+};
 
             window.addEventListener('storage', (event) => {
                 if (event.key === 'servicesUpdated') {

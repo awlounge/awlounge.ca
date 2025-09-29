@@ -329,7 +329,9 @@ app.get("/my-appointments", authenticate, async (req, res) => {
         }
 
         // Send back a clean, simplified list of events
-        const appointments = events.map(event => ({
+        const appointments = events
+			.filter(event => event.summary && event.summary.startsWith('Booking:'))
+            .map(event => ({
             id: event.id,
             summary: event.summary,
             description: event.description,
@@ -347,7 +349,13 @@ app.get("/my-appointments", authenticate, async (req, res) => {
 // --- Booking and Payment Routes ---
 app.post("/create-payment-intent", async (req, res) => {
     try {
-        const { serviceId } = req.body;
+        // --- MODIFIED: Now receives performerName from the frontend ---
+        const { serviceId, performerName } = req.body;
+
+        if (!serviceId || !performerName) {
+            return res.status(400).json({ error: "Service ID and performer name are required." });
+        }
+
         const serviceRes = await pool.query("SELECT * FROM services WHERE id = $1", [serviceId]);
         if (serviceRes.rows.length === 0) {
             return res.status(400).json({ error: "Service not found" });
@@ -355,24 +363,18 @@ app.post("/create-payment-intent", async (req, res) => {
         const service = serviceRes.rows[0];
 
         // --- NEW LOGIC ---
-        // 1. Find the primary performer to determine which Stripe key to use.
-        //    (This assumes the first performer listed is the one receiving the deposit)
-        const primaryPerformer = service.performer.split(',')[0].trim();
-        if (!primaryPerformer) {
-            return res.status(400).json({ error: "Service has no assigned performer." });
-        }
+        // 1. Look up the performer's Stripe secret key using the name provided.
+        const stripeSecretKey = process.env[`USER_${performerName.toUpperCase()}_STRIPE_SK`];
 
-        // 2. Look up that performer's specific Stripe secret key.
-        const stripeSecretKey = process.env[`USER_${primaryPerformer.toUpperCase()}_STRIPE_SK`];
         if (!stripeSecretKey) {
-            console.error(`Stripe key not found for performer: ${primaryPerformer}`);
+            console.error(`Stripe key not found for performer: ${performerName}`);
             return res.status(500).json({ error: "Payment provider not configured for this team member." });
         }
 
-        // 3. Initialize Stripe with the correct key ONLY for this transaction.
+        // 2. Initialize Stripe with the correct key ONLY for this transaction.
         const stripe = new Stripe(stripeSecretKey);
 
-        // 4. Create the payment intent as before.
+        // 3. Create the payment intent as before.
         const amount = Math.round(service.price * 0.25);
         const paymentIntent = await stripe.paymentIntents.create({
             amount,
