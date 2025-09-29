@@ -122,6 +122,9 @@ const transporter = nodemailer.createTransport({
 
 // --- Auth Functions & Routes ---
 function authenticate(req, res, next) {
+	// ---- TEMPORARY DEBUGGING LINE ----
+    console.log('Incoming Headers:', JSON.stringify(req.headers, null, 2));
+    // ------------------------------------
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         return res.status(401).json({ error: "Unauthorized" });
