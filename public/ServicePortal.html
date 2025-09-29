@@ -310,57 +310,6 @@
 
 <script>
 
-
-async function loadAppointments(token) {
-    if (!token) return;
-    const container = document.getElementById('appointment-list-container');
-    container.innerHTML = '<p>Loading appointments...</p>';
-
-    try {
-        const res = await fetch(`${BASE_URL}/my-appointments`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error('Failed to fetch appointments.');
-
-        const appointments = await res.json();
-        
-        if (appointments.length === 0) {
-            container.innerHTML = '<p>You have no upcoming appointments.</p>';
-            return;
-        }
-
-        let appointmentsHTML = '';
-        appointments.forEach(appt => {
-            const startDate = new Date(appt.start);
-            const endDate = new Date(appt.end);
-            
-            // Format time nicely for display
-            const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
-            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-
-            const timeString = `${startDate.toLocaleTimeString('en-US', timeOptions)} - ${endDate.toLocaleTimeString('en-US', timeOptions)}`;
-            const dateString = startDate.toLocaleDateString('en-US', dateOptions);
-
-            appointmentsHTML += `
-                <div class="appointment-card">
-                    <h3>${appt.summary || 'No Title'}</h3>
-                    <div class="appointment-time">
-                        <i class="fas fa-calendar-alt"></i> ${dateString}<br>
-                        <i class="fas fa-clock"></i> ${timeString}
-                    </div>
-                    <p class="appointment-description">${appt.description || 'No details provided.'}</p>
-                </div>
-            `;
-        });
-        container.innerHTML = appointmentsHTML;
-
-    } catch (error) {
-        console.error('Error loading appointments:', error);
-        container.innerHTML = '<p style="color: red;">Could not load appointments.</p>';
-    }
-}
-
-
     document.addEventListener('DOMContentLoaded', () => {
         const BASE_URL = '';
         let token = localStorage.getItem('token');
@@ -443,6 +392,64 @@ if (portalNav) {
         }
     });
 }
+
+
+
+
+
+
+async function loadAppointments(token) {
+    if (!token) return;
+    const container = document.getElementById('appointment-list-container');
+    container.innerHTML = '<p>Loading appointments...</p>';
+
+    try {
+        const res = await fetch(`${BASE_URL}/my-appointments`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to fetch appointments.');
+
+        const appointments = await res.json();
+        
+        if (appointments.length === 0) {
+            container.innerHTML = '<p>You have no upcoming appointments.</p>';
+            return;
+        }
+
+        let appointmentsHTML = '';
+        appointments.forEach(appt => {
+            const startDate = new Date(appt.start);
+            const endDate = new Date(appt.end);
+            
+            // Format time nicely for display
+            const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+            const timeString = `${startDate.toLocaleTimeString('en-US', timeOptions)} - ${endDate.toLocaleTimeString('en-US', timeOptions)}`;
+            const dateString = startDate.toLocaleDateString('en-US', dateOptions);
+
+            appointmentsHTML += `
+                <div class="appointment-card">
+                    <h3>${appt.summary || 'No Title'}</h3>
+                    <div class="appointment-time">
+                        <i class="fas fa-calendar-alt"></i> ${dateString}<br>
+                        <i class="fas fa-clock"></i> ${timeString}
+                    </div>
+                    <p class="appointment-description">${appt.description || 'No details provided.'}</p>
+                </div>
+            `;
+        });
+        container.innerHTML = appointmentsHTML;
+
+    } catch (error) {
+        console.error('Error loading appointments:', error);
+        container.innerHTML = '<p style="color: red;">Could not load appointments.</p>';
+    }
+}
+
+
+
+
 
 
             // REMOVED BROKEN EVENT LISTENER FOR CATEGORY SELECT
