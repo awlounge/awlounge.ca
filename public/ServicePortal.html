@@ -70,6 +70,104 @@
         .delete-category-btn { background: none; border: none; color: var(--red); cursor: pointer; font-size: 16px; }
         .modal-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; display: flex; gap: 10px; }
         .modal-footer input { flex-grow: 1; }
+		
+
+    /* Responsive styles for mobile devices */
+    @media (max-width: 768px) {
+        body {
+            padding: 10px; /* Reduce overall padding for smaller screens */
+        }
+
+        .portal-container {
+            padding: 0;
+        }
+
+        /* --- Service Management Form --- */
+        #serviceForm .form-row,
+        #category-wrapper {
+            flex-direction: column; /* Stack form inputs vertically */
+            align-items: stretch;
+        }
+
+        #serviceForm input,
+        #serviceForm select,
+        #serviceForm button {
+            width: 100%; /* Make all form elements full-width */
+        }
+        
+        .page-header {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        /* --- Services Table to Card Conversion --- */
+        #servicesTable thead {
+            display: none; /* Hide the original table header */
+        }
+
+        #servicesTable tr {
+            display: block; /* Make each row a block-level element */
+            margin-bottom: 20px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+            overflow: hidden;
+        }
+
+        #servicesTable td {
+            display: block; /* Stack cells vertically */
+            text-align: right; /* Align cell content to the right */
+            position: relative;
+            padding-left: 50%; /* Make space for the label on the left */
+            border-bottom: 1px solid #eee;
+        }
+        
+        #servicesTable td:last-child {
+            border-bottom: none; /* Remove border from the last cell (actions) */
+        }
+
+        /* Add data labels before each cell */
+        #servicesTable td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 12px;
+            width: calc(50% - 24px);
+            text-align: left;
+            font-weight: bold;
+            color: var(--text);
+        }
+        
+        #servicesTable td:first-child { /* Center the image */
+             padding: 12px;
+             text-align: center;
+        }
+        #servicesTable td:first-child::before {
+            display: none; /* No label for the image */
+        }
+
+
+        /* --- Team Profile Editing --- */
+        .edit-profile-form {
+            grid-template-columns: 1fr; /* Stack the profile image and form fields */
+            gap: 20px;
+        }
+
+        .form-left-col {
+            max-width: 200px;
+            margin: 0 auto; /* Center the profile image column */
+        }
+        
+        .form-actions {
+            flex-direction: column;
+            gap: 10px;
+            align-items: stretch;
+        }
+        
+        .form-actions button {
+            width: 100%;
+        }
+    }
     </style>
 </head>
 <body>
@@ -424,7 +522,7 @@
             data.forEach(s => {
                 const tr = document.createElement("tr");
                 const imageCell = s.imageurl ? `<img src="${s.imageurl}" alt="${s.name}" class="image-preview">` : 'No Image';
-                tr.innerHTML = `<td>${imageCell}</td><td>${s.name}</td><td>${s.category}</td><td>${s.description || ''}</td><td>${s.performer}</td><td>${s.duration} min</td><td>$${(s.price / 100).toFixed(2)}</td><td><button class="btn btn-main edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button class="btn btn-danger" onclick="deleteService(${s.id})">Delete</button></td>`;
+                tr.innerHTML = `<td data-label="Image">${imageCell}</td><td data-label="Name">${s.name}</td><td data-label="Category">${s.category}</td><td data-label="Description">${s.description || ''}</td><td data-label="Provider(s)">${s.performer}</td><td data-label="Duration">${s.duration} min</td><td data-label="Price">$${(s.price / 100).toFixed(2)}</td><td data-label="Actions"><button class="btn btn-main edit" onclick='editService(${JSON.stringify(s)})'>Edit</button><button class="btn btn-danger" onclick="deleteService(${s.id})">Delete</button></td>`;
                 tbody.appendChild(tr);
             });
         }
