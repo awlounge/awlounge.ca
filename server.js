@@ -89,7 +89,6 @@ async function initDB() {
 initDB();
 
 // --- Middleware and Setup ---
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -354,6 +353,26 @@ app.post("/create-payment-intent", async (req, res) => {
             return res.status(400).json({ error: "Service not found" });
         }
         const service = serviceRes.rows[0];
+
+        // --- NEW LOGIC ---
+        // 1. Find the primary performer to determine which Stripe key to use.
+        //    (This assumes the first performer listed is the one receiving the deposit)
+        const primaryPerformer = service.performer.split(',')[0].trim();
+        if (!primaryPerformer) {
+            return res.status(400).json({ error: "Service has no assigned performer." });
+        }
+
+        // 2. Look up that performer's specific Stripe secret key.
+        const stripeSecretKey = process.env[`USER_${primaryPerformer.toUpperCase()}_STRIPE_SK`];
+        if (!stripeSecretKey) {
+            console.error(`Stripe key not found for performer: ${primaryPerformer}`);
+            return res.status(500).json({ error: "Payment provider not configured for this team member." });
+        }
+
+        // 3. Initialize Stripe with the correct key ONLY for this transaction.
+        const stripe = new Stripe(stripeSecretKey);
+
+        // 4. Create the payment intent as before.
         const amount = Math.round(service.price * 0.25);
         const paymentIntent = await stripe.paymentIntents.create({
             amount,
@@ -361,6 +380,7 @@ app.post("/create-payment-intent", async (req, res) => {
             description: `25% deposit for ${service.name}`
         });
         res.json({ clientSecret: paymentIntent.client_secret });
+
     } catch (err) {
         console.error('Payment intent error:', err);
         res.status(500).json({ error: "Failed to create payment intent" });
