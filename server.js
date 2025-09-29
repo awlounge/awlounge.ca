@@ -333,7 +333,7 @@ app.get("/my-appointments", authenticate, async (req, res) => {
 
         // Send back a clean, simplified list of events
         const appointments = events
-			.filter(event => event.summary && event.summary.startsWith('Booking:'))
+			.filter(event => event.summary && event.summary.startsWith('AWL Appointment:'))
             .map(event => ({
             id: event.id,
             summary: event.summary,
@@ -415,7 +415,7 @@ app.post("/book/:calendarId", async (req, res) => {
         const duration = serviceRes.rows[0]?.duration || 60;
         const endDateTime = new Date(startDateTime.getTime() + duration * 60 * 1000);
         const event = {
-            summary: `Booking: ${name} - ${service}`,
+            summary: `AWL Appointment: ${name} - ${service}`,
             description: `Client: ${name}\nPhone: ${phone}\nEmail: ${email}\nService: ${service}\nProvider: ${performer}`,
             start: { dateTime: startDateTime.toISOString(), timeZone: "America/Toronto" },
             end: { dateTime: endDateTime.toISOString(), timeZone: "America/Toronto" }
