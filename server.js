@@ -138,19 +138,26 @@ function authenticate(req, res, next) {
 
 app.post("/admin/login", (req, res) => {
     const { username, password } = req.body;
-    const allowedUsers = [];
-    for (let i = 1; i <= 10; i++) {
-        const user = process.env[`AWLOUNGE_USER_${i}`];
-        const pass = process.env[`AWLOUNGE_PASS_${i}`];
-        const role = process.env[`AWLOUNGE_ROLE_${i}`] || "user";
-        if (user && pass) {
-            allowedUsers.push({ user, pass, role });
-        }
+    if (!username || !password) {
+        return res.status(400).json({ success: false, error: "Username and password are required." });
     }
-    const validUser = allowedUsers.find(u => u.user === username && u.pass === password);
-    if (validUser) {
-        const token = jwt.sign({ username: validUser.user, role: validUser.role }, JWT_SECRET, { expiresIn: "4h" });
-        res.json({ success: true, token, username: validUser.user, role: validUser.role });
+
+    // Sanitize username to be uppercase to match environment variable format
+    const userKey = username.trim().toUpperCase();
+
+    const userPass = process.env[`USER_${userKey}_PASS`];
+    const userRole = process.env[`USER_${userKey}_ROLE`];
+    const calendarId = process.env[`USER_${userKey}_CALENDAR_ID`];
+
+    if (userPass && userPass === password) {
+        // User is valid, create a token with their info
+        const tokenPayload = {
+            username: username, // Keep original case for display
+            role: userRole || 'user',
+            calendarId: calendarId || null // Include the calendar ID in the token
+        };
+        const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "4h" });
+        res.json({ success: true, token, username: username, role: userRole });
     } else {
         res.status(401).json({ success: false, error: "Invalid credentials" });
     }
@@ -296,6 +303,45 @@ app.delete("/services/:id", authenticate, async (req, res) => {
     } catch (err) {
         console.error('Delete service error:', err);
         res.status(500).json({ error: "Failed to delete service." });
+    }
+});
+
+app.get("/my-appointments", authenticate, async (req, res) => {
+    // req.user is populated by the authenticate middleware from the JWT
+    const { calendarId } = req.user;
+
+    if (!calendarId) {
+        // If the user (e.g., Admin) doesn't have a calendar, return an empty list
+        return res.json([]);
+    }
+
+    try {
+        const response = await calendar.events.list({
+            calendarId: calendarId,
+            timeMin: (new Date()).toISOString(), // Fetch events from now onwards
+            maxResults: 50, // Get up to 50 upcoming events
+            singleEvents: true,
+            orderBy: 'startTime',
+        });
+
+        const events = response.data.items;
+        if (!events || events.length === 0) {
+            return res.json([]);
+        }
+
+        // Send back a clean, simplified list of events
+        const appointments = events.map(event => ({
+            id: event.id,
+            summary: event.summary,
+            description: event.description,
+            start: event.start.dateTime || event.start.date,
+            end: event.end.dateTime || event.end.date,
+        }));
+        res.json(appointments);
+
+    } catch (err) {
+        console.error('The API returned an error: ' + err);
+        res.status(500).json({ error: "Failed to fetch appointments from Google Calendar." });
     }
 });
 

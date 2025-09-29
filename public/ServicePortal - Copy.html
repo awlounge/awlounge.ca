@@ -71,36 +71,6 @@
         .modal-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; display: flex; gap: 10px; }
         .modal-footer input { flex-grow: 1; }
 		
-		/* ADD these styles to ServicePortal.html */
-.appointment-card {
-    background: #fff;
-    border: 1px solid #eee;
-    border-left: 5px solid var(--gold-2);
-    padding: 15px 20px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-.appointment-card h3 {
-    font-family: "Playfair Display", serif;
-    margin: 0 0 10px 0;
-    font-size: 1.1rem;
-}
-.appointment-time {
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 10px;
-}
-.appointment-time i {
-    color: var(--blue);
-    margin-right: 8px;
-}
-.appointment-description {
-    font-size: 0.9rem;
-    color: var(--muted);
-    white-space: pre-wrap; /* This preserves line breaks from the description */
-    line-height: 1.5;
-}
 
     /* Responsive styles for mobile devices */
     @media (max-width: 768px) {
@@ -215,19 +185,9 @@
                 <button id="logoutBtn" class="btn btn-secondary" style="padding: 8px 15px;">Logout</button>
             </div>
             <nav class="portal-nav">
-    <button class="portal-nav-link active" data-target="appointments-view">My Appointments</button>
-    <button class="portal-nav-link" data-target="services-view">Manage Services</button>
-    <button class="portal-nav-link" data-target="team-view">Manage Team Profiles</button>
-</nav>
-
-<div id="appointments-view" class="portal-view active">
-    <div class="container">
-        <h2>My Upcoming Appointments</h2>
-        <div id="appointment-list-container">
-            <p>Loading appointments...</p>
-        </div>
-    </div>
-</div>
+                <button class="portal-nav-link active" data-target="services-view">Manage Services</button>
+                <button class="portal-nav-link" data-target="team-view">Manage Team Profiles</button>
+            </nav>
 
             <div id="services-view" class="portal-view active">
                 <div class="container">
@@ -309,58 +269,6 @@
     </div>
 
 <script>
-
-
-async function loadAppointments() {
-    if (!token) return;
-    const container = document.getElementById('appointment-list-container');
-    container.innerHTML = '<p>Loading appointments...</p>';
-
-    try {
-        const res = await fetch(`${BASE_URL}/my-appointments`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error('Failed to fetch appointments.');
-
-        const appointments = await res.json();
-        
-        if (appointments.length === 0) {
-            container.innerHTML = '<p>You have no upcoming appointments.</p>';
-            return;
-        }
-
-        let appointmentsHTML = '';
-        appointments.forEach(appt => {
-            const startDate = new Date(appt.start);
-            const endDate = new Date(appt.end);
-            
-            // Format time nicely for display
-            const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
-            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-
-            const timeString = `${startDate.toLocaleTimeString('en-US', timeOptions)} - ${endDate.toLocaleTimeString('en-US', timeOptions)}`;
-            const dateString = startDate.toLocaleDateString('en-US', dateOptions);
-
-            appointmentsHTML += `
-                <div class="appointment-card">
-                    <h3>${appt.summary || 'No Title'}</h3>
-                    <div class="appointment-time">
-                        <i class="fas fa-calendar-alt"></i> ${dateString}<br>
-                        <i class="fas fa-clock"></i> ${timeString}
-                    </div>
-                    <p class="appointment-description">${appt.description || 'No details provided.'}</p>
-                </div>
-            `;
-        });
-        container.innerHTML = appointmentsHTML;
-
-    } catch (error) {
-        console.error('Error loading appointments:', error);
-        container.innerHTML = '<p style="color: red;">Could not load appointments.</p>';
-    }
-}
-
-
     document.addEventListener('DOMContentLoaded', () => {
         const BASE_URL = '';
         let token = localStorage.getItem('token');
@@ -388,7 +296,6 @@ async function loadAppointments() {
                 else { addNewMemberBtn.classList.remove('hidden'); }
             }
             loadPortalContent();
-			loadAppointments();
         }
 
         function loadPortalContent() {
@@ -424,26 +331,19 @@ async function loadAppointments() {
                 window.location.reload();
             };
 
-const portalNav = document.querySelector('.portal-nav');
-if (portalNav) {
-    portalNav.addEventListener('click', (event) => {
-        const navLink = event.target.closest('.portal-nav-link');
-        if (!navLink) return;
-
-        // Tab switching UI logic
-        portalNav.querySelector('.active').classList.remove('active');
-        navLink.classList.add('active');
-        document.querySelectorAll('.portal-view').forEach(view => {
-            view.classList.toggle('active', view.id === navLink.dataset.target);
-        });
-
-        // If the appointments tab is clicked, load the data
-        if (navLink.dataset.target === 'appointments-view') {
-            loadAppointments();
-        }
-    });
-}
-
+            const portalNav = document.querySelector('.portal-nav');
+            if(portalNav) {
+                portalNav.addEventListener('click', (event) => {
+                    const navLink = event.target.closest('.portal-nav-link');
+                    if (!navLink) return;
+                    const targetId = navLink.dataset.target;
+                    portalNav.querySelector('.active').classList.remove('active');
+                    navLink.classList.add('active');
+                    document.querySelectorAll('.portal-view').forEach(view => {
+                        view.classList.toggle('active', view.id === targetId);
+                    });
+                });
+            }
 
             // REMOVED BROKEN EVENT LISTENER FOR CATEGORY SELECT
             
