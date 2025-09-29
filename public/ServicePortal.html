@@ -194,6 +194,7 @@
                     <h2>Manage Services</h2>
                     <form id="serviceForm">
                         <input type="hidden" id="serviceId" name="id">
+						<input type="hidden" id="existingImageUrl" name="existingImageUrl">
                         <div class="form-row">
                             <button type="button" id="manageCategoriesBtn" class="btn-secondary btn-small">Manage Categories</button>
                             <div id="category-wrapper">
@@ -347,34 +348,47 @@
             // REMOVED BROKEN EVENT LISTENER FOR CATEGORY SELECT
             
             const serviceForm = document.getElementById("serviceForm");
-            if(serviceForm) {
-                serviceForm.onsubmit = async (e) => {
-                    e.preventDefault();
-                    const form = e.target;
-                    const id = form.serviceId.value;
-                    const formData = new FormData();
-                    
-                    // --- THIS IS THE FIX ---
-                    // The old code was trying to find an input field that no longer exists.
-                    // Now, we simply get the selected category from the dropdown.
-                    formData.append('category', form.category.value);
-                    
-                    ['id', 'name', 'duration', 'price', 'description'].forEach(fieldName => { if (form[fieldName]) formData.append(fieldName, form[fieldName].value); });
-                    const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
-                    formData.append('performer', selectedPerformers.join(', '));
-                    if (form.image.files[0]) { formData.append('image', form.image.files[0]); }
-                    const url = id ? `${BASE_URL}/services/${id}` : `${BASE_URL}/services`;
-                    const method = id ? "PUT" : "POST";
-                    const res = await fetch(url, { method, headers: { "Authorization": `Bearer ${token}` }, body: formData });
-                    if (res.ok) {
-                        form.reset();
-                        document.getElementById('serviceId').value = '';
-                        loadServices();
-                        loadCategories();
-                        localStorage.setItem('servicesUpdated', Date.now());
-                    } else { alert('Failed to save service.'); }
-                };
-            }
+if (serviceForm) {
+    serviceForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const id = form.serviceId.value;
+        const formData = new FormData();
+        
+        formData.append('category', form.category.value);
+        
+        // This array now includes 'existingImageUrl' to be sent to the server
+        ['id', 'name', 'duration', 'price', 'description', 'existingImageUrl'].forEach(fieldName => {
+            if (form[fieldName]) formData.append(fieldName, form[fieldName].value);
+        });
+
+        const selectedPerformers = Array.from(document.getElementById('performer').selectedOptions).map(option => option.value);
+        formData.append('performer', selectedPerformers.join(', '));
+        
+        if (form.image.files[0]) {
+            formData.append('image', form.image.files[0]);
+        }
+
+        const url = id ? `${BASE_URL}/services/${id}` : `${BASE_URL}/services`;
+        const method = id ? "PUT" : "POST";
+        const res = await fetch(url, {
+            method,
+            headers: { "Authorization": `Bearer ${token}` },
+            body: formData
+        });
+
+        if (res.ok) {
+            form.reset();
+            document.getElementById('serviceId').value = '';
+            document.getElementById('existingImageUrl').value = ''; // Clear hidden field on reset
+            loadServices();
+            loadCategories();
+            localStorage.setItem('servicesUpdated', Date.now());
+        } else {
+            alert('Failed to save service.');
+        }
+    };
+}
 
             const teamListContainer = document.querySelector('.team-list-container');
             if(teamListContainer) {
@@ -567,19 +581,22 @@
         };
 
         window.editService = function(service) {
-            document.getElementById("serviceId").value = service.id;
-            document.getElementById("category").value = service.category;
-            document.getElementById("name").value = service.name;
-            document.getElementById("duration").value = service.duration;
-            document.getElementById("price").value = service.price;
-            document.getElementById("description").value = service.description || '';
-            const performerSelect = document.getElementById("performer");
-            const performers = service.performer.split(',').map(p => p.trim());
-            Array.from(performerSelect.options).forEach(option => {
-                option.selected = performers.includes(option.value);
-            });
-            window.scrollTo(0, 0);
-        };
+			document.getElementById("serviceId").value = service.id;
+			document.getElementById("category").value = service.category;
+			document.getElementById("name").value = service.name;
+			document.getElementById("duration").value = service.duration;
+			document.getElementById("price").value = service.price;
+			document.getElementById("description").value = service.description || '';
+			document.getElementById("existingImageUrl").value = service.imageurl || ''; // This line is added
+
+			const performerSelect = document.getElementById("performer");
+			const performers = service.performer.split(',').map(p => p.trim());
+			Array.from(performerSelect.options).forEach(option => {
+			option.selected = performers.includes(option.value);
+		});
+		
+    window.scrollTo(0, 0);
+};
 
         setupEventListeners();
         if (token) {
