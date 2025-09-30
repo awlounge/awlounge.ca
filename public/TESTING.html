@@ -984,14 +984,15 @@ payBtn.onclick = async () => {
 
         const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
             payment_method: {
-                card: cardNumber, // Use the main cardNumber element here
+                // --- THIS IS THE CORRECTED LINE ---
+                card: cardNumber, 
                 billing_details: { name: nameInput.value, email: emailInput.value }
             }
         });
 
         if (error) {
             cardErrorsDiv.textContent = error.message;
-            cardErrorsDiv.classList.add('visible'); // Make the error div visible
+            cardErrorsDiv.classList.add('visible');
             throw new Error(error.message);
         }
 
