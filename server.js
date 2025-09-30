@@ -481,27 +481,32 @@ app.post("/book/:calendarId", async (req, res) => {
         const duration = serviceRes.rows[0]?.duration || 60;
         const endDateTime = new Date(startDateTime.getTime() + duration * 60 * 1000);
 
-        // --- NEW: Generate a unique token and link for the consent form ---
         const consentToken = uuidv4();
         const consentFormLink = `${req.protocol}://${req.get('host')}/consent-form.html?token=${consentToken}`;
-
-        // --- NEW: Create the initial submission record in the database ---
         await pool.query(
             "INSERT INTO consent_form_submissions (token, customer_name, customer_email) VALUES ($1, $2, $3)",
             [consentToken, name, email]
         );
 
-        // --- MODIFIED: The Google Calendar event now includes the consent form link for your records ---
         const event = {
-            summary: `AWL Appointment: ${service}`,
+            summary: `Booking: ${name} - ${service}`,
             description: `Client: ${name}\nPhone: ${phone}\nEmail: ${email}\nService: ${service}\nProvider: ${performer}\n\nConsent Form Link: ${consentFormLink}`,
             start: { dateTime: startDateTime.toISOString(), timeZone: "America/Toronto" },
             end: { dateTime: endDateTime.toISOString(), timeZone: "America/Toronto" }
         };
+        
+        // --- THIS IS THE CORRECTED LOGIC ---
+
+        // 1. Wait ONLY for the critical step: creating the calendar event.
         await calendar.events.insert({ calendarId, requestBody: event });
 
-        // --- MODIFIED: Your full email template now includes the consent form section ---
-        await transporter.sendMail({
+        // 2. Immediately send the success response back to the user's browser.
+        res.json({ success: true, message: "Booking confirmed" });
+
+        console.log(`✅ Booking confirmed for ${name}. Confirmation email sending in background...`);
+
+        // 3. Send the email in the background (notice 'await' is removed).
+        transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Your Appointment is Confirmed!",
@@ -533,10 +538,15 @@ app.post("/book/:calendarId", async (req, res) => {
                 { filename: 'AWL_Logo.jpg', path: path.join(__dirname, 'public', 'AWL_Logo.jpg'), cid: 'logo' },
                 { filename: 'AWL_Banner.jpg', path: path.join(__dirname, 'public', 'AWL_Banner.jpg'), cid: 'banner' }
             ]
+			        }, (error, info) => {
+            if (error) {
+                // Log any email errors for your own debugging, but it won't crash the user's booking.
+                console.error("Confirmation Email Error:", error);
+            } else {
+                console.log("Confirmation Email Sent:", info.response);
+            }
         });
 
-        console.log(`✅ Booking created and email sent for ${name} on ${startDateTime}`);
-        res.json({ success: true, message: "Booking confirmed" });
     } catch (err) {
         console.error("Booking Error:", err);
         res.status(500).json({ error: "Failed to create booking" });
