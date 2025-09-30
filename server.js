@@ -505,6 +505,7 @@ app.post("/book/:calendarId", async (req, res) => {
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Your Appointment is Confirmed!",
+            // YOUR FULL EMAIL HTML, WITH THE NEW SECTION ADDED
             html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; color: #333;">
                 <div style="text-align: center; margin-bottom: 30px;"><img src="cid:logo" alt="AWL Logo" style="max-width: 150px; height: auto;"></div>
                 <h2 style="text-align: center; color: #2a2a2a;">Appointment Confirmed!</h2>
