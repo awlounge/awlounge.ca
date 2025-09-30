@@ -1034,77 +1034,7 @@ payBtn.onclick = async () => {
             closeStripeModalBtn.onclick = () => stripeModal.style.display = "none";
             backToBookingBtn.onclick = () => { stripeModal.style.display = "none"; bookingModal.style.display = "flex"; };
             
-			payBtn.onclick = async () => {
-    payBtn.disabled = true;
-    payBtn.textContent = "Processing...";
-    cardErrorsDiv.textContent = "";
-
-    const serviceName = serviceSelect.value;
-    // --- NEW: Get the selected provider's name (e.g., "Jessa") ---
-    const performerName = performerSelect.options[performerSelect.selectedIndex].text;
-    
-    const service = allServices.find(s => s.name === serviceName && s.performer.includes(performerName));
-
-    if (!service) {
-        alert('Error: Could not find service details for the selected provider.');
-        payBtn.disabled = false;
-        payBtn.textContent = "Pay Deposit";
-        return;
-    }
-    
-    try {
-        const res = await fetch(`${BASE_URL}/create-payment-intent`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            // --- MODIFIED: Send both the serviceId AND the performerName ---
-            body: JSON.stringify({ serviceId: service.id, performerName: performerName })
-        });
-        
-        const { clientSecret, error: backendError } = await res.json();
-        if (backendError) throw new Error(backendError);
-
-        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: cardElement,
-                billing_details: { name: nameInput.value, email: emailInput.value }
-            }
-        });
-
-        if (error) {
-            cardErrorsDiv.textContent = error.message;
-            throw new Error(error.message);
-        }
-
-        if (paymentIntent.status === "succeeded") {
-            const bookingRes = await fetch(`${BASE_URL}/book/${performerCalendars[performerSelect.value]}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    name: nameInput.value.trim(),
-                    phone: phoneInput.value.trim(),
-                    email: emailInput.value.trim(),
-                    service: serviceSelect.value,
-                    performer: performerSelect.options[performerSelect.selectedIndex].text,
-                    dateTime: selectedSlot.startDateTime.toISOString()
-                })
-            });
-            const result = await bookingRes.json();
-            if (result.success) {
-                alert("✅ Payment and booking confirmed!");
-                stripeModal.style.display = "none";
-                resetBookingForm();
-            } else {
-                alert("Payment succeeded but booking failed. " + (result.error || ''));
-            }
-        }
-    } catch (err) {
-        console.error(err);
-        alert("Payment or booking failed.");
-    } finally {
-        payBtn.disabled = false;
-        payBtn.textContent = "Pay Deposit";
-    }
-};
+			
 
             window.addEventListener('storage', (event) => {
                 if (event.key === 'servicesUpdated') {
