@@ -493,7 +493,7 @@ app.post("/book/:calendarId", async (req, res) => {
 
         // --- MODIFIED: The Google Calendar event now includes the consent form link for your records ---
         const event = {
-            summary: `Booking: ${name} - ${service}`,
+            summary: `AWL Appointment: ${service}`,
             description: `Client: ${name}\nPhone: ${phone}\nEmail: ${email}\nService: ${service}\nProvider: ${performer}\n\nConsent Form Link: ${consentFormLink}`,
             start: { dateTime: startDateTime.toISOString(), timeZone: "America/Toronto" },
             end: { dateTime: endDateTime.toISOString(), timeZone: "America/Toronto" }
